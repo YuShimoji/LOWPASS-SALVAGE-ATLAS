@@ -926,6 +926,111 @@ input:focus-visible {
   margin: 0 18px;
 }
 
+.manifest-actions {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.35fr) minmax(260px, 1fr);
+  gap: 10px;
+  margin: 0 18px 18px;
+}
+
+.secondary-button {
+  border: 1px solid #536b60;
+  padding: 12px 18px;
+  color: #aab9ae;
+  background: #101b1a;
+  cursor: pointer;
+}
+
+.mission-result-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  pointer-events: none;
+  visibility: hidden;
+  color: var(--ui-ink);
+  background: rgba(4, 9, 10, 0.9);
+  opacity: 0;
+  transition: opacity 120ms linear, visibility 120ms linear;
+}
+
+.mission-result-overlay.is-visible {
+  pointer-events: auto;
+  visibility: visible;
+  opacity: 1;
+}
+
+.mission-result-panel {
+  width: min(760px, 100%);
+}
+
+.mission-result-frame {
+  border: 1px solid #71887a;
+  padding: 24px;
+  background: #0c1516;
+  box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.52);
+}
+
+.mission-result-frame h2 {
+  margin: 8px 0 16px;
+  color: var(--ui-warm);
+  font-size: clamp(22px, 4vw, 34px);
+}
+
+.mission-result-frame p {
+  color: #aab9ae;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.mission-result-stamp {
+  width: fit-content;
+  margin: 12px 0;
+  border: 2px solid currentColor;
+  padding: 8px 20px;
+  font-size: 18px;
+  letter-spacing: 0.18em;
+  transform: rotate(-1deg);
+}
+
+.mission-result-stamp.is-complete {
+  color: var(--ui-ok);
+}
+
+.mission-result-stamp.is-partial {
+  color: var(--ui-warm);
+}
+
+.mission-result-frame .resume-button {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.qa-navigation {
+  position: fixed;
+  left: 12px;
+  bottom: 42px;
+  z-index: 20;
+  display: flex;
+  max-width: min(680px, calc(100vw - 24px));
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid #486057;
+  background: rgba(5, 12, 13, 0.92);
+}
+
+.qa-navigation button {
+  border: 1px solid #40584f;
+  padding: 4px 6px;
+  color: #91aaa0;
+  background: #111d1c;
+  font-size: 8px;
+  cursor: pointer;
+}
+
 @media (max-width: 980px) {
   .expedition-frame {
     display: block;
@@ -943,7 +1048,8 @@ input:focus-visible {
   }
 
   .expedition-footer,
-  .capacity-readout {
+  .capacity-readout,
+  .manifest-actions {
     grid-template-columns: 1fr;
   }
 

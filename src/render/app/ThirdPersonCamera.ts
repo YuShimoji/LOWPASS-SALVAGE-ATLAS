@@ -23,6 +23,12 @@ export class ThirdPersonCamera {
     return this.yaw;
   }
 
+  reset(yaw = 0, pitch = 0.28): void {
+    this.yaw = yaw;
+    this.pitch = pitch;
+    this.initialized = false;
+  }
+
   update(playerPosition: Vector3, frameSeconds: number, occluders: readonly Object3D[]): void {
     this.target.set(playerPosition.x, playerPosition.y + 0.38, playerPosition.z);
     const horizontalDistance = Math.cos(this.pitch) * this.distance;

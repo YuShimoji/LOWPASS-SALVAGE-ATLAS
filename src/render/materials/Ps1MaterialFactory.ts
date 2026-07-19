@@ -15,6 +15,7 @@ interface EffectUniforms {
 
 export class Ps1MaterialFactory {
   private readonly uniformSets = new Set<EffectUniforms>();
+  private readonly materials = new Set<MeshStandardMaterial>();
   private readonly renderResolution = new Vector2(1280, 720);
 
   create(parameters: MeshStandardMaterialParameters): MeshStandardMaterial {
@@ -31,6 +32,11 @@ export class Ps1MaterialFactory {
       snapPixelSize: { value: 2.25 },
     };
     this.uniformSets.add(uniforms);
+    this.materials.add(material);
+    material.addEventListener("dispose", () => {
+      this.uniformSets.delete(uniforms);
+      this.materials.delete(material);
+    });
 
     material.onBeforeCompile = (shader) => {
       shader.uniforms.uLowpassSnapEnabled = uniforms.snapEnabled;
@@ -86,5 +92,11 @@ export class Ps1MaterialFactory {
     for (const uniforms of this.uniformSets) {
       uniforms.renderResolution.value.copy(this.renderResolution);
     }
+  }
+
+  dispose(): void {
+    for (const material of [...this.materials]) material.dispose();
+    this.materials.clear();
+    this.uniformSets.clear();
   }
 }

@@ -1,5 +1,6 @@
 import "./style.css";
 import { FrameStats } from "./diagnostics/FrameStats";
+import { SHIP_COLLIDERS, SHIP_INTERACTIONS } from "./game/content/shipLayout";
 import { InputController } from "./game/input/InputController";
 import {
   GATE_DEMONSTRATOR_ITEMS,
@@ -12,12 +13,21 @@ import {
   ExpeditionPlanner,
   InvalidExpeditionDraftError,
 } from "./game/mission/ExpeditionPlanner";
+import {
+  reserveExpeditionItems,
+  rollbackExpeditionReservation,
+  settleExpeditionReservation,
+  type ExpeditionReservation,
+} from "./game/mission/ExpeditionReservation";
 import { evaluateItemForGate } from "./game/mission/gateEvaluator";
+import { MissionSessionController } from "./game/mission/MissionSession";
+import type { ExpeditionManifest } from "./game/mission/expeditionTypes";
 import { CREW_DEFINITIONS } from "./game/squad/squadTypes";
 import { FixedStepRunner } from "./game/simulation/FixedStepRunner";
 import { GameSimulation } from "./game/simulation/GameSimulation";
 import {
   createInitialGameState,
+  INITIAL_PLAYER_POSITION,
   type ActiveModal,
   type VisualSettings,
 } from "./game/simulation/GameState";
@@ -25,11 +35,19 @@ import { PhysicsWorld } from "./physics/PhysicsWorld";
 import { RenderSystem } from "./render/app/RenderSystem";
 import { ExpeditionPanel } from "./ui/ExpeditionPanel";
 import { Hud } from "./ui/Hud";
+import { MissionResultPanel } from "./ui/MissionResultPanel";
 
 declare global {
   interface Window {
     __LOWPASS_DEBUG__?: {
       snapshot(): ReturnType<typeof createInitialGameState>;
+      diagnostics(): {
+        world: string;
+        physics: ReturnType<PhysicsWorld["getDiagnostics"]> | null;
+        render: ReturnType<RenderSystem["getDiagnostics"]> | null;
+        domNodes: number;
+      };
+      teleportForQa(x: number, z: number): void;
     };
   }
 }
@@ -46,13 +64,20 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     CREW_DEFINITIONS,
     ITEM_DEFINITIONS,
     [...SHIP_INVENTORY, ...GATE_DEMONSTRATOR_ITEMS],
+    SHIP_INVENTORY.map((item) => item.id),
   );
   const planner = new ExpeditionPlanner(state.expedition.draft, gateContext);
   let renderSystem: RenderSystem | null = null;
   let physics: PhysicsWorld | null = null;
   let input: InputController | null = null;
   let expeditionPanel: ExpeditionPanel | null = null;
+  let resultPanel: MissionResultPanel | null = null;
+  let missionController: MissionSessionController | null = null;
+  let activeReservation: ExpeditionReservation | null = null;
+  let transitionInFlight = false;
+  let appDisposed = false;
   let frameHandle = 0;
+  let qaPanel: HTMLElement | null = null;
 
   const releaseWorldInput = (): void => {
     input?.clearMovement();
@@ -60,8 +85,10 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   };
 
   const setModal = (requestedModal: ActiveModal): void => {
-    const modal =
-      requestedModal === "expedition" && state.expedition.confirmedManifest
+    const resultLocked = state.mission.session?.phase === "results";
+    const modal = resultLocked && requestedModal === "none"
+      ? "mission-result"
+      : requestedModal === "expedition" && state.expedition.confirmedManifest
         ? "manifest-summary"
         : requestedModal;
     simulation.setModal(modal);
@@ -75,6 +102,11 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       expeditionPanel?.hide();
     }
 
+    if (modal === "mission-result" && state.mission.lastResult) {
+      resultPanel?.show(state.mission.lastResult);
+    } else {
+      resultPanel?.hide();
+    }
     if (modal !== "none") releaseWorldInput();
   };
 
@@ -86,6 +118,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     onPauseToggle: () => setModal(state.ui.activeModal === "settings" ? "none" : "settings"),
     onVisualSetting: updateVisualSetting,
   });
+  resultPanel = new MissionResultPanel(root, () => void returnToShip());
 
   const refreshDraftUi = (): void => {
     state.expedition.draft = planner.getDraftSnapshot();
@@ -139,6 +172,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
           }
         }
       },
+      onDeploy: (manifest) => void startFixedMission(manifest),
     },
   );
 
@@ -154,7 +188,6 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   }
 
   const activeRenderSystem = renderSystem;
-  const activePhysics = physics;
   const activeInput = input;
   const fixedStep = new FixedStepRunner();
   const frameStats = new FrameStats();
@@ -164,11 +197,170 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   let handledActivationRevision = 0;
   let gateScanRevision = 0;
 
+  if (new URLSearchParams(window.location.search).has("qa")) {
+    qaPanel = createQaNavigation(root, (target) => {
+      let position = SHIP_INTERACTIONS.find((interaction) => interaction.id === "expedition-console")?.position;
+      if (missionController) {
+        if (target === "extract") position = missionController.definition.extractionPoint;
+        else if (target === "cart") position = missionController.getCartPosition();
+        else position = missionController.definition.salvage.find((resource) => resource.sourceId === target)?.position;
+      }
+      if (!position) return;
+      const playerPosition = { x: position.x, y: 0.93, z: position.z };
+      activeInput.clearMovement();
+      physics?.teleportCharacter(playerPosition);
+      simulation.teleportPlayer(playerPosition);
+      if (missionController) simulation.setInteractions(missionController.getInteractions());
+    });
+  }
+
+  async function startFixedMission(manifest: ExpeditionManifest): Promise<void> {
+    if (transitionInFlight || state.world.mode !== "ship" || appDisposed) return;
+    transitionInFlight = true;
+    setModal("none");
+    state.world.mode = "mission-loading";
+    state.runtime.mode = "paused";
+    releaseWorldInput();
+    simulation.setNotice("固定探索マップを読み込んでいます…");
+
+    const reservationId = crypto.randomUUID();
+    let reservationCommit: ReturnType<typeof reserveExpeditionItems>;
+    try {
+      reservationCommit = reserveExpeditionItems(
+        manifest,
+        state.inventory.itemLocations,
+        reservationId,
+      );
+      state.inventory.itemLocations = reservationCommit.locations;
+    } catch (error) {
+      state.world.mode = "ship";
+      state.runtime.mode = "playing";
+      transitionInFlight = false;
+      simulation.setNotice(error instanceof Error ? error.message : "遠征装備を予約できませんでした");
+      return;
+    }
+
+    try {
+      const [{ FLOODED_MARKET_MISSION }, { createFloodedMarket }] = await Promise.all([
+        import("./game/mission/fixed/floodedMarket"),
+        import("./render/objects/createFloodedMarket"),
+      ]);
+      if (appDisposed) return;
+      const sessionId = crypto.randomUUID();
+      const nextMissionController = new MissionSessionController(
+        FLOODED_MARKET_MISSION,
+        manifest,
+        sessionId,
+        reservationCommit.locations,
+      );
+      const nextPhysics = await PhysicsWorld.create({
+        colliders: FLOODED_MARKET_MISSION.colliders,
+        initialPlayerPosition: FLOODED_MARKET_MISSION.playerSpawn,
+        kinematicObjects: [{
+          id: nextMissionController.state.cartId,
+          position: nextMissionController.getCartPosition(),
+          halfExtents: { x: 0.58, y: 0.45, z: 0.42 },
+          sensor: true,
+        }],
+      });
+      if (appDisposed) {
+        nextPhysics.dispose();
+        return;
+      }
+
+      activeRenderSystem.enterMission((materials) =>
+        createFloodedMarket(materials, FLOODED_MARKET_MISSION, manifest, nextMissionController.state),
+      );
+      physics?.dispose();
+      physics = nextPhysics;
+      missionController = nextMissionController;
+      activeReservation = reservationCommit.reservation;
+      state.inventory.itemLocations = nextMissionController.state.itemLocations;
+      state.mission.session = nextMissionController.state;
+      state.mission.lastResult = null;
+      state.world.mode = "mission";
+      simulation.teleportPlayer(FLOODED_MARKET_MISSION.playerSpawn);
+      simulation.setInteractions(nextMissionController.getInteractions());
+      state.runtime.mode = "playing";
+      simulation.setNotice(
+        `降下完了 // TEAM ${manifest.selectedAgentIds.length} · GEAR ${manifest.items.length}`,
+      );
+    } catch (error) {
+      state.inventory.itemLocations = rollbackExpeditionReservation(reservationCommit.reservation);
+      state.world.mode = "ship";
+      state.runtime.mode = "playing";
+      simulation.setInteractions(SHIP_INTERACTIONS);
+      simulation.setNotice(`探索マップの開始に失敗しました: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(error);
+    } finally {
+      transitionInFlight = false;
+    }
+  }
+
+  async function returnToShip(): Promise<void> {
+    if (
+      transitionInFlight ||
+      !missionController ||
+      !activeReservation ||
+      !state.mission.lastResult ||
+      appDisposed
+    ) return;
+    transitionInFlight = true;
+    state.runtime.mode = "paused";
+    releaseWorldInput();
+    simulation.setNotice("飛空居住船への帰還シーケンスを開始");
+    try {
+      const nextPhysics = await PhysicsWorld.create({
+        colliders: SHIP_COLLIDERS,
+        initialPlayerPosition: INITIAL_PLAYER_POSITION,
+      });
+      const settledLocations = settleExpeditionReservation(
+        activeReservation,
+        missionController.state.itemLocations,
+        missionController.definition.id,
+      );
+      activeRenderSystem.returnToShip();
+      physics?.dispose();
+      physics = nextPhysics;
+      missionController.dispose();
+      missionController = null;
+      activeReservation = null;
+      state.inventory.itemLocations = settledLocations;
+      state.mission.session = null;
+      state.world.mode = "ship";
+      state.world.completedExpeditions += 1;
+      simulation.teleportPlayer(INITIAL_PLAYER_POSITION);
+      simulation.setInteractions(SHIP_INTERACTIONS);
+      resultPanel?.hide();
+      simulation.setModal("none");
+      simulation.setNotice(
+        `船内へ帰還しました // ${state.mission.lastResult.outcome.toUpperCase()} · RUN ${state.world.completedExpeditions}`,
+      );
+    } catch (error) {
+      setModal("mission-result");
+      simulation.setNotice(`帰還に失敗しました: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(error);
+    } finally {
+      transitionInFlight = false;
+    }
+  }
+
   const handleWorldAction = (): void => {
     if (state.interaction.activationRevision === handledActivationRevision) return;
     handledActivationRevision = state.interaction.activationRevision;
     const action = state.interaction.activatedAction;
     if (!action) return;
+
+    if (state.world.mode === "mission" && missionController) {
+      const resolution = missionController.handleInteraction(action);
+      simulation.setNotice(resolution.notice);
+      simulation.setInteractions(missionController.getInteractions());
+      if (resolution.result) {
+        state.mission.lastResult = resolution.result;
+        setModal("mission-result");
+      }
+      return;
+    }
 
     if (action.type === "open-expedition-console") {
       setModal("expedition");
@@ -196,17 +388,26 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     previousTime = now;
 
     const commands = activeInput.consumeFrameCommands();
-    if (commands.pausePressed) {
+    if (commands.pausePressed && state.ui.activeModal !== "mission-result") {
       setModal(state.ui.activeModal === "none" ? "settings" : "none");
     }
     if (commands.debugPressed) hud.toggleDebug();
 
     let droppedSimulationTime = false;
-    if (state.runtime.mode === "playing") {
+    const currentPhysics = physics;
+    if (state.runtime.mode === "playing" && currentPhysics) {
       const result = fixedStep.advance(frameSeconds, (dt) => {
         const movement = activeInput.sampleMovement(activeRenderSystem.cameraRig.getYaw());
-        const physicsSnapshot = activePhysics.stepCharacter(movement, dt);
+        const physicsSnapshot = currentPhysics.stepCharacter(movement, dt);
         simulation.fixedUpdate(dt, movement, physicsSnapshot);
+        if (missionController) {
+          missionController.fixedUpdate(dt, state.player.position, state.player.facingYaw);
+          currentPhysics.setKinematicObjectPosition(
+            missionController.state.cartId,
+            missionController.getCartPosition(),
+          );
+          simulation.setInteractions(missionController.getInteractions());
+        }
       });
       interpolationAlpha = result.alpha;
       droppedSimulationTime = result.droppedTime;
@@ -224,8 +425,9 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         fps: frameStats.fps,
         droppedSimulationFrames: frameStats.droppedSimulationFrames,
         render: activeRenderSystem.getDiagnostics(),
-        physics: activePhysics.getDiagnostics(),
+        physics: physics?.getDiagnostics() ?? { colliderCount: 0, collisionCount: 0 },
         expedition: planner.getEvaluation(),
+        mission: missionController?.getObjectiveProgress() ?? null,
       });
     }
     frameHandle = requestAnimationFrame(animate);
@@ -233,19 +435,65 @@ async function bootstrap(root: HTMLElement): Promise<void> {
 
   window.__LOWPASS_DEBUG__ = {
     snapshot: () => structuredClone(state),
+    diagnostics: () => ({
+      world: state.world.mode,
+      physics: physics?.getDiagnostics() ?? null,
+      render: renderSystem?.getDiagnostics() ?? null,
+      domNodes: document.querySelectorAll("*").length,
+    }),
+    teleportForQa: (x, z) => {
+      const position = { x, y: 0.93, z };
+      activeInput.clearMovement();
+      physics?.teleportCharacter(position);
+      simulation.teleportPlayer(position);
+      if (missionController) simulation.setInteractions(missionController.getInteractions());
+    },
   };
   frameHandle = requestAnimationFrame(animate);
 
-  const cleanup = (): void => {
-    cancelAnimationFrame(frameHandle);
-    activeInput.dispose();
-    activePhysics.dispose();
-    activeRenderSystem.dispose();
-    delete window.__LOWPASS_DEBUG__;
-  };
-  window.addEventListener("beforeunload", cleanup, { once: true });
-  document.addEventListener("visibilitychange", () => {
+  const handleVisibilityChange = (): void => {
     previousTime = performance.now();
     fixedStep.reset();
-  });
+  };
+  const cleanup = (): void => {
+    if (appDisposed) return;
+    appDisposed = true;
+    cancelAnimationFrame(frameHandle);
+    activeInput.dispose();
+    missionController?.dispose();
+    physics?.dispose();
+    activeRenderSystem.dispose();
+    resultPanel?.dispose();
+    qaPanel?.remove();
+    delete window.__LOWPASS_DEBUG__;
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+  };
+  window.addEventListener("beforeunload", cleanup, { once: true });
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+}
+
+function createQaNavigation(
+  root: HTMLElement,
+  onNavigate: (target: string) => void,
+): HTMLElement {
+  const panel = document.createElement("aside");
+  panel.className = "qa-navigation";
+  panel.setAttribute("aria-label", "Phase C QA navigation");
+  for (const [target, label] of [
+    ["console", "QA 出撃コンソール"],
+    ["filter-01", "QA フィルター01"],
+    ["filter-02", "QA フィルター02"],
+    ["filter-03", "QA フィルター03"],
+    ["cooling-coil", "QA 冷却コイル"],
+    ["cart", "QA カート"],
+    ["extract", "QA 抽出地点"],
+  ] as const) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = label;
+    button.addEventListener("click", () => onNavigate(target));
+    panel.append(button);
+  }
+  root.append(panel);
+  return panel;
 }

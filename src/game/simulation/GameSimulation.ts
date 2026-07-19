@@ -1,6 +1,7 @@
 import { distanceSquared, copyVec3, type Vec3 } from "../core/types";
 import type { MovementIntent } from "../input/InputActions";
-import { SHIP_INTERACTIONS, type InteractionDefinition } from "../content/shipLayout";
+import { SHIP_INTERACTIONS } from "../content/shipLayout";
+import type { InteractionDefinition } from "../interaction/interactionTypes";
 import type { GameState, VisualSettings } from "./GameState";
 
 export interface PhysicsSnapshot {
@@ -10,6 +11,8 @@ export interface PhysicsSnapshot {
 }
 
 export class GameSimulation {
+  private interactions: readonly InteractionDefinition[] = SHIP_INTERACTIONS;
+
   constructor(readonly state: GameState) {}
 
   fixedUpdate(dt: number, input: MovementIntent, physics: PhysicsSnapshot): void {
@@ -46,8 +49,20 @@ export class GameSimulation {
     this.state.runtime.mode = modal === "none" ? "playing" : "paused";
   }
 
+  setInteractions(interactions: readonly InteractionDefinition[]): void {
+    this.interactions = interactions;
+    this.refreshInteraction(false);
+  }
+
+  teleportPlayer(position: Vec3): void {
+    this.state.player.position = copyVec3(position);
+    this.state.player.previousPosition = copyVec3(position);
+    this.state.player.movementSpeed = 0;
+    this.refreshInteraction(false);
+  }
+
   private refreshInteraction(activate: boolean): void {
-    const nearest = findNearestInteraction(this.state.player.position, SHIP_INTERACTIONS);
+    const nearest = findNearestInteraction(this.state.player.position, this.interactions);
     this.state.interaction.targetId = nearest?.id ?? null;
     this.state.interaction.prompt = nearest?.prompt ?? null;
 

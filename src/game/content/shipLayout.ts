@@ -1,14 +1,7 @@
-import type { Vec3 } from "../core/types";
+import type { InteractionDefinition } from "../interaction/interactionTypes";
+import type { WorldColliderSpec } from "../../physics/physicsTypes";
 
-export interface ShipColliderSpec {
-  id: string;
-  center: Vec3;
-  halfExtents: Vec3;
-  surface: "floor" | "wall" | "fixture";
-  visible: boolean;
-}
-
-export const SHIP_COLLIDERS: readonly ShipColliderSpec[] = [
+export const SHIP_COLLIDERS: readonly WorldColliderSpec[] = [
   {
     id: "deck-floor",
     center: { x: 0, y: -0.25, z: -3 },
@@ -87,20 +80,6 @@ export const SHIP_COLLIDERS: readonly ShipColliderSpec[] = [
     visible: true,
   },
 ] as const;
-
-export interface InteractionDefinition {
-  id: string;
-  position: Vec3;
-  radius: number;
-  prompt: string;
-  response: string;
-  action: InteractionAction;
-}
-
-export type InteractionAction =
-  | { type: "show-notice" }
-  | { type: "open-expedition-console" }
-  | { type: "scan-gate-item"; itemInstanceId: string };
 
 export const SHIP_INTERACTIONS: readonly InteractionDefinition[] = [
   {

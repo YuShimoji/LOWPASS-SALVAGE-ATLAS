@@ -2,6 +2,7 @@ import type { PhysicsDiagnostics } from "../physics/PhysicsWorld";
 import type { RenderDiagnostics } from "../render/app/RenderSystem";
 import type { GameState, VisualSettings } from "../game/simulation/GameState";
 import type { ExpeditionGateEvaluation } from "../game/mission/gateEvaluator";
+import type { MissionObjectiveProgress } from "../game/mission/MissionSession";
 
 export interface HudDiagnostics {
   fps: number;
@@ -9,6 +10,7 @@ export interface HudDiagnostics {
   render: RenderDiagnostics;
   physics: PhysicsDiagnostics;
   expedition: ExpeditionGateEvaluation;
+  mission: MissionObjectiveProgress | null;
 }
 
 export interface HudCallbacks {
@@ -39,7 +41,7 @@ export class Hud {
     this.root.className = "ui-layer";
     this.root.innerHTML = `
       <header class="brand-chip" aria-label="Game title">
-        <span class="brand-kicker">PHASE B / HAB-03</span>
+        <span class="brand-kicker">PHASE C / FIXED EXPEDITION</span>
         <strong>LOWPASS</strong><span class="brand-subtitle">SALVAGE ATLAS</span>
       </header>
       <section class="objective-chip" aria-label="Current objective">
@@ -52,7 +54,7 @@ export class Hud {
       </section>
       <div class="reticle" aria-hidden="true"></div>
       <aside class="controls-hint">
-        <span>WASD</span> 移動　<span>SHIFT</span> 走る　<span>MOUSE</span> 視点　<span>F1</span> 診断
+        <span>WASD</span> 移動　<span>SHIFT</span> 走る　<span>E</span> 操作　<span>MOUSE</span> 視点　<span>F1</span> 診断
       </aside>
     `;
 
@@ -107,12 +109,20 @@ export class Hud {
     const interactionPrompt = state.runtime.mode === "playing" ? state.interaction.prompt : null;
     this.prompt.textContent = interactionPrompt ?? "";
     this.prompt.classList.toggle("is-visible", interactionPrompt !== null);
-    this.status.textContent = state.expedition.confirmedManifest
-      ? `MANIFEST · ${state.expedition.confirmedManifest.totalCapacityUnits}/28U`
-      : `DRAFT · ${diagnostics.expedition.capacity.usedUnits}/28U`;
-    this.objective.textContent = state.expedition.confirmedManifest
-      ? "確定マニフェストを確認する"
-      : "出撃コンソールで遠征編成を確定する";
+    if (state.world.mode === "mission-loading") {
+      this.status.textContent = "MISSION · LOADING";
+      this.objective.textContent = "固定探索マップへ降下する";
+    } else if (state.world.mode === "mission" && diagnostics.mission && state.expedition.confirmedManifest) {
+      this.status.textContent = `TEAM ${state.expedition.confirmedManifest.selectedAgentIds.length} · GEAR ${state.expedition.confirmedManifest.items.length}`;
+      this.objective.textContent = `浄水フィルター ${diagnostics.mission.filtersSecured}/${diagnostics.mission.filtersRequired} · 冷却コイル ${diagnostics.mission.coolingCoilLoaded ? "積載済" : "未積載"}`;
+    } else {
+      this.status.textContent = state.expedition.confirmedManifest
+        ? `MANIFEST · ${state.expedition.confirmedManifest.totalCapacityUnits}/28U · RUN ${state.world.completedExpeditions}`
+        : `DRAFT · ${diagnostics.expedition.capacity.usedUnits}/28U`;
+      this.objective.textContent = state.expedition.confirmedManifest
+        ? "確定マニフェストから固定遠征を開始する"
+        : "出撃コンソールで遠征編成を確定する";
+    }
 
     if (state.interaction.noticeRevision !== this.noticeRevision && state.interaction.notice) {
       this.noticeRevision = state.interaction.noticeRevision;
@@ -129,14 +139,19 @@ export class Hud {
       const { player, runtime } = state;
       const { render, physics } = diagnostics;
       this.debug.textContent = [
-        "PHASE B DIAGNOSTICS  [F1]",
+        "PHASE C DIAGNOSTICS  [F1]",
+        `WORLD ${state.world.mode.toUpperCase()}  RUNS ${state.world.completedExpeditions}`,
         `FPS ${diagnostics.fps.toFixed(0).padStart(3)}  FIXED 60Hz  TICK ${runtime.tick}`,
         `POS ${format(player.position.x)}  ${format(player.position.y)}  ${format(player.position.z)}`,
         `SPEED ${player.movementSpeed.toFixed(2)}m/s  GROUND ${player.grounded ? "YES" : "NO"}`,
         `RAPIER COL ${physics.colliderCount}  CONTACT ${physics.collisionCount}`,
         `WEBGL ${render.drawCalls} calls  ${render.triangles} tris  ${render.renderWidth}×${render.renderHeight}`,
+        `SCENE OBJECTS ${render.sceneObjects}`,
         `DROPPED CATCH-UP ${diagnostics.droppedSimulationFrames}`,
         `GATE DRAFT ${diagnostics.expedition.accepted ? "VALID" : "BLOCKED"}  ${diagnostics.expedition.capacity.usedUnits}/28U`,
+        diagnostics.mission
+          ? `SALVAGE ${diagnostics.mission.securedResources}/${diagnostics.mission.requiredResources}  CART ${diagnostics.mission.cartAtExtraction ? "EXTRACT" : "FIELD"}`
+          : "SALVAGE INACTIVE",
       ].join("\n");
     }
   }

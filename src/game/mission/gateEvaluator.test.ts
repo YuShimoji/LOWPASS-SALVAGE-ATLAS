@@ -103,7 +103,6 @@ describe("gate evaluator", () => {
       id: "unknown-definition-01",
       definitionId: "missing-definition" as ItemDefinitionId,
       condition: "damaged",
-      location: "ship-inventory",
     };
     const extendedContext = createGateEvaluationContext(
       CREW_DEFINITIONS,

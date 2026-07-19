@@ -10,6 +10,7 @@ export interface ExpeditionPanelCallbacks {
   onAssignItem(itemInstanceId: string, agentId: CrewId): void;
   onReturnItem(itemInstanceId: string): void;
   onConfirm(): void;
+  onDeploy(manifest: ExpeditionManifest): void;
 }
 
 export interface ExpeditionPanelCatalog {
@@ -184,7 +185,7 @@ export class ExpeditionPanel {
     this.panel.innerHTML = `
       <div class="manifest-frame" role="dialog" aria-modal="true" aria-labelledby="manifest-title">
         <header class="expedition-header">
-          <div><span class="panel-kicker">DEVELOPMENT HANDOFF / PHASE C NOT LOADED</span><h2 id="manifest-title">ExpeditionManifest 確定</h2></div>
+          <div><span class="panel-kicker">PHASE C / FIXED MISSION READY</span><h2 id="manifest-title">ExpeditionManifest 確定</h2></div>
           <button type="button" class="icon-close" data-expedition-close aria-label="サマリーを閉じる">×</button>
         </header>
         <div class="manifest-stamp">GATE AUTHORIZED</div>
@@ -195,11 +196,16 @@ export class ExpeditionPanel {
           <div><dt>SOURCE REVISION</dt><dd>${manifest.sourceDraftRevision}</dd></div>
         </dl>
         <section class="manifest-loadouts"><h3>確定ロードアウト</h3><div>${loadoutMarkup}</div></section>
-        <p class="manifest-note">探索マップへの遷移はフェーズCの範囲です。この画面では不変マニフェストの内容だけを表示しています。</p>
-        <button type="button" class="resume-button" data-expedition-close>船内へ戻る</button>
+        <p class="manifest-note">この不変マニフェストを入力として固定探索マップを読み込みます。帰還後も同じ内容で再出撃できます。</p>
+        <div class="manifest-actions">
+          <button type="button" class="secondary-button" data-expedition-close>船内へ戻る</button>
+          <button type="button" class="resume-button" data-deploy-expedition>固定探索マップへ降下</button>
+        </div>
       </div>
     `;
     this.bindCloseEvents();
+    const deployButton = this.panel.querySelector<HTMLButtonElement>("[data-deploy-expedition]");
+    if (deployButton) bindButtonActivation(deployButton, () => this.callbacks.onDeploy(manifest));
   }
 
   hide(): void {
