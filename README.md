@@ -85,10 +85,10 @@ Three.jsとRapierはゲームルールを所有しません。ゲート室の物
 - `MachineAgentState` は機械のid、definition、faction、mode、位置、向き、標的、経路、cooldown、perceptionだけを保持する保存可能なシミュレーション状態である。Three.jsオブジェクトとRapierハンドルは含めず、敵AI、Porter制御、描画、音、DOMを分離した
 - `PresenceAssessment` は標的から11 m以内にいる、行動可能・認識可能・完全隔壁に遮られていない実体だけを評価する。隊員1.0、友好Porter 0.75、敵ドローン1.0、リレーとフレア0で、敵側が同数以上なら `predatory`、味方超過が0.75未満なら `cautious`、0.75以上なら `outnumbered` とする。5 Hz評価、0.8秒ヒステリシス、退避後4秒の同一標的cooldownをデータ定義から適用する
 - `HostileDroneState` は `dormant`、`patrol`、`investigate`、`stalk`、`lock-on`、`interdict`、`sabotage-relay`、`observe`、`disengage`、`return-to-route`、`disabled` を持つ。固定60 Hz移動、4 Hz意思決定、5 Hz知覚・存在量評価で、孤立度、通信状態、距離から標的を選び、数的不利への移行時は2秒のロックオンを即時中止して退避する
-- 干渉パルスは8秒間、対象の通信を最大 `burst` に制限し、遠隔操作切替と進行中インタラクションを中断する。`agent-carried` の片手資源だけを `mission-ground` へ遷移させ、装備スロットの無線、端末、工具は落とさない。HP、死亡、永久破壊、銃撃は導入していない
+- 干渉パルスは8秒間、対象の通信を最大 `burst` に制限し、遠隔操作切替、Porter認証、リレー再起動などの進行中インタラクションを中断する。`agent-carried` の片手資源だけを `mission-ground` へ遷移させ、装備スロットの無線、端末、工具は落とさない。HP、死亡、永久破壊、銃撃は導入していない
 - 既存フレアを `MachineStimulus` として接続した。孤立地点は `investigate`、集団地点は接近せず `observe` とし、フレアを隊員の正確な位置として扱わない。activeリレーは半径6 m以内に防衛側がいない場合だけ2.5秒でdisabledとなり、所在を変えず通信グラフから一時除外される。プレイヤーの1.5秒操作で再起動し、グラフを即時再評価する
 - 抽出ビーコン半径8 mは干渉・リレー妨害を禁止する安全区域である。通常HUDはロック進行、妨害残り時間、Porter命令など必要最小限だけを示し、敵内部状態、存在量、標的評価はデバッグHUDだけへ表示する
-- `PorterAndroidController` は停止中の荷役補助機を、簡易フィールド端末を持つ操作可能な隊員の3秒認証で友好化する。`follow`、`hold`、`carry-to`、短距離voice通信、存在量0.75を提供し、冷却コイルを `world → machine-carried → extraction-pad` と搬送する。経路失敗時は再計算、再投影、再試行、安全配置、失敗報告、待機の順に回復する
+- `PorterAndroidController` は停止中の荷役補助機を、簡易フィールド端末を持つ操作可能な隊員の3秒認証で友好化する。`follow`、`hold`、`carry-to`、短距離voice通信、存在量0.75を提供し、冷却コイルを `world → machine-carried → extraction-pad` と搬送する。経路失敗時は再計算、再投影、再試行、安全配置、失敗報告、待機の順に回復する。認証後は低い反復音、経路失敗とゲート拒絶では別の下降音を状態投影として再生する
 - Porterのゲート特性は8U、volume 5、logic 5で、物体単体上限の双方から拒絶される。資源を抽出台へ置いた後は現地へ残り、`AlliedMachineOutcome` に `friendly-left-behind` と支援item idを不変結果として記録する。船内隊員・装備・貨物には追加せず、`ExpeditionManifest` も変更しない
 - 隊員別脅威知識、保留報告、SignalZone、携帯リレー、分隊命令、操作対象切替、カート、complete / partial精算は既存境界を再利用する。標準構成は敵1体で、`?drones=2` だけが2体の診断構成を追加する
 
@@ -216,22 +216,23 @@ DOMの+1は3回目帰還時の消費・置き去り結果に対応する状態�
 
 Viteの500 kB警告は継続しています。警告閾値は変更していません。初期チャンクは2,866.56 kB（gzip 1,007.98 kB）で、ミッション定義と探索ビューのdynamic import境界は維持されています。Vite 8.1.5は `vite:build-import-analysis` の `PLUGIN_TIMINGS` 診断も表示しますが、ビルドは正常終了しています。Rapier開発実行時の `using deprecated parameters for the initialization function; pass a single object instead` は依存側初期化ラッパー由来で、今回の60 Hz物理、コライダー復帰、3往復には影響していません。警告だけを理由とした物理基盤変更は行っていません。
 
-## フェーズE 機械生態系の検証結果 — 2026-07-20
+## フェーズE 機械生態系の検証結果 — 2026-07-21
 
 - フェーズDコミット `6a6cb6ccd8f37b2a8c197713a1c9031c884a27fc` で型検査、14ファイル・55テスト、ビルド、依存整合、diff検査を先に再検証した
 - `phase-d-squad-comms` タグを同コミットへ作成し、既存の部分実装コミットを保全したまま `feat/phase-e-machine-ecology` を作成した。既存履歴、タグ、ブランチの強制更新は行っていない
 - `npm run typecheck`: PASS
-- `npm test`: PASS（19ファイル、85テスト）。Presence、敵AI、干渉、relay、Porterに加え、stable / paired / scattered、分隊命令、通信、知識、カート、complete / partial、精算、disposeを回帰した
+- `npm test`: PASS（19ファイル、87テスト）。Presence、敵AI、干渉、relay、Porterに加え、stable / paired / scattered、分隊命令、通信、知識、カート、complete / partial、精算、disposeを回帰した。干渉中のPorter認証とリレー再起動中断も個別に固定した
 - `npm run build`: PASS、`npm ls --depth=0`: PASS、`git diff --check`: PASS
-- 遅延チャンクは機械音響1.21 kB、MissionSession 7.89 kB、探索ビュー8.24 kB、Porter 8.90 kB、固定マップ8.94 kB、ScoutDrone 19.21 kBで、機械固有処理を初期船内ロードから分離した
+- 遅延チャンクは機械音響1.52 kB、MissionSession 7.89 kB、探索ビュー8.24 kB、Porter 8.90 kB、固定マップ8.94 kB、ScoutDrone 19.21 kBで、機械固有処理を初期船内ロードから分離した
 
 ### 実ブラウザ検証
 
 - `scattered` の標準プレイで孤立したMaraが優先標的となり、走査光、前傾姿勢、`LOCK-ON` 進行、通信ノイズ表示、8秒の最大burst干渉を確認した
 - QAの孤立状態から2秒以内に援軍を到着させると、ロックが解除され、`OUTNUMBERED` / `OBSERVE` と後退へ切り替わった。敵の集団退避と友好Porterの0.75存在量寄与を確認した
+- 最初の退避時だけ簡易端末へ `FIELD TERMINAL // LOCAL PRESENCE 2.00 > 1.00 // DRONE RETREAT` が短時間表示され、その後は通常HUDへ内部数値を常駐させないことを確認した
 - Porterを簡易端末で3秒認証し、friendly voice node、冷却コイルの搬送、`extraction-pad` 配置、volume・logic双方のゲート拒絶、`friendly-left-behind` と支援1件の結果を確認した。船内メンバー、装備、貨物には追加されていない
 - activeリレーのdisabled化、通信グラフからの除外、再起動プロンプト、1.5秒後の `RELAY_RESTARTED` と通信再評価を確認した
-- 従来カート経路で冷却コイルを積載し、4/4 `complete` を確認した。別の3往復はPorter支援を含む `partial` 3回で、通知・結果・操作は各1回だけ発火した
+- 従来カート経路で冷却コイルを積載した4/4 `complete` を回帰確認済みである。2026-07-21の実測ではPorter支援partialを別途確認し、装備を置き去りにしない `partial` を3往復して通知・結果・操作が各1回だけ発火することを確認した。意図的にリレーを置き去りにした場合は、同じマニフェストの次回予約が正しく拒絶された
 - コンソールerror 0、未処理例外0。warningは既知のRapier初期化非推奨1種類だけだった
 - 隔壁越し非算入、孤立・集団フレア分岐、同一標的4秒cooldown、片手資源だけの落下、妨害解除後の切替、端末なし認証拒絶、経路失敗時安全配置は自動テストで検証した。ブラウザでは直接の視覚照合を行っていない
 - 自動ブラウザ試験は `audio=muted` で行ったため、警告周波数上昇、再評価音、退避音の主観的な聞き分けは未評価である
@@ -254,9 +255,9 @@ Viteの500 kB警告は継続しています。警告閾値は変更していま�
 | DOM transientFeedbackNodes | 0 |
 | DOM resultHistoryNodes | 1 |
 
-反復中のDOM totalは2回目252、3回目253で、差分は上限1件の結果行だった。modalとtransientは終了後0へ戻り、result historyは1件のまま、Rapier、Scene、geometry、texture、programに単調増加は観測されなかった。
+各帰還後のDOM totalは253で一定だった。modalとtransientは終了後0へ戻り、result historyは1件のまま、Rapier、Scene、geometry、texture、programに単調増加は観測されなかった。
 
-初期チャンクは2,876.11 kB（gzip 1,010.88 kB）で、Phase Dの2,866.56 kB（gzip 1,007.98 kB）からの増分は9.55 kB（gzip 2.90 kB）だった。機械固有処理のdynamic import境界は維持している。Viteの500 kB警告は継続し、閾値は変更していない。Rapier開発実行時の `using deprecated parameters for the initialization function; pass a single object instead` は依存側初期化ラッパー由来で、60 Hz物理、遮蔽判定、3往復には影響しなかったため物理基盤を変更していない。
+初期チャンクは2,876.58 kB（gzip 1,011.02 kB）で、Phase Dの2,866.56 kB（gzip 1,007.98 kB）からの増分は10.02 kB（gzip 3.04 kB）だった。機械固有処理のdynamic import境界は維持している。Viteの500 kB警告は継続し、閾値は変更していない。Rapier開発実行時の `using deprecated parameters for the initialization function; pass a single object instead` は依存側初期化ラッパー由来で、60 Hz物理、遮蔽判定、3往復には影響しなかったため物理基盤を変更していない。
 
 ## 残課題
 

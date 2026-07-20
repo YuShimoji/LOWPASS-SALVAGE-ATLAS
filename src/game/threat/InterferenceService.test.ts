@@ -84,4 +84,17 @@ describe("interference pulse and relay recovery", () => {
     expect(squad.isRelayDisabled("relay-01")).toBe(false);
     expect(session.state.itemLocations["relay-01"]).toEqual(locationBefore);
   });
+
+  it("interrupts a relay restart performed by the affected agent", () => {
+    const { session, squad } = createRuntime();
+    expect(squad.deployRelay().code).toBe("RELAY_DEPLOYED");
+    expect(squad.disableRelay("relay-01", 1).code).toBe("RELAY_DISABLED");
+    expect(squad.beginRelayRestart("relay-01", 2).code).toBe("RELAY_RESTARTING");
+    squad.applyInterference("player", 10.5);
+    expect(squad.state.relayRestartByItemId["relay-01"]).toBeUndefined();
+    const player = squad.getControlledPosition();
+    squad.fixedUpdate(1 / 60, player, 4);
+    expect(squad.isRelayDisabled("relay-01")).toBe(true);
+    expect(session.state.itemLocations["relay-01"]?.kind).toBe("mission-ground");
+  });
 });

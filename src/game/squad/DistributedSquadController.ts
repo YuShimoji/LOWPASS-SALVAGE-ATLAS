@@ -294,6 +294,9 @@ export class DistributedSquadController {
       this.state.interferenceUntilByAgentId[targetAgentId] ?? 0,
       untilSeconds,
     );
+    for (const [relayId, restart] of Object.entries(this.state.relayRestartByItemId)) {
+      if (restart.startedByAgentId === targetAgentId) delete this.state.relayRestartByItemId[relayId];
+    }
     this.evaluateCommunication(this.state.communicationEvaluatedAtSeconds);
     this.setFeedback("INTERFERENCE_PULSE", `${targetAgentId}の通信はBURSTへ制限されています`);
   }

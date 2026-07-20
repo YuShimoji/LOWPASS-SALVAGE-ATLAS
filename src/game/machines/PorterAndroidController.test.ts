@@ -70,6 +70,16 @@ describe("PorterAndroidController", () => {
     expect(controller.contributesPresence()).toBe(true);
   });
 
+  it("interrupts an in-progress handshake when its operating agent is interdicted", () => {
+    const { controller } = createController();
+    expect(controller.beginAuthentication(authContext(), 0).accepted).toBe(true);
+    controller.fixedUpdate(1 / 60, 1, authContext(), { player: authContext().position });
+    expect(controller.interruptExclusiveOperation("player", 1.1)).toBe(true);
+    controller.fixedUpdate(1 / 60, 4, authContext(), { player: authContext().position });
+    expect(controller.state.authenticated).toBe(false);
+    expect(controller.state.mode).toBe("dormant");
+  });
+
   it("supports follow and hold commands", () => {
     const { controller } = createController();
     authenticate(controller);

@@ -126,6 +126,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   let ecologyRefreshAccumulator = 0;
   let cachedEcologyContext: ThreatEcologyContext | null = null;
   let porterWasAuthenticated = false;
+  let handledFirstRetreatAnalysisRevision = 0;
 
   const releaseWorldInput = (): void => {
     input?.clearMovement();
@@ -605,6 +606,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       ecologyRefreshAccumulator = 0.2;
       cachedEcologyContext = null;
       porterWasAuthenticated = false;
+      handledFirstRetreatAnalysisRevision = 0;
       state.world.mode = "mission";
       simulation.teleportPlayer(controlledSpawn);
       refreshMissionInteractions();
@@ -790,6 +792,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
               machineAudio?.playPorterAuthenticated();
               simulation.setNotice("PORTER AUTHORIZED // SHORT-RANGE VOICE NODE ONLINE");
             }
+            machineAudio?.updatePorter(porterController.state.mode, state.runtime.elapsedSeconds);
           }
           if (squadController && threatController) {
             ecologyRefreshAccumulator += dt;
@@ -846,6 +849,15 @@ async function bootstrap(root: HTMLElement): Promise<void> {
               },
               cachedEcologyContext,
             );
+            if (threatController.state.firstRetreatAnalysisRevision > handledFirstRetreatAnalysisRevision) {
+              handledFirstRetreatAnalysisRevision = threatController.state.firstRetreatAnalysisRevision;
+              const presence = threatController.state.drone.presence;
+              if (squadController.hasFieldTerminal() && presence) {
+                simulation.setNotice(
+                  `FIELD TERMINAL // LOCAL PRESENCE ${presence.alliedPresence.toFixed(2)} > ${presence.hostilePresence.toFixed(2)} // DRONE RETREAT`,
+                );
+              }
+            }
             machineAudio?.update(
               threatController.state.drone.mode,
               threatController.state.drone.lockOnProgress,
