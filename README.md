@@ -1,6 +1,10 @@
 # LOWPASS: SALVAGE ATLAS
 
-デスクトップブラウザ向け3Dゲームの垂直スライスです。TypeScript、Vite、Three.js、Rapier、DOM UIで構成されています。フェーズAの三人称アクション基盤、フェーズBの遠征編成、フェーズCの固定探索・回収ループ、フェーズDの分散分隊に加え、フェーズEでは敵対ドローンと友好搬送アンドロイドによる非致死的な機械生態系を接続しています。
+デスクトップブラウザ向け3Dゲームの垂直スライスです。TypeScript、Vite、Three.js、Rapier、DOM UIで構成されています。フェーズAの三人称アクション基盤、フェーズBの遠征編成、フェーズCの固定探索・回収ループ、フェーズDの分散分隊、フェーズEの非致死的な機械生態系に加え、フェーズFでは帰還精算を境界とする訪問間世界永続化を接続しています。
+
+## 再開ポイント
+
+別端末・別セッションでは最初に [`PROJECT_HANDOFF.md`](PROJECT_HANDOFF.md) を読み、現行ブランチ、検証基準、最初のコマンド、未決定の人間判断を確認してください。プロジェクトの現在地は [`docs/project-context.md`](docs/project-context.md)、確定判断は [`docs/decision-log.md`](docs/decision-log.md)、未採用の方向性は [`docs/idea-ledger.md`](docs/idea-ledger.md) に分離しています。このREADMEは実装仕様とフェーズ別の検証証跡を保持します。
 
 ## 実行
 
