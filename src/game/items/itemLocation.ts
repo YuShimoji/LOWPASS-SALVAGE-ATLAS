@@ -7,6 +7,7 @@ export type ItemLocation =
   | { readonly kind: "crew"; readonly crewId: CrewId }
   | { readonly kind: "mission-ground"; readonly position: Vec3 }
   | { readonly kind: "cart"; readonly cartId: string }
+  | { readonly kind: "consumed"; readonly missionId: string }
   | { readonly kind: "recovered-to-ship"; readonly missionId: string };
 
 export type ItemLocationLedger = Record<string, ItemLocation>;

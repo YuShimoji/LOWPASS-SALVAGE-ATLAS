@@ -11,6 +11,7 @@ import {
 import type { ExpeditionManifest } from "../../game/mission/expeditionTypes";
 import type { FixedMissionDefinition } from "../../game/mission/fixedMissionTypes";
 import type { MissionSessionState } from "../../game/mission/MissionSession";
+import type { DistributedSquadState } from "../../game/squad/squadTypes";
 import type { Ps1MaterialFactory } from "../materials/Ps1MaterialFactory";
 import { disposeObjectTree } from "./disposeObjectTree";
 import type { MissionWorldView } from "./missionWorldView";
@@ -20,9 +21,10 @@ export function createFloodedMarket(
   definition: FixedMissionDefinition,
   manifest: ExpeditionManifest,
   session: MissionSessionState,
+  squad: DistributedSquadState,
 ): MissionWorldView {
   const root = new Group();
-  root.name = "phase-c-flooded-market";
+  root.name = "phase-d-flooded-market";
   const concrete = materials.create({ color: "#353b37" });
   const wall = materials.create({ color: "#59625b" });
   const shelf = materials.create({ color: "#42463d", metalness: 0.22 });
@@ -39,6 +41,7 @@ export function createFloodedMarket(
   const red = materials.createEmissive("#d95d50", 0.65);
   const dark = materials.create({ color: "#202725" });
   const cameraOccluders: Object3D[] = [];
+  const shortcutViews = new Map<string, Object3D>();
 
   for (const spec of definition.colliders) {
     if (!spec.visible) continue;
@@ -52,6 +55,8 @@ export function createFloodedMarket(
     mesh.receiveShadow = true;
     mesh.castShadow = spec.surface !== "floor";
     root.add(mesh);
+    const shortcut = definition.toolShortcuts.find((candidate) => candidate.colliderId === spec.id);
+    if (shortcut) shortcutViews.set(shortcut.id, mesh);
     if (spec.surface !== "floor") cameraOccluders.push(mesh);
   }
 
@@ -119,14 +124,24 @@ export function createFloodedMarket(
   cart.name = "mission-shopping-cart";
   root.add(cart);
 
-  const selectedCrew = manifest.selectedAgentIds.filter((crewId) => crewId !== "player");
-  selectedCrew.forEach((crewId, index) => {
+  const crewViews = new Map<string, Group>();
+  manifest.selectedAgentIds.forEach((crewId) => {
     const crew = createCrewMarker(materials, crewId, manifest.items.filter((item) => item.assignedAgentId === crewId).length);
-    crew.position.set(-1.2 + index * 2.4, 0, definition.playerSpawn.z + 0.7);
     root.add(crew);
+    crewViews.set(crewId, crew);
   });
 
-  const update = (activeSession: MissionSessionState, elapsedSeconds: number): void => {
+  const relayViews = new Map<string, Group>();
+  for (const relay of manifest.items.filter((item) => item.definitionId === "portable-relay")) {
+    const view = createRelay(materials);
+    view.name = `portable-relay-${relay.instanceId}`;
+    view.visible = false;
+    root.add(view);
+    relayViews.set(relay.instanceId, view);
+  }
+  const beaconViews = new Map<string, Group>();
+
+  const update = (activeSession: MissionSessionState, activeSquad: DistributedSquadState, elapsedSeconds: number): void => {
     const cartLocation = activeSession.itemLocations[activeSession.cartId];
     if (cartLocation?.kind === "mission-ground") {
       cart.position.set(cartLocation.position.x, cartLocation.position.y, cartLocation.position.z);
@@ -148,9 +163,47 @@ export function createFloodedMarket(
     extractionRing.rotation.z = elapsedSeconds * 0.18;
     extractionLight.intensity = 2.1 + Math.sin(elapsedSeconds * 3.2) * 0.4;
     floodPlane.position.y = 0.045 + Math.sin(elapsedSeconds * 0.8) * 0.008;
+    for (const [crewId, view] of crewViews) {
+      const agent = activeSquad.agents[crewId];
+      view.visible = Boolean(agent && activeSquad.control.controlledAgentId !== crewId);
+      if (agent) {
+        view.position.set(agent.position.x, 0, agent.position.z);
+        view.rotation.y = agent.facingYaw;
+      }
+    }
+    for (const [relayId, view] of relayViews) {
+      const location = activeSession.itemLocations[relayId];
+      view.visible = location?.kind === "mission-ground";
+      if (location?.kind === "mission-ground") {
+        view.position.set(location.position.x, location.position.y, location.position.z);
+        view.rotation.y = elapsedSeconds * 0.35;
+      }
+    }
+    for (const [shortcutId, view] of shortcutViews) {
+      view.visible = !activeSquad.shortcutOpenById[shortcutId];
+    }
+    const activeBeaconIds = new Set(Object.keys(activeSquad.signals.beacons));
+    for (const beacon of Object.values(activeSquad.signals.beacons)) {
+      let view = beaconViews.get(beacon.id);
+      if (!view) {
+        view = createSignalBeacon(materials);
+        view.name = beacon.id;
+        root.add(view);
+        beaconViews.set(beacon.id, view);
+      }
+      view.position.set(beacon.position.x, beacon.position.y, beacon.position.z);
+      view.rotation.y = elapsedSeconds * 1.8;
+      view.scale.setScalar(0.92 + Math.sin(elapsedSeconds * 5) * 0.08);
+    }
+    for (const [beaconId, view] of beaconViews) {
+      if (activeBeaconIds.has(beaconId)) continue;
+      root.remove(view);
+      disposeObjectTree(view);
+      beaconViews.delete(beaconId);
+    }
   };
 
-  update(session, 0);
+  update(session, squad, 0);
   return {
     root,
     cameraOccluders,
@@ -159,6 +212,27 @@ export function createFloodedMarket(
       disposeObjectTree(root);
     },
   };
+}
+
+function createRelay(materials: Ps1MaterialFactory): Group {
+  const relay = new Group();
+  const housing = new Mesh(new BoxGeometry(0.42, 0.72, 0.36), materials.create({ color: "#56645e" }));
+  housing.position.y = 0.36;
+  const antenna = new Mesh(new CylinderGeometry(0.025, 0.025, 0.8, 5), materials.createEmissive("#7bd4c8", 0.5));
+  antenna.position.y = 1;
+  relay.add(housing, antenna);
+  return relay;
+}
+
+function createSignalBeacon(materials: Ps1MaterialFactory): Group {
+  const beacon = new Group();
+  const flare = new Mesh(new CylinderGeometry(0.09, 0.12, 0.54, 6), materials.createEmissive("#f1814f", 1.2));
+  flare.position.y = 0.3;
+  const halo = new Mesh(new TorusGeometry(0.42, 0.045, 5, 12), materials.createEmissive("#ffd08c", 0.9));
+  halo.rotation.x = Math.PI / 2;
+  halo.position.y = 0.42;
+  beacon.add(flare, halo);
+  return beacon;
 }
 
 function createCart(materials: Ps1MaterialFactory): Group {

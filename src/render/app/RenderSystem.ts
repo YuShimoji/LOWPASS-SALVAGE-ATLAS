@@ -27,6 +27,9 @@ export interface RenderDiagnostics {
   renderWidth: number;
   renderHeight: number;
   sceneObjects: number;
+  geometries: number;
+  textures: number;
+  programs: number;
 }
 
 export class RenderSystem {
@@ -91,18 +94,26 @@ export class RenderSystem {
     this.cameraRig.applyLookDelta(deltaX, deltaY);
   }
 
-  enterMission(createView: (materials: Ps1MaterialFactory) => MissionWorldView): void {
+  enterMission(
+    createView: (materials: Ps1MaterialFactory) => MissionWorldView,
+    cameraStart?: { readonly playerPosition: { x: number; y: number; z: number }; readonly cameraPosition: { x: number; y: number; z: number } },
+  ): void {
     const view = createView(this.materials);
     this.removeCurrentWorld();
     this.missionView = view;
     this.scene.add(view.root);
-    this.cameraRig.reset();
+    if (cameraStart) this.cameraRig.resetFromStart(cameraStart.playerPosition, cameraStart.cameraPosition);
+    else this.cameraRig.reset();
   }
 
   returnToShip(): void {
     this.removeCurrentWorld();
     this.ship = createShipInterior(this.materials);
     this.scene.add(this.ship.root);
+    this.cameraRig.reset();
+  }
+
+  rebindControlledAgent(): void {
     this.cameraRig.reset();
   }
 
@@ -118,8 +129,8 @@ export class RenderSystem {
       this.lastGateScanRevision = gateScan.revision;
       this.gateAudio.play(gateScan.evaluation.accepted);
     }
-    if (this.missionView && state.mission.session) {
-      this.missionView.update(state.mission.session, state.runtime.elapsedSeconds);
+    if (this.missionView && state.mission.session && state.mission.squad) {
+      this.missionView.update(state.mission.session, state.mission.squad, state.runtime.elapsedSeconds);
     } else {
       this.ship?.animate(
         state.runtime.elapsedSeconds,
@@ -143,6 +154,9 @@ export class RenderSystem {
       renderWidth: this.drawingBufferSize.x,
       renderHeight: this.drawingBufferSize.y,
       sceneObjects,
+      geometries: this.renderer.info.memory.geometries,
+      textures: this.renderer.info.memory.textures,
+      programs: this.renderer.info.programs?.length ?? 0,
     };
   }
 

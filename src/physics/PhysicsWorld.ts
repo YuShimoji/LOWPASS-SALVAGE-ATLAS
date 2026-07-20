@@ -40,6 +40,7 @@ export class PhysicsWorld {
     private readonly characterController: RAPIER.KinematicCharacterController,
     private readonly colliderCount: number,
     private readonly kinematicBodies: ReadonlyMap<string, RAPIER.RigidBody>,
+    private readonly worldColliders: ReadonlyMap<string, RAPIER.Collider>,
   ) {}
 
   static async create(config: PhysicsWorldConfig = DEFAULT_CONFIG): Promise<PhysicsWorld> {
@@ -47,8 +48,9 @@ export class PhysicsWorld {
     await rapierInitialization;
 
     const world = new RAPIER.World({ x: 0, y: GRAVITY, z: 0 });
+    const worldColliders = new Map<string, RAPIER.Collider>();
     for (const collider of config.colliders) {
-      world.createCollider(
+      const instance = world.createCollider(
         RAPIER.ColliderDesc.cuboid(
           collider.halfExtents.x,
           collider.halfExtents.y,
@@ -57,6 +59,7 @@ export class PhysicsWorld {
           .setTranslation(collider.center.x, collider.center.y, collider.center.z)
           .setFriction(0.8),
       );
+      worldColliders.set(collider.id, instance);
     }
 
     const playerBody = world.createRigidBody(
@@ -105,6 +108,7 @@ export class PhysicsWorld {
       characterController,
       config.colliders.length + 1 + kinematicBodies.size,
       kinematicBodies,
+      worldColliders,
     );
   }
 
@@ -152,6 +156,13 @@ export class PhysicsWorld {
     const body = this.kinematicBodies.get(id);
     if (!body) return;
     body.setNextKinematicTranslation(position);
+  }
+
+  setWorldColliderEnabled(id: string, enabled: boolean): boolean {
+    const collider = this.worldColliders.get(id);
+    if (!collider) return false;
+    collider.setEnabled(enabled);
+    return true;
   }
 
   teleportCharacter(position: Vec3): void {

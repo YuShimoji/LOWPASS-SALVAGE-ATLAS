@@ -24,9 +24,12 @@ export class MissionResultPanel {
           <div><dt>SESSION</dt><dd>${escapeHtml(result.sessionId)}</dd></div>
           <div><dt>RECOVERED</dt><dd>${result.recoveredResourceIds.length} RESOURCE(S)</dd></div>
           <div><dt>ELAPSED</dt><dd>${result.elapsedSeconds.toFixed(1)} SEC</dd></div>
+          <div><dt>LEFT BEHIND</dt><dd>${result.leftBehindEquipmentIds.length || "NONE"}</dd></div>
+          <div><dt>CONSUMED</dt><dd>${result.consumedEquipmentIds.length || "NONE"}</dd></div>
         </dl>
         <p>${complete ? "全必須資源を抽出しました。" : "確保済み資源だけを持ち帰ります。未回収資源は現地に残ります。"}</p>
         <p class="manifest-note">現地ショッピングカートはゲート対象外のため回収されません。</p>
+        ${result.leftBehindEquipmentIds.length > 0 ? `<p class="manifest-note">置き去り装備: ${result.leftBehindEquipmentIds.map(escapeHtml).join(" / ")}</p>` : ""}
         <button type="button" class="resume-button" data-return-to-ship>飛空居住船へ帰還</button>
       </div>
     `;

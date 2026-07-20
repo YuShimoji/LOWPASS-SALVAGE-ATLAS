@@ -22,7 +22,10 @@ import {
 import { evaluateItemForGate } from "./game/mission/gateEvaluator";
 import { MissionSessionController } from "./game/mission/MissionSession";
 import type { ExpeditionManifest } from "./game/mission/expeditionTypes";
-import { CREW_DEFINITIONS } from "./game/squad/squadTypes";
+import { createInsertionPlan, type MissionLaunchOptions } from "./game/insertion/InsertionPlanner";
+import { WaypointNavigationService } from "./game/navigation/WaypointNavigationService";
+import { DistributedSquadController } from "./game/squad/DistributedSquadController";
+import { CREW_DEFINITIONS, type CrewId, type SquadOrderType } from "./game/squad/squadTypes";
 import { FixedStepRunner } from "./game/simulation/FixedStepRunner";
 import { GameSimulation } from "./game/simulation/GameSimulation";
 import {
@@ -33,9 +36,11 @@ import {
 } from "./game/simulation/GameState";
 import { PhysicsWorld } from "./physics/PhysicsWorld";
 import { RenderSystem } from "./render/app/RenderSystem";
+import { SquadFeedbackAudio } from "./render/audio/SquadFeedbackAudio";
 import { ExpeditionPanel } from "./ui/ExpeditionPanel";
 import { Hud } from "./ui/Hud";
 import { MissionResultPanel } from "./ui/MissionResultPanel";
+import { SquadPanel } from "./ui/SquadPanel";
 
 declare global {
   interface Window {
@@ -46,8 +51,15 @@ declare global {
         physics: ReturnType<PhysicsWorld["getDiagnostics"]> | null;
         render: ReturnType<RenderSystem["getDiagnostics"]> | null;
         domNodes: number;
+        communicationRevision: number;
       };
       teleportForQa(x: number, z: number): void;
+      setAgentPositionForQa(agentId: CrewId, x: number, z: number): void;
+      issueOrderForQa(agentId: CrewId, type: SquadOrderType, zoneId?: string): string;
+      switchControlForQa(agentId: CrewId): string;
+      deployRelayForQa(): string;
+      recoverRelayForQa(): string;
+      deployFlareForQa(): string;
     };
   }
 }
@@ -73,6 +85,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   let expeditionPanel: ExpeditionPanel | null = null;
   let resultPanel: MissionResultPanel | null = null;
   let missionController: MissionSessionController | null = null;
+  let squadController: DistributedSquadController | null = null;
   let activeReservation: ExpeditionReservation | null = null;
   let transitionInFlight = false;
   let appDisposed = false;
@@ -118,7 +131,74 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     onPauseToggle: () => setModal(state.ui.activeModal === "settings" ? "none" : "settings"),
     onVisualSetting: updateVisualSetting,
   });
+  const squadAudio = new SquadFeedbackAudio();
   resultPanel = new MissionResultPanel(root, () => void returnToShip());
+
+  const refreshMissionInteractions = (): void => {
+    if (!missionController) return;
+    simulation.setInteractions([
+      ...missionController.getInteractions(),
+      ...(squadController?.getInteractions() ?? []),
+    ]);
+  };
+
+  const setSquadNotice = (message: string): void => {
+    simulation.setNotice(message);
+    refreshMissionInteractions();
+  };
+
+  const issueSquadOrder = (agentId: CrewId, type: SquadOrderType, zoneId: string | null): string => {
+    if (!squadController) return "分隊セッションがありません";
+    const zone = squadController.definition.searchZones.find((candidate) => candidate.id === zoneId);
+    const result = squadController.issueOrder(agentId, {
+      type,
+      ...(type === "search-zone" && zoneId ? { targetZoneId: zoneId } : {}),
+      ...(type === "move-to" && zone ? { targetPosition: zone.entrance } : {}),
+    }, state.runtime.elapsedSeconds);
+    squadAudio.play(result.accepted);
+    setSquadNotice(`${result.code} // ${result.reason}`);
+    return result.code;
+  };
+
+  const switchControlledAgent = (agentId: CrewId): string => {
+    if (!squadController || !physics) return "分隊セッションがありません";
+    releaseWorldInput();
+    const previousMode = state.runtime.mode;
+    state.runtime.mode = "paused";
+    const attempt = squadController.attemptControlSwitch(
+      agentId,
+      transitionInFlight || state.ui.activeModal !== "none" || Boolean(missionController?.state.cartAttached),
+    );
+    if (attempt.resolution.accepted && attempt.nextPosition) {
+      physics.teleportCharacter(attempt.nextPosition);
+      simulation.teleportPlayer(attempt.nextPosition);
+      activeRenderSystem.rebindControlledAgent();
+    }
+    squadAudio.play(attempt.resolution.accepted);
+    state.runtime.mode = previousMode;
+    setSquadNotice(`${attempt.resolution.code} // ${attempt.resolution.reason}`);
+    return attempt.resolution.code;
+  };
+
+  const runEquipmentAction = (action: "deploy-relay" | "recover-relay" | "flare"): string => {
+    if (!squadController) return "分隊セッションがありません";
+    const result = action === "deploy-relay"
+      ? squadController.deployRelay()
+      : action === "recover-relay"
+        ? squadController.recoverRelay()
+        : squadController.deployFlare(state.runtime.elapsedSeconds);
+    squadAudio.play(result.accepted);
+    setSquadNotice(`${result.code} // ${result.reason}`);
+    return result.code;
+  };
+
+  const squadPanel = new SquadPanel(root, {
+    onOrder: issueSquadOrder,
+    onSwitchControl: switchControlledAgent,
+    onDeployRelay: () => { runEquipmentAction("deploy-relay"); },
+    onRecoverRelay: () => { runEquipmentAction("recover-relay"); },
+    onDeployFlare: () => { runEquipmentAction("flare"); },
+  });
 
   const refreshDraftUi = (): void => {
     state.expedition.draft = planner.getDraftSnapshot();
@@ -135,6 +215,26 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       const message = error instanceof Error ? error.message : String(error);
       simulation.setNotice(`編成を更新できません: ${message}`);
     }
+  };
+
+  const configureQaPhaseDLoadout = (): void => {
+    if (state.expedition.confirmedManifest) {
+      simulation.setNotice("QAプリセットは確定前ドラフトでのみ使用できます");
+      return;
+    }
+    const desiredAssignments = [
+      ["radio-02", "mara"],
+      ["relay-01", "player"],
+      ["terminal-01", "player"],
+      ["crowbar-01", "player"],
+    ] as const;
+    runPlannerAction(() => {
+      const draft = planner.getDraftSnapshot();
+      for (const [itemId, agentId] of desiredAssignments) {
+        if (!draft.itemInstanceIds.includes(itemId)) planner.assignItem(itemId, agentId);
+      }
+    });
+    simulation.setNotice("QA PHASE D LOADOUT // 28U READY");
   };
 
   expeditionPanel = new ExpeditionPanel(
@@ -172,7 +272,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
           }
         }
       },
-      onDeploy: (manifest) => void startFixedMission(manifest),
+      onDeploy: (manifest, options) => void startFixedMission(manifest, options),
     },
   );
 
@@ -199,22 +299,28 @@ async function bootstrap(root: HTMLElement): Promise<void> {
 
   if (new URLSearchParams(window.location.search).has("qa")) {
     qaPanel = createQaNavigation(root, (target) => {
+      if (target === "phase-d-loadout") {
+        configureQaPhaseDLoadout();
+        return;
+      }
       let position = SHIP_INTERACTIONS.find((interaction) => interaction.id === "expedition-console")?.position;
       if (missionController) {
         if (target === "extract") position = missionController.definition.extractionPoint;
         else if (target === "cart") position = missionController.getCartPosition();
-        else position = missionController.definition.salvage.find((resource) => resource.sourceId === target)?.position;
+        else position = missionController.definition.salvage.find((resource) => resource.sourceId === target)?.position
+          ?? missionController.definition.searchZones.find((zone) => zone.id === target)?.entrance
+          ?? missionController.definition.toolShortcuts.find((shortcut) => shortcut.id === target)?.interactionPosition;
       }
       if (!position) return;
       const playerPosition = { x: position.x, y: 0.93, z: position.z };
       activeInput.clearMovement();
       physics?.teleportCharacter(playerPosition);
       simulation.teleportPlayer(playerPosition);
-      if (missionController) simulation.setInteractions(missionController.getInteractions());
+      refreshMissionInteractions();
     });
   }
 
-  async function startFixedMission(manifest: ExpeditionManifest): Promise<void> {
+  async function startFixedMission(manifest: ExpeditionManifest, launchOptions: MissionLaunchOptions): Promise<void> {
     if (transitionInFlight || state.world.mode !== "ship" || appDisposed) return;
     transitionInFlight = true;
     setModal("none");
@@ -247,15 +353,39 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       ]);
       if (appDisposed) return;
       const sessionId = crypto.randomUUID();
+      const navigation = new WaypointNavigationService(FLOODED_MARKET_MISSION.navigation);
+      const insertionPlan = createInsertionPlan(
+        manifest,
+        launchOptions.insertionMode,
+        launchOptions.insertionSeed,
+        {
+          missionId: FLOODED_MARKET_MISSION.id,
+          extractionPoint: FLOODED_MARKET_MISSION.extractionPoint,
+          anchors: FLOODED_MARKET_MISSION.insertionAnchors,
+          presets: FLOODED_MARKET_MISSION.insertionPresets,
+          colliders: FLOODED_MARKET_MISSION.colliders,
+          navigation,
+        },
+      );
       const nextMissionController = new MissionSessionController(
         FLOODED_MARKET_MISSION,
         manifest,
         sessionId,
         reservationCommit.locations,
       );
+      const nextSquadController = new DistributedSquadController(
+        FLOODED_MARKET_MISSION,
+        manifest,
+        insertionPlan,
+        nextMissionController.state.itemLocations,
+      );
+      const controlledSpawn = nextSquadController.getControlledPosition();
+      const controlledPlacement = insertionPlan.placements.find(
+        (placement) => placement.agentId === nextSquadController.state.control.controlledAgentId,
+      );
       const nextPhysics = await PhysicsWorld.create({
         colliders: FLOODED_MARKET_MISSION.colliders,
-        initialPlayerPosition: FLOODED_MARKET_MISSION.playerSpawn,
+        initialPlayerPosition: controlledSpawn,
         kinematicObjects: [{
           id: nextMissionController.state.cartId,
           position: nextMissionController.getCartPosition(),
@@ -268,22 +398,33 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         return;
       }
 
-      activeRenderSystem.enterMission((materials) =>
-        createFloodedMarket(materials, FLOODED_MARKET_MISSION, manifest, nextMissionController.state),
+      activeRenderSystem.enterMission(
+        (materials) => createFloodedMarket(
+          materials,
+          FLOODED_MARKET_MISSION,
+          manifest,
+          nextMissionController.state,
+          nextSquadController.state,
+        ),
+        controlledPlacement
+          ? { playerPosition: controlledPlacement.position, cameraPosition: controlledPlacement.cameraPosition }
+          : undefined,
       );
       physics?.dispose();
       physics = nextPhysics;
       missionController = nextMissionController;
+      squadController = nextSquadController;
       activeReservation = reservationCommit.reservation;
       state.inventory.itemLocations = nextMissionController.state.itemLocations;
       state.mission.session = nextMissionController.state;
+      state.mission.squad = nextSquadController.state;
       state.mission.lastResult = null;
       state.world.mode = "mission";
-      simulation.teleportPlayer(FLOODED_MARKET_MISSION.playerSpawn);
-      simulation.setInteractions(nextMissionController.getInteractions());
+      simulation.teleportPlayer(controlledSpawn);
+      refreshMissionInteractions();
       state.runtime.mode = "playing";
       simulation.setNotice(
-        `降下完了 // TEAM ${manifest.selectedAgentIds.length} · GEAR ${manifest.items.length}`,
+        `降下完了 // ${insertionPlan.mode.toUpperCase()} · TEAM ${manifest.selectedAgentIds.length} · GEAR ${manifest.items.length}`,
       );
     } catch (error) {
       state.inventory.itemLocations = rollbackExpeditionReservation(reservationCommit.reservation);
@@ -324,9 +465,12 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       physics = nextPhysics;
       missionController.dispose();
       missionController = null;
+      squadController?.dispose();
+      squadController = null;
       activeReservation = null;
       state.inventory.itemLocations = settledLocations;
       state.mission.session = null;
+      state.mission.squad = null;
       state.world.mode = "ship";
       state.world.completedExpeditions += 1;
       simulation.teleportPlayer(INITIAL_PLAYER_POSITION);
@@ -352,9 +496,19 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     if (!action) return;
 
     if (state.world.mode === "mission" && missionController) {
-      const resolution = missionController.handleInteraction(action);
+      if (action.type === "mission-shortcut" && squadController) {
+        const shortcut = squadController.definition.toolShortcuts.find((candidate) => candidate.id === action.shortcutId);
+        const resolution = squadController.openShortcut(action.shortcutId);
+        if (resolution.accepted && shortcut) physics?.setWorldColliderEnabled(shortcut.colliderId, false);
+        setSquadNotice(`${resolution.code} // ${resolution.reason}`);
+        return;
+      }
+      const resolution = missionController.handleInteraction(
+        action,
+        squadController?.state.control.controlledAgentId ?? "player",
+      );
       simulation.setNotice(resolution.notice);
-      simulation.setInteractions(missionController.getInteractions());
+      refreshMissionInteractions();
       if (resolution.result) {
         state.mission.lastResult = resolution.result;
         setModal("mission-result");
@@ -402,11 +556,12 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         simulation.fixedUpdate(dt, movement, physicsSnapshot);
         if (missionController) {
           missionController.fixedUpdate(dt, state.player.position, state.player.facingYaw);
+          squadController?.fixedUpdate(dt, state.player.position, state.runtime.elapsedSeconds);
           currentPhysics.setKinematicObjectPosition(
             missionController.state.cartId,
             missionController.getCartPosition(),
           );
-          simulation.setInteractions(missionController.getInteractions());
+          refreshMissionInteractions();
         }
       });
       interpolationAlpha = result.alpha;
@@ -429,6 +584,19 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         expedition: planner.getEvaluation(),
         mission: missionController?.getObjectiveProgress() ?? null,
       });
+      if (squadController) {
+        const availableFlareCount = squadController.manifest.items.filter((item) =>
+          item.definitionId === "flare-pack" && missionController?.state.itemLocations[item.instanceId]?.kind === "crew",
+        ).length;
+        squadPanel.update({
+          state: squadController.state,
+          definition: squadController.definition,
+          hasFieldTerminal: squadController.hasFieldTerminal(),
+          availableFlareCount,
+        });
+      } else {
+        squadPanel.update(null);
+      }
     }
     frameHandle = requestAnimationFrame(animate);
   };
@@ -440,14 +608,28 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       physics: physics?.getDiagnostics() ?? null,
       render: renderSystem?.getDiagnostics() ?? null,
       domNodes: document.querySelectorAll("*").length,
+      communicationRevision: squadController?.state.communicationRevision ?? 0,
     }),
     teleportForQa: (x, z) => {
       const position = { x, y: 0.93, z };
       activeInput.clearMovement();
       physics?.teleportCharacter(position);
       simulation.teleportPlayer(position);
-      if (missionController) simulation.setInteractions(missionController.getInteractions());
+      refreshMissionInteractions();
     },
+    setAgentPositionForQa: (agentId, x, z) => {
+      squadController?.setAgentPositionForQa(agentId, { x, y: 0.93, z });
+      if (squadController?.state.control.controlledAgentId === agentId) {
+        const position = { x, y: 0.93, z };
+        physics?.teleportCharacter(position);
+        simulation.teleportPlayer(position);
+      }
+    },
+    issueOrderForQa: (agentId, type, zoneId) => issueSquadOrder(agentId, type, zoneId ?? null),
+    switchControlForQa: switchControlledAgent,
+    deployRelayForQa: () => runEquipmentAction("deploy-relay"),
+    recoverRelayForQa: () => runEquipmentAction("recover-relay"),
+    deployFlareForQa: () => runEquipmentAction("flare"),
   };
   frameHandle = requestAnimationFrame(animate);
 
@@ -461,9 +643,12 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     cancelAnimationFrame(frameHandle);
     activeInput.dispose();
     missionController?.dispose();
+    squadController?.dispose();
     physics?.dispose();
     activeRenderSystem.dispose();
     resultPanel?.dispose();
+    squadPanel.dispose();
+    squadAudio.dispose();
     qaPanel?.remove();
     delete window.__LOWPASS_DEBUG__;
     document.removeEventListener("visibilitychange", handleVisibilityChange);
@@ -478,14 +663,19 @@ function createQaNavigation(
 ): HTMLElement {
   const panel = document.createElement("aside");
   panel.className = "qa-navigation";
-  panel.setAttribute("aria-label", "Phase C QA navigation");
+  panel.setAttribute("aria-label", "Phase D QA navigation");
   for (const [target, label] of [
+    ["phase-d-loadout", "QA Phase D 28U"],
     ["console", "QA 出撃コンソール"],
     ["filter-01", "QA フィルター01"],
     ["filter-02", "QA フィルター02"],
     ["filter-03", "QA フィルター03"],
     ["cooling-coil", "QA 冷却コイル"],
     ["cart", "QA カート"],
+    ["sales", "QA 売場"],
+    ["cooling", "QA 冷却室"],
+    ["underground", "QA 地下"],
+    ["cooling-gate", "QA 短縮ゲート"],
     ["extract", "QA 抽出地点"],
   ] as const) {
     const button = document.createElement("button");

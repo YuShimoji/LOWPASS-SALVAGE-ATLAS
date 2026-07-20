@@ -5,6 +5,7 @@ import type { InteractionAction } from "../interaction/interactionTypes";
 import { createInitialItemLocations } from "../items/itemDefinitions";
 import type { ItemLocationLedger } from "../items/itemLocation";
 import type { FixedMissionResult, MissionSessionState } from "../mission/MissionSession";
+import type { DistributedSquadState } from "../squad/squadTypes";
 
 export type RuntimeMode = "playing" | "paused";
 
@@ -64,6 +65,7 @@ export interface GameState {
   };
   mission: {
     session: MissionSessionState | null;
+    squad: DistributedSquadState | null;
     lastResult: FixedMissionResult | null;
   };
   ui: {
@@ -111,6 +113,7 @@ export function createInitialGameState(): GameState {
     },
     mission: {
       session: null,
+      squad: null,
       lastResult: null,
     },
     ui: {

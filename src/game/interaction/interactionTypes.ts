@@ -6,6 +6,7 @@ export type InteractionAction =
   | { readonly type: "scan-gate-item"; readonly itemInstanceId: string }
   | { readonly type: "mission-item"; readonly itemInstanceId: string }
   | { readonly type: "mission-cart-toggle" }
+  | { readonly type: "mission-shortcut"; readonly shortcutId: string }
   | { readonly type: "mission-extract" };
 
 export interface InteractionDefinition {

@@ -41,7 +41,7 @@ export class Hud {
     this.root.className = "ui-layer";
     this.root.innerHTML = `
       <header class="brand-chip" aria-label="Game title">
-        <span class="brand-kicker">PHASE C / FIXED EXPEDITION</span>
+        <span class="brand-kicker">PHASE D / DISTRIBUTED SQUAD</span>
         <strong>LOWPASS</strong><span class="brand-subtitle">SALVAGE ATLAS</span>
       </header>
       <section class="objective-chip" aria-label="Current objective">
@@ -113,8 +113,13 @@ export class Hud {
       this.status.textContent = "MISSION · LOADING";
       this.objective.textContent = "固定探索マップへ降下する";
     } else if (state.world.mode === "mission" && diagnostics.mission && state.expedition.confirmedManifest) {
-      this.status.textContent = `TEAM ${state.expedition.confirmedManifest.selectedAgentIds.length} · GEAR ${state.expedition.confirmedManifest.items.length}`;
-      this.objective.textContent = `浄水フィルター ${diagnostics.mission.filtersSecured}/${diagnostics.mission.filtersRequired} · 冷却コイル ${diagnostics.mission.coolingCoilLoaded ? "積載済" : "未積載"}`;
+      const squad = state.mission.squad;
+      this.status.textContent = squad
+        ? `CTRL ${squad.control.controlledAgentId.toUpperCase()} · LEAD ${squad.control.fieldLeadAgentId.toUpperCase()}`
+        : `TEAM ${state.expedition.confirmedManifest.selectedAgentIds.length} · GEAR ${state.expedition.confirmedManifest.items.length}`;
+      this.objective.textContent = squad?.rallyObjective.active
+        ? `${squad.rallyObjective.label} · ${Math.round(squad.rallyObjective.progress * 100)}%`
+        : `浄水フィルター ${diagnostics.mission.filtersSecured}/${diagnostics.mission.filtersRequired} · 冷却コイル ${diagnostics.mission.coolingCoilLoaded ? "積載済" : "未積載"}`;
     } else {
       this.status.textContent = state.expedition.confirmedManifest
         ? `MANIFEST · ${state.expedition.confirmedManifest.totalCapacityUnits}/28U · RUN ${state.world.completedExpeditions}`
@@ -139,7 +144,7 @@ export class Hud {
       const { player, runtime } = state;
       const { render, physics } = diagnostics;
       this.debug.textContent = [
-        "PHASE C DIAGNOSTICS  [F1]",
+        "PHASE D DIAGNOSTICS  [F1]",
         `WORLD ${state.world.mode.toUpperCase()}  RUNS ${state.world.completedExpeditions}`,
         `FPS ${diagnostics.fps.toFixed(0).padStart(3)}  FIXED 60Hz  TICK ${runtime.tick}`,
         `POS ${format(player.position.x)}  ${format(player.position.y)}  ${format(player.position.z)}`,
@@ -147,11 +152,15 @@ export class Hud {
         `RAPIER COL ${physics.colliderCount}  CONTACT ${physics.collisionCount}`,
         `WEBGL ${render.drawCalls} calls  ${render.triangles} tris  ${render.renderWidth}×${render.renderHeight}`,
         `SCENE OBJECTS ${render.sceneObjects}`,
+        `GPU MEM GEO ${render.geometries}  TEX ${render.textures}  PROG ${render.programs}`,
         `DROPPED CATCH-UP ${diagnostics.droppedSimulationFrames}`,
         `GATE DRAFT ${diagnostics.expedition.accepted ? "VALID" : "BLOCKED"}  ${diagnostics.expedition.capacity.usedUnits}/28U`,
         diagnostics.mission
           ? `SALVAGE ${diagnostics.mission.securedResources}/${diagnostics.mission.requiredResources}  CART ${diagnostics.mission.cartAtExtraction ? "EXTRACT" : "FIELD"}`
           : "SALVAGE INACTIVE",
+        state.mission.squad
+          ? `COMMS ${Object.values(state.mission.squad.agents).map((agent) => `${agent.id}:${agent.communicationBand}`).join(" ")}`
+          : "COMMS INACTIVE",
       ].join("\n");
     }
   }

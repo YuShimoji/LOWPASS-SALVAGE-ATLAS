@@ -16,6 +16,8 @@ export interface FixedMissionResult {
   readonly returnedCrewIds: readonly CrewId[];
   readonly elapsedSeconds: number;
   readonly cartRecovered: false;
+  readonly leftBehindEquipmentIds: readonly string[];
+  readonly consumedEquipmentIds: readonly string[];
 }
 
 export interface MissionSessionState {
@@ -143,9 +145,9 @@ export class MissionSessionController {
     return interactions;
   }
 
-  handleInteraction(action: InteractionAction): MissionActionResolution {
+  handleInteraction(action: InteractionAction, actorId: CrewId = "player"): MissionActionResolution {
     this.assertActive();
-    if (action.type === "mission-item") return this.handleItem(action.itemInstanceId);
+    if (action.type === "mission-item") return this.handleItem(action.itemInstanceId, actorId);
     if (action.type === "mission-cart-toggle") {
       this.state.cartAttached = !this.state.cartAttached;
       return this.record(this.state.cartAttached ? "カートを牽引します" : "カートをその場に固定しました");
@@ -193,13 +195,13 @@ export class MissionSessionController {
     this.state.cartAttached = false;
   }
 
-  private handleItem(itemId: string): MissionActionResolution {
+  private handleItem(itemId: string, actorId: CrewId): MissionActionResolution {
     const resource = this.resourceByInstanceId.get(itemId);
     const location = this.state.itemLocations[itemId];
     if (!resource || location?.kind !== "mission-ground") return this.record("対象はすでに移動しています");
 
     if (resource.carryMode === "hand") {
-      this.state.itemLocations[itemId] = { kind: "crew", crewId: "player" };
+      this.state.itemLocations[itemId] = { kind: "crew", crewId: actorId };
       return this.record(`${resource.label}を手持ち回収しました`);
     }
 
@@ -247,6 +249,12 @@ export class MissionSessionController {
       returnedCrewIds: [...this.manifest.selectedAgentIds],
       elapsedSeconds: this.state.elapsedSeconds,
       cartRecovered: false as const,
+      leftBehindEquipmentIds: this.manifest.items
+        .map((item) => item.instanceId)
+        .filter((itemId) => this.state.itemLocations[itemId]?.kind === "mission-ground"),
+      consumedEquipmentIds: this.manifest.items
+        .map((item) => item.instanceId)
+        .filter((itemId) => this.state.itemLocations[itemId]?.kind === "consumed"),
     });
     return this.record(
       complete ? "COMPLETE // 全必須資源を回収しました" : "PARTIAL // 回収済み資源を確保して帰還します",

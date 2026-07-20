@@ -54,4 +54,19 @@ describe("expedition reservation transaction", () => {
     expect(settled["session:resource"]?.kind).toBe("recovered-to-ship");
     expect(settled["session:shopping-cart"]).toBeUndefined();
   });
+
+  it("does not return expedition equipment left on mission ground", () => {
+    const relayDraft = createInitialExpeditionDraft();
+    relayDraft.itemInstanceIds.push("relay-01");
+    relayDraft.assignments.push({ itemInstanceId: "relay-01", agentId: "player" });
+    const relayManifest = createExpeditionManifest(relayDraft, context, {
+      manifestId: "manifest-left-behind",
+      createdAtIso: "2026-07-20T00:00:00.000Z",
+    });
+    const commit = reserveExpeditionItems(relayManifest, createInitialItemLocations(), "reservation-left-behind");
+    commit.locations["relay-01"] = { kind: "mission-ground", position: { x: 0, y: 0.93, z: -2 } };
+    const settled = settleExpeditionReservation(commit.reservation, commit.locations, "flooded-market-01");
+    expect(settled["relay-01"]).toEqual({ kind: "mission-ground", position: { x: 0, y: 0.93, z: -2 } });
+    expect(settled["radio-01"]?.kind).toBe("ship-inventory");
+  });
 });

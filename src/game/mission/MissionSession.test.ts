@@ -103,4 +103,29 @@ describe("MissionSession", () => {
       controller.dispose();
     }
   });
+
+  it("records deployed expedition equipment as left behind in the immutable result", () => {
+    const relayDraft = createInitialExpeditionDraft();
+    relayDraft.itemInstanceIds.push("relay-01");
+    relayDraft.assignments.push({ itemInstanceId: "relay-01", agentId: "player" });
+    const relayManifest = createExpeditionManifest(relayDraft, context, {
+      manifestId: "manifest-result-left-behind",
+      createdAtIso: "2026-07-20T00:00:00.000Z",
+    });
+    const reservation = reserveExpeditionItems(relayManifest, createInitialItemLocations(), "reserve-left-behind");
+    const controller = new MissionSessionController(
+      FLOODED_MARKET_MISSION,
+      relayManifest,
+      "left-behind-run",
+      reservation.locations,
+    );
+    controller.state.itemLocations["relay-01"] = { kind: "mission-ground", position: { x: 0, y: 0.93, z: -2 } };
+    controller.handleInteraction({
+      type: "mission-item",
+      itemInstanceId: missionItemId("left-behind-run", "filter-01"),
+    });
+    const result = controller.handleInteraction({ type: "mission-extract" }).result;
+    expect(result?.leftBehindEquipmentIds).toEqual(["relay-01"]);
+    expect(Object.isFrozen(result)).toBe(true);
+  });
 });

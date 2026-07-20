@@ -88,7 +88,10 @@ export class InputController {
 
   private readonly handleCanvasClick = (): void => {
     if (document.pointerLockElement !== this.canvas) {
-      void this.canvas.requestPointerLock();
+      void this.canvas.requestPointerLock().catch(() => {
+        // Embedded browsers and automation may reject pointer lock. The game
+        // remains playable with keyboard input, so this is a recoverable edge.
+      });
     }
   };
 }

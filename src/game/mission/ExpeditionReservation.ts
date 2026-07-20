@@ -59,7 +59,14 @@ export function settleExpeditionReservation(
 ): ItemLocationLedger {
   const settled = cloneItemLocationLedger(reservation.beforeLocations);
   for (const itemId of reservation.reservedItemIds) {
-    settled[itemId] = { kind: "ship-inventory" };
+    const active = activeLocations[itemId];
+    if (active?.kind === "crew") {
+      settled[itemId] = { kind: "ship-inventory" };
+    } else if (active?.kind === "mission-ground") {
+      settled[itemId] = { kind: "mission-ground", position: { ...active.position } };
+    } else if (active?.kind === "consumed") {
+      settled[itemId] = { kind: "consumed", missionId };
+    }
   }
   for (const [itemId, location] of Object.entries(activeLocations)) {
     if (location.kind === "recovered-to-ship") {
