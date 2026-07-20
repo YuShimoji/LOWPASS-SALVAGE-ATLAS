@@ -1,5 +1,6 @@
 import { communicationBandRank, CommunicationGraph } from "../communication/CommunicationGraph";
 import type { CommunicationBand } from "../communication/communicationTypes";
+import type { AgentCommunicationStatus } from "../communication/communicationTypes";
 import { copyVec3, distanceSquared, type Vec3 } from "../core/types";
 import type { InsertionPlan } from "../insertion/InsertionPlanner";
 import type { InteractionDefinition } from "../interaction/interactionTypes";
@@ -120,12 +121,13 @@ export class DistributedSquadController {
     this.communicationAccumulator = 0;
   }
 
-  fixedUpdate(dt: number, controlledPosition: Vec3, elapsedSeconds: number): void {
+  fixedUpdate(dt: number, controlledPosition: Vec3, elapsedSeconds: number, controlledFacingYaw?: number): void {
     this.assertActive();
     const controlled = this.state.agents[this.state.control.controlledAgentId];
     if (controlled) {
       controlled.position = copyVec3(controlledPosition);
       controlled.lastKnownPosition = copyVec3(controlledPosition);
+      if (controlledFacingYaw !== undefined) controlled.facingYaw = controlledFacingYaw;
     }
     for (const agent of Object.values(this.state.agents)) {
       if (agent.controlMode !== "autonomous") continue;
@@ -269,6 +271,21 @@ export class DistributedSquadController {
 
   getAgentPositions(): Readonly<Record<string, Vec3>> {
     return Object.fromEntries(Object.values(this.state.agents).map((agent) => [agent.id, copyVec3(agent.position)]));
+  }
+
+  getCommunicationStatus(sourceAgentId: CrewId, targetAgentId: CrewId): AgentCommunicationStatus {
+    const status = this.communication.evaluateAgentLinks(sourceAgentId, [targetAgentId])[targetAgentId];
+    return status ?? {
+      agentId: targetAgentId,
+      quality: 0,
+      band: "none",
+      routeNodeIds: [],
+      localInstructionAllowed: false,
+    };
+  }
+
+  hasHeldItemDefinition(agentId: CrewId, definitionId: string): boolean {
+    return Boolean(this.findHeldItem(agentId, definitionId));
   }
 
   setAgentPositionForQa(agentId: CrewId, position: Vec3): void {

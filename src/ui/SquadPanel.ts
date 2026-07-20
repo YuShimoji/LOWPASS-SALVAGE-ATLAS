@@ -1,11 +1,14 @@
 import type { FixedMissionDefinition } from "../game/mission/fixedMissionTypes";
 import type { CrewId, DistributedSquadState, SquadOrderType } from "../game/squad/squadTypes";
+import type { ThreatEncounterState } from "../game/threat/threatTypes";
 
 export interface SquadPanelViewModel {
   readonly state: DistributedSquadState;
   readonly definition: FixedMissionDefinition;
   readonly hasFieldTerminal: boolean;
   readonly availableFlareCount: number;
+  readonly threat: ThreatEncounterState;
+  readonly elapsedSeconds: number;
 }
 
 export interface SquadPanelCallbacks {
@@ -51,10 +54,13 @@ export class SquadPanel {
     const controlled = state.agents[state.control.controlledAgentId];
     const connectedCount = agents.filter((agent) => agent.communicationBand !== "none").length;
     const rally = state.rallyObjective;
+    const threatKnowledge = controlled ? view.threat.byAgent[controlled.id] : null;
+    const threatContact = threatKnowledge?.contact ?? null;
+    this.root.classList.toggle("has-threat", Boolean(threatContact));
     this.summary.innerHTML = `
       <span class="squad-summary-kicker">SQUAD / ${connectedCount} LINKED</span>
       <strong>${escapeHtml(controlled?.id.toUpperCase() ?? "UNKNOWN")}</strong>
-      <span>${rally.achieved ? "CREW LINKED" : rally.active ? `RALLY ${Math.round(rally.progress * 100)}%` : "STABLE"}</span>
+      <span>${threatContact ? `CONTACT ${threatContact.freshness.toUpperCase()}` : rally.achieved ? "CREW LINKED" : rally.active ? `RALLY ${Math.round(rally.progress * 100)}%` : "STABLE"}</span>
     `;
 
     const revisionKey = [
@@ -62,6 +68,11 @@ export class SquadPanel {
       state.feedback.revision,
       state.knowledge.receivedReportRevision,
       state.signals.revision,
+      view.threat.reportRevision,
+      view.threat.deliveryRevision,
+      view.threat.drone.transitionRevision,
+      threatContact?.observedAtSeconds ?? "none",
+      threatContact?.freshness ?? "unknown",
       view.hasFieldTerminal,
       view.availableFlareCount,
       agents.map((agent) => `${agent.id}:${agent.currentOrder?.order.type ?? "none"}:${agent.statusLabel}`).join("|"),
@@ -104,9 +115,15 @@ export class SquadPanel {
     const receivedReports = Object.values(state.knowledge.squad.entries);
     const latestReport = receivedReports.sort((left, right) => right.discoveredAtSeconds - left.discoveredAtSeconds)[0];
     const beacon = Object.values(state.signals.beacons)[0];
+    const threatReport = threatContact
+      ? `<strong>SCOUT DRONE // ${threatContact.freshness.toUpperCase()}</strong>
+        <small>HOLDER ${escapeHtml(controlled?.id.toUpperCase() ?? "UNKNOWN")} · SOURCE ${escapeHtml(threatContact.observedByAgentId.toUpperCase())} · VIA ${escapeHtml(threatContact.route.toUpperCase())}</small>
+        <small>LAST ${threatContact.position.x.toFixed(1)}, ${threatContact.position.z.toFixed(1)} · AGE ${Math.max(0, view.elapsedSeconds - threatContact.observedAtSeconds).toFixed(1)}s · OUTBOX ${Object.keys(threatKnowledge?.pendingReports ?? {}).length}</small>`
+      : `<strong>NO LOCAL THREAT REPORT</strong><small>操作中隊員には接触情報がありません</small>`;
     this.details.innerHTML = `
       <header class="squad-panel-header"><span>FIELD TERMINAL</span><strong>${view.hasFieldTerminal ? "ONLINE" : "LIMITED"}</strong></header>
       <div class="squad-agent-list">${agentRows}</div>
+      <section class="squad-report-strip threat-report-strip"><span>THREAT / LOCAL KNOWLEDGE</span>${threatReport}</section>
       <section class="squad-report-strip">
         <span>REPORT</span><strong>${escapeHtml(latestReport?.label ?? "NO SHARED REPORT")}</strong>
         <small>${beacon ? `FLARE ACTIVE · ${beacon.recognizedByAgentIds.length}/${agents.length} DETECTED` : `FLARES ${view.availableFlareCount}`}</small>

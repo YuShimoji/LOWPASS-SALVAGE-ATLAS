@@ -1,6 +1,6 @@
 # LOWPASS: SALVAGE ATLAS
 
-デスクトップブラウザ向け3Dゲームの垂直スライスです。TypeScript、Vite、Three.js、Rapier、DOM UIで構成されています。フェーズAの三人称アクション基盤、フェーズBの遠征編成、フェーズCの固定探索・回収ループに加え、フェーズDでは決定論的な分散降下、分隊命令、通信網、個別知識、リレー、フレア、操作隊員切替までを実装しています。
+デスクトップブラウザ向け3Dゲームの垂直スライスです。TypeScript、Vite、Three.js、Rapier、DOM UIで構成されています。フェーズAの三人称アクション基盤、フェーズBの遠征編成、フェーズCの固定探索・回収ループ、フェーズDの分散分隊に加え、フェーズEでは敵対ScoutDrone接触を一体だけ薄く接続しています。
 
 ## 実行
 
@@ -28,9 +28,9 @@ npm run build
 
 編成画面はドラッグ＆ドロップを必須にせず、標準のチェックボックス、ラジオボタン、ボタンで操作できます。Tabでフォーカスを移動し、EnterまたはSpaceで選択・割当できます。画面を開いている間は移動、カメラ、ポインターロック入力が停止し、設定画面とは排他的に表示されます。
 
-探索では `E` で資源回収、カートの牽引・解放、工具短縮路、抽出を操作します。右下の `SQUAD` パネルから `follow`、`hold`、`move-to`、`search-zone`、`rally`、操作対象切替、携帯リレー、フレアを操作できます。パネルは折り畳み式で、通常HUDの中央を覆いません。
+探索では `E` で資源回収、カートの牽引・解放、工具短縮路、抽出を操作します。簡易フィールド端末を保持した操作隊員がScoutDroneの1.8 m以内かつ見通し内にいる場合、同じ `E` で非致死性ジャムを実行できます。右下の `SQUAD` パネルから `follow`、`hold`、`move-to`、`search-zone`、`rally`、操作対象切替、携帯リレー、フレアを操作できます。接触情報は操作中隊員が直接観測または受信した範囲だけを同じ折り畳みパネルに表示します。
 
-`?qa=1` を付けた開発URLでは、ブラウザ反復試験用の28U編成プリセットと位置移動ボタンだけが追加されます。プリセットは通常の `ExpeditionPlanner` 操作を呼び、資源取得、工具、カート、抽出は通常のインタラクション経路を使用します。
+`?qa=1` を付けた開発URLでは、ブラウザ反復試験用の28U編成プリセットと位置移動ボタンだけが追加されます。`&audio=muted` を併用すると自動試験中はAudioContextを生成しません。プリセットは通常の `ExpeditionPlanner` 操作を呼び、資源取得、工具、カート、ScoutDroneジャム、抽出は通常のインタラクション経路を使用します。
 
 ## アーキテクチャ
 
@@ -80,6 +80,15 @@ Three.jsとRapierはゲームルールを所有しません。ゲート室の物
 
 再集結目標 `REESTABLISH THE CREW` は `paired` / `scattered` でだけ一時表示されます。全員が信号地点の半径内に一定時間留まると達成しますが、資源抽出の必須条件にはしません。無線なし隊員も視認したフレアへの `rally` は受領できます。
 
+### フェーズEのScoutDrone境界
+
+- 固定マップには一体のScoutDroneを登録する。状態は `dormant`、`patrol`、`investigate`、`track`、`search_last_known`、`disengage`、`disabled` の決定論的状態機械で、移動は既存の手書きNavigationService、知覚遮蔽はRapier ray queryを使う
+- 隊員ごとに脅威接触、鮮度、観測者、最終既知位置、未送信レポートを分離する。構造化レポートは既存CommunicationGraphの4 Hz revisionでだけ伝播し、SignalZoneや携帯リレーの経路をそのまま使う。切断時は宛先ごとに最新一件へ集約し、再接続時にreport idを重複排除して一度だけ届ける
+- 操作対象の切替、命令、フレアは脅威知識を直接付与しない。通常HUDは操作中隊員の接触だけを表示し、live接触のhaloとstaleな最終既知markerも同じ知識境界から投影する。隠れたAI状態は `F1` と `window.__LOWPASS_DEBUG__.threatReadback()` のQA診断にだけ出す
+- 期待ループは、隊員一名が接触を取得し、通信可能なら共有、切断中なら他隊員は不知のまま、遮蔽後は最後に見た位置を探索し、再捕捉できなければ離脱する、というもの。別解として既存field-terminalの近距離ジャムで停止できる。回避・停止のどちらも資源回収とcomplete/partial帰還を妨げない
+- 調整値はデータ定義に集約している。現値は検知6.5 m、隊員観測8.5 m、FOV 118度、巡回1.25 m/s、追跡1.75 m/s、見失い猶予0.8秒、最終既知探索5.5秒、接触stale化1.25秒、ジャム1.8 mである
+- このスライスは武器、体力、ダメージ、攻撃、複数敵、搬送アンドロイド、NPC資源運搬、オンライン同期を実装しない。戦闘深度か搬送・物流かの次スライス選択は、人間による脅威可読性、圧力、NPC応答遅延、命令操作性、HUD密度、ミュート時の視覚フィードバック、既存音量の評価後に行う
+
 ## フェーズBで変更した主なファイル
 
 - `src/game/items/itemDefinitions.ts`: 装備定義・個体・船内在庫・ゲート実演物体
@@ -125,6 +134,17 @@ Three.jsとRapierはゲームルールを所有しません。ゲート室の物
 - `src/render/audio/SquadFeedbackAudio.ts`: 色だけに依存しない命令・拒絶フィードバック音
 - `src/main.ts`: 独立サービスの調停、ワールド切替、入力停止、物理・描画同期
 - `src/game/{insertion,navigation,communication,knowledge,squad}/*.test.ts`: フェーズD純粋ロジックと回帰テスト
+
+## フェーズEで変更した主なファイル
+
+- `src/game/threat/ScoutDroneController.ts`: 決定論的状態機械、個別接触、4 Hz保留報告、離脱、field-terminalジャム
+- `src/game/threat/threatTypes.ts`: encounter、接触鮮度、送信経路、構造化レポート、解決状態
+- `src/game/mission/fixed/floodedMarket.ts`: 一体のScoutDrone巡回・知覚・調整値
+- `src/physics/PhysicsWorld.ts`: 既存Rapierワールド上の遮蔽ray query
+- `src/render/objects/createFloodedMarket.ts`: gameplay authorityを持たないドローン、接触halo、最終既知marker
+- `src/ui/SquadPanel.ts`: 操作隊員の局所知識だけを示す折り畳み脅威レポート
+- `src/main.ts`: 動的ミッション境界内のthreat service、interaction、QA readback、明示的audio muteの調停
+- `src/game/threat/ScoutDroneController.test.ts`: 状態、知覚、再接続一回配信、SignalZone/relay、操作切替、解決、固定シードの回帰試験
 
 ## フェーズB基準点の検証結果 — 2026-07-20
 
@@ -187,17 +207,36 @@ DOMの+1は3回目帰還時の消費・置き去り結果に対応する状態�
 
 Viteの500 kB警告は継続しています。警告閾値は変更していません。初期チャンクは2,866.56 kB（gzip 1,007.98 kB）で、ミッション定義と探索ビューのdynamic import境界は維持されています。Vite 8.1.5は `vite:build-import-analysis` の `PLUGIN_TIMINGS` 診断も表示しますが、ビルドは正常終了しています。Rapier開発実行時の `using deprecated parameters for the initialization function; pass a single object instead` は依存側初期化ラッパー由来で、今回の60 Hz物理、コライダー復帰、3往復には影響していません。警告だけを理由とした物理基盤変更は行っていません。
 
+## フェーズE ScoutDroneスライスの検証結果 — 2026-07-20
+
+- `npm run typecheck`: PASS
+- `npm test`: PASS（15ファイル、63テスト）。決定論的状態遷移、live/stale差、真の隠れ位置ではなく最終既知位置の探索、SignalZone切断、relay再接続一回配信、操作切替の非全知性、全Phase D命令、非戦闘解決、固定seed、受信履歴上限、3回disposeを含む
+- `npm run build`: PASS、`npm ls --depth=0`: PASS、`git diff --check`: PASS
+- ミュート実ブラウザ: `stable`、`paired`、`scattered` を通し、接触取得、切断中の隊員別live/stale差、relay経由のMara→Player voice報告、最終既知探索、脅威下rally、field-terminal停止、complete結果を7枚の画像と `threatReadback()` で照合した
+- pointer-lockの明示的Promise拒絶は未処理rejection 0件。ブラウザconsole error 0件、warningは既知のRapier初期化非推奨1種類。`?qa=1&audio=muted` ではAudioContextを生成せず、視覚だけでlive/stale、送信元、経路、rally、停止、帰還結果を区別できた
+- 3帰還は `partial`、`partial`、`complete`。最後のcompleteでは4資源、relay置き去り1、flare消費1を結果と所在台帳へ分離して記録した
+
+| 帰還 | Rapier bodies / colliders | Scene objects | DOM nodes | geometries | textures | programs | drones | inspected listeners |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 1 / 12 | 60 | 239 | 47 | 3 | 4 | 0 | 29 |
+| 2 | 1 / 12 | 60 | 239 | 47 | 3 | 4 | 0 | 29 |
+| 3 | 1 / 12 | 60 | 240 | 47 | 3 | 4 | 0 | 29 |
+
+3回目のDOM +1は置き去り・消費を持つ結果表示の追加行で、Rapier body/collider、scene、GPU memory、drone、window/document/canvas listenerには単調増加がない。長時間接触で見つけた受信report id履歴の無制限増加は32件上限へ修正し、pending outboxも最大6件に固定した。
+
+Phase D比で初期チャンクは2,866.56→2,880.03 kB（+13.47 kB）、Vite gzipは1,007.98→1,011.53 kB（+3.55 kB）。`floodedMarket` は7.82→8.36 kB、`createFloodedMarket` は5.05→6.36 kBで、両方のdynamic import境界を維持した。500 kB警告の閾値は変更していない。最終buildでは過去に観測されたimport-analysis timing診断は出ず、開発ブラウザのRapier非推奨warningだけが継続した。
+
 ## 残課題
 
 | 目的 | 影響 | 要件 | 状態 | 担当 | 次の一手 |
 | --- | --- | --- | --- | --- | --- |
-| フェーズEの脅威と協力者 | 分隊探索に敵対圧力と搬送支援がまだない | 孤立隊員を狙う敵ドローン、3名集合時の退避、修理可能な搬送アンドロイド | フェーズDスコープ外・未着手 | フェーズE | 既存の通信・命令・NavigationServiceへ知覚と行動を接続する。戦闘は別スライスで判断する |
+| フェーズEの次スライス選択 | ScoutDrone接触は一体・非戦闘に限定され、戦闘深度と搬送支援は未実装 | H1実機レビューから戦闘深度または搬送・物流の一方を選ぶ | ScoutDrone垂直スライス実装済み・人間評価待ち | ゲームデザイン / UX | 脅威可読性、圧力、NPC応答遅延、命令操作性、HUD密度、ミュート視覚フィードバックをstable/paired/scatteredで評価する |
 | NPCの資源物理運搬 | NPCは探索・報告までで、資源やカートを操作しない | ItemLocation所有権、運搬予約、競合解決、帰還精算 | フェーズDスコープ外・未着手 | フェーズE以降 | プレイヤー経路を迂回せず、純粋な運搬トランザクションから薄く実装する |
 | 初期バンドル分割 | 初回ダウンロードが大きい | Three.js/Rapierのvendor分割、実機起動計測、キャッシュ戦略 | 非ブロッキング | 将来の性能作業 | 現在のdynamic import境界を維持して実測後に分割方針を決める |
 | Rapier非推奨警告の解消 | 開発コンソールに警告が残る | 依存版と初期化APIの互換性確認 | 非ブロッキング | 依存更新作業 | Rapier更新時に移行を再評価する |
 | 人間による感覚評価 | 自動検証では遊びやすさ、音量、視認性の最終判断はできない | 分散距離、NPC速度、フレア45秒、通信段階、パネル密度、色覚・音量の実機評価 | 実装済み・人間評価待ち | ゲームデザイン / UX | デスクトップ実機で各モードを通し、調整値だけをデータ定義へ反映する |
 
-オンライン同期、敵AI、搬送アンドロイド、戦闘はフェーズDでは実装していません。フェーズEは不変マニフェスト、ItemLocation、NavigationService、CommunicationGraph、分隊知識の境界を保ったまま、敵ドローンまたは搬送アンドロイドのどちらか一方を薄い垂直スライスとして接続する地点から開始します。
+オンライン同期、搬送アンドロイド、NPC資源運搬、武器・戦闘は実装していません。フェーズEは不変マニフェスト、ItemLocation、NavigationService、CommunicationGraph、分隊知識の境界を保ったScoutDrone一体の接触スライスまでです。
 
 ## アセット方針
 

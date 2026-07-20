@@ -178,6 +178,20 @@ select {
   color: var(--ui-muted);
 }
 
+.squad-panel.has-threat .squad-summary-button,
+.threat-report-strip {
+  border-color: rgba(239, 116, 100, 0.72);
+}
+
+.squad-panel.has-threat .squad-summary-button > span:last-child,
+.threat-report-strip strong {
+  color: var(--ui-danger);
+}
+
+.threat-report-strip small + small {
+  margin-top: 2px;
+}
+
 .squad-feedback {
   margin: 7px 0 0;
   color: var(--ui-muted);

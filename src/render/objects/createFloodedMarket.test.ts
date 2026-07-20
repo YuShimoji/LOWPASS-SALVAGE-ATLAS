@@ -9,6 +9,7 @@ import { MissionSessionController } from "../../game/mission/MissionSession";
 import { WaypointNavigationService } from "../../game/navigation/WaypointNavigationService";
 import { CREW_DEFINITIONS } from "../../game/squad/squadTypes";
 import { DistributedSquadController } from "../../game/squad/DistributedSquadController";
+import { ScoutDroneController } from "../../game/threat/ScoutDroneController";
 import { Ps1MaterialFactory } from "../materials/Ps1MaterialFactory";
 import { createFloodedMarket } from "./createFloodedMarket";
 
@@ -44,12 +45,25 @@ describe("flooded market render adapter", () => {
         session.state.itemLocations,
       );
       const materials = new Ps1MaterialFactory();
-      const view = createFloodedMarket(materials, FLOODED_MARKET_MISSION, manifest, session.state, squad.state);
+      const threat = new ScoutDroneController(
+        FLOODED_MARKET_MISSION.threatEncounter,
+        manifest.selectedAgentIds,
+        squad.navigation,
+      );
+      const view = createFloodedMarket(
+        materials,
+        FLOODED_MARKET_MISSION,
+        manifest,
+        session.state,
+        squad.state,
+        threat.state,
+      );
       expect(view.root.children.length).toBeGreaterThan(0);
-      view.update(session.state, squad.state, 1);
+      view.update(session.state, squad.state, threat.state, 1);
       view.dispose();
       expect(view.root.children).toHaveLength(0);
       materials.dispose();
+      threat.dispose();
       squad.dispose();
       session.dispose();
     }

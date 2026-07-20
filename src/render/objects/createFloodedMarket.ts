@@ -12,6 +12,7 @@ import type { ExpeditionManifest } from "../../game/mission/expeditionTypes";
 import type { FixedMissionDefinition } from "../../game/mission/fixedMissionTypes";
 import type { MissionSessionState } from "../../game/mission/MissionSession";
 import type { DistributedSquadState } from "../../game/squad/squadTypes";
+import type { ThreatEncounterState } from "../../game/threat/threatTypes";
 import type { Ps1MaterialFactory } from "../materials/Ps1MaterialFactory";
 import { disposeObjectTree } from "./disposeObjectTree";
 import type { MissionWorldView } from "./missionWorldView";
@@ -22,6 +23,7 @@ export function createFloodedMarket(
   manifest: ExpeditionManifest,
   session: MissionSessionState,
   squad: DistributedSquadState,
+  threat: ThreatEncounterState,
 ): MissionWorldView {
   const root = new Group();
   root.name = "phase-d-flooded-market";
@@ -140,8 +142,24 @@ export function createFloodedMarket(
     relayViews.set(relay.instanceId, view);
   }
   const beaconViews = new Map<string, Group>();
+  const scoutDrone = createScoutDrone(materials);
+  scoutDrone.root.name = "phase-e-hostile-scout-drone";
+  root.add(scoutDrone.root);
+  const lastKnownMarker = new Mesh(
+    new TorusGeometry(0.7, 0.045, 5, 16),
+    materials.createEmissive("#df9259", 0.58),
+  );
+  lastKnownMarker.name = "controlled-agent-last-known-threat-marker";
+  lastKnownMarker.rotation.x = Math.PI / 2;
+  lastKnownMarker.visible = false;
+  root.add(lastKnownMarker);
 
-  const update = (activeSession: MissionSessionState, activeSquad: DistributedSquadState, elapsedSeconds: number): void => {
+  const update = (
+    activeSession: MissionSessionState,
+    activeSquad: DistributedSquadState,
+    activeThreat: ThreatEncounterState,
+    elapsedSeconds: number,
+  ): void => {
     const cartLocation = activeSession.itemLocations[activeSession.cartId];
     if (cartLocation?.kind === "mission-ground") {
       cart.position.set(cartLocation.position.x, cartLocation.position.y, cartLocation.position.z);
@@ -201,9 +219,24 @@ export function createFloodedMarket(
       disposeObjectTree(view);
       beaconViews.delete(beaconId);
     }
+    const drone = activeThreat.drone;
+    scoutDrone.root.visible = drone.visible;
+    scoutDrone.root.position.set(drone.position.x, drone.position.y, drone.position.z);
+    scoutDrone.root.rotation.y = drone.facingYaw;
+    scoutDrone.root.rotation.z = drone.mode === "disabled" ? 0.72 : 0;
+    scoutDrone.rotor.rotation.y = elapsedSeconds * (drone.active ? 8 : 0.25);
+    const controlledKnowledge = activeThreat.byAgent[activeSquad.control.controlledAgentId];
+    const controlledContact = controlledKnowledge?.contact ?? null;
+    scoutDrone.contactHalo.visible = Boolean(controlledContact?.freshness === "live" && drone.visible);
+    scoutDrone.contactHalo.rotation.z = elapsedSeconds * 1.7;
+    lastKnownMarker.visible = controlledContact?.freshness === "stale";
+    if (controlledContact) {
+      lastKnownMarker.position.set(controlledContact.position.x, 0.12, controlledContact.position.z);
+      lastKnownMarker.rotation.z = elapsedSeconds * 0.35;
+    }
   };
 
-  update(session, squad, 0);
+  update(session, squad, threat, 0);
   return {
     root,
     cameraOccluders,
@@ -212,6 +245,36 @@ export function createFloodedMarket(
       disposeObjectTree(root);
     },
   };
+}
+
+function createScoutDrone(materials: Ps1MaterialFactory): {
+  readonly root: Group;
+  readonly rotor: Group;
+  readonly contactHalo: Mesh;
+} {
+  const root = new Group();
+  const hull = new Mesh(new BoxGeometry(0.74, 0.28, 0.5), materials.create({ color: "#3d4641", metalness: 0.48 }));
+  hull.castShadow = true;
+  const optic = new Mesh(new BoxGeometry(0.18, 0.16, 0.08), materials.createEmissive("#d95d50", 0.92));
+  optic.position.set(0, -0.02, -0.29);
+  const rotor = new Group();
+  for (const x of [-0.52, 0.52]) {
+    const arm = new Mesh(new BoxGeometry(0.44, 0.045, 0.05), materials.create({ color: "#202725" }));
+    arm.position.x = x;
+    const ring = new Mesh(new TorusGeometry(0.23, 0.028, 5, 12), materials.create({ color: "#59625b", metalness: 0.5 }));
+    ring.rotation.x = Math.PI / 2;
+    ring.position.x = x;
+    rotor.add(arm, ring);
+  }
+  const contactHalo = new Mesh(
+    new TorusGeometry(0.62, 0.045, 5, 16),
+    materials.createEmissive("#ef745f", 0.86),
+  );
+  contactHalo.rotation.x = Math.PI / 2;
+  contactHalo.position.y = 0.42;
+  contactHalo.visible = false;
+  root.add(hull, optic, rotor, contactHalo);
+  return { root, rotor, contactHalo };
 }
 
 function createRelay(materials: Ps1MaterialFactory): Group {

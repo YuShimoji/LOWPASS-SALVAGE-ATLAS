@@ -11,6 +11,7 @@ const SPRINT_SPEED = 5.1;
 const GRAVITY = -18;
 
 export interface PhysicsDiagnostics {
+  rigidBodyCount: number;
   colliderCount: number;
   collisionCount: number;
 }
@@ -147,9 +148,28 @@ export class PhysicsWorld {
 
   getDiagnostics(): PhysicsDiagnostics {
     return {
+      rigidBodyCount: this.world.bodies.len(),
       colliderCount: this.colliderCount,
       collisionCount: this.collisionCount,
     };
+  }
+
+  hasLineOfSight(from: Vec3, to: Vec3): boolean {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const dz = to.z - from.z;
+    const distance = Math.hypot(dx, dy, dz);
+    if (distance <= 0.001) return true;
+    const ray = new RAPIER.Ray(from, { x: dx / distance, y: dy / distance, z: dz / distance });
+    const hit = this.world.castRay(
+      ray,
+      Math.max(0, distance - 0.12),
+      true,
+      RAPIER.QueryFilterFlags.EXCLUDE_SENSORS,
+      undefined,
+      this.playerCollider,
+    );
+    return hit === null;
   }
 
   setKinematicObjectPosition(id: string, position: Vec3): void {

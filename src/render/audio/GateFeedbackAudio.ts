@@ -1,7 +1,10 @@
 export class GateFeedbackAudio {
   private context: AudioContext | null = null;
 
+  constructor(private readonly enabled = true) {}
+
   play(accepted: boolean): void {
+    if (!this.enabled) return;
     try {
       this.context ??= new AudioContext();
       if (this.context.state === "suspended") void this.context.resume();

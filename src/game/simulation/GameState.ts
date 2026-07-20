@@ -6,6 +6,7 @@ import { createInitialItemLocations } from "../items/itemDefinitions";
 import type { ItemLocationLedger } from "../items/itemLocation";
 import type { FixedMissionResult, MissionSessionState } from "../mission/MissionSession";
 import type { DistributedSquadState } from "../squad/squadTypes";
+import type { ThreatEncounterState } from "../threat/threatTypes";
 
 export type RuntimeMode = "playing" | "paused";
 
@@ -66,6 +67,7 @@ export interface GameState {
   mission: {
     session: MissionSessionState | null;
     squad: DistributedSquadState | null;
+    threat: ThreatEncounterState | null;
     lastResult: FixedMissionResult | null;
   };
   ui: {
@@ -114,6 +116,7 @@ export function createInitialGameState(): GameState {
     mission: {
       session: null,
       squad: null,
+      threat: null,
       lastResult: null,
     },
     ui: {

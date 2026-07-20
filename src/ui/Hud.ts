@@ -41,7 +41,7 @@ export class Hud {
     this.root.className = "ui-layer";
     this.root.innerHTML = `
       <header class="brand-chip" aria-label="Game title">
-        <span class="brand-kicker">PHASE D / DISTRIBUTED SQUAD</span>
+        <span class="brand-kicker">PHASE E / HOSTILE CONTACT</span>
         <strong>LOWPASS</strong><span class="brand-subtitle">SALVAGE ATLAS</span>
       </header>
       <section class="objective-chip" aria-label="Current objective">
@@ -144,12 +144,12 @@ export class Hud {
       const { player, runtime } = state;
       const { render, physics } = diagnostics;
       this.debug.textContent = [
-        "PHASE D DIAGNOSTICS  [F1]",
+        "PHASE E DIAGNOSTICS  [F1]",
         `WORLD ${state.world.mode.toUpperCase()}  RUNS ${state.world.completedExpeditions}`,
         `FPS ${diagnostics.fps.toFixed(0).padStart(3)}  FIXED 60Hz  TICK ${runtime.tick}`,
         `POS ${format(player.position.x)}  ${format(player.position.y)}  ${format(player.position.z)}`,
         `SPEED ${player.movementSpeed.toFixed(2)}m/s  GROUND ${player.grounded ? "YES" : "NO"}`,
-        `RAPIER COL ${physics.colliderCount}  CONTACT ${physics.collisionCount}`,
+        `RAPIER BODY ${physics.rigidBodyCount}  COL ${physics.colliderCount}  CONTACT ${physics.collisionCount}`,
         `WEBGL ${render.drawCalls} calls  ${render.triangles} tris  ${render.renderWidth}×${render.renderHeight}`,
         `SCENE OBJECTS ${render.sceneObjects}`,
         `GPU MEM GEO ${render.geometries}  TEX ${render.textures}  PROG ${render.programs}`,
@@ -161,6 +161,9 @@ export class Hud {
         state.mission.squad
           ? `COMMS ${Object.values(state.mission.squad.agents).map((agent) => `${agent.id}:${agent.communicationBand}`).join(" ")}`
           : "COMMS INACTIVE",
+        state.mission.threat
+          ? `THREAT ${state.mission.threat.drone.mode.toUpperCase()}  TARGET ${state.mission.threat.drone.targetAgentId ?? "NONE"}  REV ${state.mission.threat.drone.transitionRevision}`
+          : "THREAT INACTIVE",
       ].join("\n");
     }
   }

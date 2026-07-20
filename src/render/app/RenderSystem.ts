@@ -44,7 +44,7 @@ export class RenderSystem {
   private readonly interpolatedPlayer = new Vector3();
   private readonly drawingBufferSize = new Vector2();
   private readonly fog = new Fog(0x091114, 9, 31);
-  private readonly gateAudio = new GateFeedbackAudio();
+  private readonly gateAudio: GateFeedbackAudio;
   private lastGateScanRevision = -1;
   private lastLowResolution: boolean | null = null;
   private disposed = false;
@@ -52,7 +52,9 @@ export class RenderSystem {
   constructor(
     private readonly mount: HTMLElement,
     private readonly onContextStatus: (message: string) => void,
+    audioEnabled = true,
   ) {
+    this.gateAudio = new GateFeedbackAudio(audioEnabled);
     this.renderer = new WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
     this.canvas = this.renderer.domElement;
     this.canvas.className = "game-canvas";
@@ -129,8 +131,13 @@ export class RenderSystem {
       this.lastGateScanRevision = gateScan.revision;
       this.gateAudio.play(gateScan.evaluation.accepted);
     }
-    if (this.missionView && state.mission.session && state.mission.squad) {
-      this.missionView.update(state.mission.session, state.mission.squad, state.runtime.elapsedSeconds);
+    if (this.missionView && state.mission.session && state.mission.squad && state.mission.threat) {
+      this.missionView.update(
+        state.mission.session,
+        state.mission.squad,
+        state.mission.threat,
+        state.runtime.elapsedSeconds,
+      );
     } else {
       this.ship?.animate(
         state.runtime.elapsedSeconds,

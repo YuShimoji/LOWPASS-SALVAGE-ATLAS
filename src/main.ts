@@ -26,6 +26,7 @@ import { createInsertionPlan, type MissionLaunchOptions } from "./game/insertion
 import { WaypointNavigationService } from "./game/navigation/WaypointNavigationService";
 import { DistributedSquadController } from "./game/squad/DistributedSquadController";
 import { CREW_DEFINITIONS, type CrewId, type SquadOrderType } from "./game/squad/squadTypes";
+import { ScoutDroneController } from "./game/threat/ScoutDroneController";
 import { FixedStepRunner } from "./game/simulation/FixedStepRunner";
 import { GameSimulation } from "./game/simulation/GameSimulation";
 import {
@@ -52,6 +53,14 @@ declare global {
         render: ReturnType<RenderSystem["getDiagnostics"]> | null;
         domNodes: number;
         communicationRevision: number;
+        threat: {
+          activeDroneCount: number;
+          mode: string | null;
+          transitionRevision: number;
+          reportRevision: number;
+          deliveryRevision: number;
+          pendingReportCount: number;
+        };
       };
       teleportForQa(x: number, z: number): void;
       setAgentPositionForQa(agentId: CrewId, x: number, z: number): void;
@@ -60,6 +69,9 @@ declare global {
       deployRelayForQa(): string;
       recoverRelayForQa(): string;
       deployFlareForQa(): string;
+      setDronePositionForQa(x: number, z: number, facingYaw?: number): void;
+      disableThreatForQa(): string;
+      threatReadback(): ReturnType<ScoutDroneController["getDebugReadback"]> | null;
     };
   }
 }
@@ -71,6 +83,8 @@ void bootstrap(mount);
 
 async function bootstrap(root: HTMLElement): Promise<void> {
   const state = createInitialGameState();
+  const query = new URLSearchParams(window.location.search);
+  const audioEnabled = query.get("audio") !== "muted";
   const simulation = new GameSimulation(state);
   const gateContext = createGateEvaluationContext(
     CREW_DEFINITIONS,
@@ -86,6 +100,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   let resultPanel: MissionResultPanel | null = null;
   let missionController: MissionSessionController | null = null;
   let squadController: DistributedSquadController | null = null;
+  let threatController: ScoutDroneController | null = null;
   let activeReservation: ExpeditionReservation | null = null;
   let transitionInFlight = false;
   let appDisposed = false;
@@ -131,7 +146,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     onPauseToggle: () => setModal(state.ui.activeModal === "settings" ? "none" : "settings"),
     onVisualSetting: updateVisualSetting,
   });
-  const squadAudio = new SquadFeedbackAudio();
+  const squadAudio = new SquadFeedbackAudio(audioEnabled);
   resultPanel = new MissionResultPanel(root, () => void returnToShip());
 
   const refreshMissionInteractions = (): void => {
@@ -139,6 +154,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     simulation.setInteractions([
       ...missionController.getInteractions(),
       ...(squadController?.getInteractions() ?? []),
+      ...(threatController?.getInteractions() ?? []),
     ]);
   };
 
@@ -187,6 +203,21 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       : action === "recover-relay"
         ? squadController.recoverRelay()
         : squadController.deployFlare(state.runtime.elapsedSeconds);
+    squadAudio.play(result.accepted);
+    setSquadNotice(`${result.code} // ${result.reason}`);
+    return result.code;
+  };
+
+  const runThreatDisable = (): string => {
+    if (!threatController || !squadController || !physics) return "脅威接触セッションがありません";
+    const controlledId = squadController.state.control.controlledAgentId;
+    const result = threatController.attemptDisable(
+      controlledId,
+      squadController.getControlledPosition(),
+      squadController.hasHeldItemDefinition(controlledId, "field-terminal"),
+      state.runtime.elapsedSeconds,
+      (from, to) => physics?.hasLineOfSight(from, to) ?? false,
+    );
     squadAudio.play(result.accepted);
     setSquadNotice(`${result.code} // ${result.reason}`);
     return result.code;
@@ -277,7 +308,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   );
 
   try {
-    renderSystem = new RenderSystem(root, (message) => simulation.setNotice(message));
+    renderSystem = new RenderSystem(root, (message) => simulation.setNotice(message), audioEnabled);
     physics = await PhysicsWorld.create();
     input = new InputController(renderSystem.canvas, (x, y) => renderSystem?.applyLookDelta(x, y));
   } catch (error) {
@@ -297,7 +328,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   let handledActivationRevision = 0;
   let gateScanRevision = 0;
 
-  if (new URLSearchParams(window.location.search).has("qa")) {
+  if (query.has("qa")) {
     qaPanel = createQaNavigation(root, (target) => {
       if (target === "phase-d-loadout") {
         configureQaPhaseDLoadout();
@@ -307,6 +338,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       if (missionController) {
         if (target === "extract") position = missionController.definition.extractionPoint;
         else if (target === "cart") position = missionController.getCartPosition();
+        else if (target === "drone") position = threatController?.state.drone.position;
         else position = missionController.definition.salvage.find((resource) => resource.sourceId === target)?.position
           ?? missionController.definition.searchZones.find((zone) => zone.id === target)?.entrance
           ?? missionController.definition.toolShortcuts.find((shortcut) => shortcut.id === target)?.interactionPosition;
@@ -379,6 +411,12 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         insertionPlan,
         nextMissionController.state.itemLocations,
       );
+      const nextThreatController = new ScoutDroneController(
+        FLOODED_MARKET_MISSION.threatEncounter,
+        manifest.selectedAgentIds,
+        nextSquadController.navigation,
+        state.runtime.elapsedSeconds,
+      );
       const controlledSpawn = nextSquadController.getControlledPosition();
       const controlledPlacement = insertionPlan.placements.find(
         (placement) => placement.agentId === nextSquadController.state.control.controlledAgentId,
@@ -405,6 +443,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
           manifest,
           nextMissionController.state,
           nextSquadController.state,
+          nextThreatController.state,
         ),
         controlledPlacement
           ? { playerPosition: controlledPlacement.position, cameraPosition: controlledPlacement.cameraPosition }
@@ -414,10 +453,12 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       physics = nextPhysics;
       missionController = nextMissionController;
       squadController = nextSquadController;
+      threatController = nextThreatController;
       activeReservation = reservationCommit.reservation;
       state.inventory.itemLocations = nextMissionController.state.itemLocations;
       state.mission.session = nextMissionController.state;
       state.mission.squad = nextSquadController.state;
+      state.mission.threat = nextThreatController.state;
       state.mission.lastResult = null;
       state.world.mode = "mission";
       simulation.teleportPlayer(controlledSpawn);
@@ -467,10 +508,13 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       missionController = null;
       squadController?.dispose();
       squadController = null;
+      threatController?.dispose();
+      threatController = null;
       activeReservation = null;
       state.inventory.itemLocations = settledLocations;
       state.mission.session = null;
       state.mission.squad = null;
+      state.mission.threat = null;
       state.world.mode = "ship";
       state.world.completedExpeditions += 1;
       simulation.teleportPlayer(INITIAL_PLAYER_POSITION);
@@ -501,6 +545,10 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         const resolution = squadController.openShortcut(action.shortcutId);
         if (resolution.accepted && shortcut) physics?.setWorldColliderEnabled(shortcut.colliderId, false);
         setSquadNotice(`${resolution.code} // ${resolution.reason}`);
+        return;
+      }
+      if (action.type === "mission-threat-disable" && threatController && action.threatId === threatController.state.drone.id) {
+        runThreatDisable();
         return;
       }
       const resolution = missionController.handleInteraction(
@@ -556,7 +604,19 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         simulation.fixedUpdate(dt, movement, physicsSnapshot);
         if (missionController) {
           missionController.fixedUpdate(dt, state.player.position, state.player.facingYaw);
-          squadController?.fixedUpdate(dt, state.player.position, state.runtime.elapsedSeconds);
+          squadController?.fixedUpdate(dt, state.player.position, state.runtime.elapsedSeconds, state.player.facingYaw);
+          if (squadController && threatController) {
+            threatController.fixedUpdate(
+              dt,
+              state.runtime.elapsedSeconds,
+              squadController.state,
+              (from, to) => currentPhysics.hasLineOfSight(from, to),
+              (sourceId, targetId) => squadController?.getCommunicationStatus(sourceId, targetId) ?? {
+                band: "none",
+                localInstructionAllowed: false,
+              },
+            );
+          }
           currentPhysics.setKinematicObjectPosition(
             missionController.state.cartId,
             missionController.getCartPosition(),
@@ -580,11 +640,11 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         fps: frameStats.fps,
         droppedSimulationFrames: frameStats.droppedSimulationFrames,
         render: activeRenderSystem.getDiagnostics(),
-        physics: physics?.getDiagnostics() ?? { colliderCount: 0, collisionCount: 0 },
+        physics: physics?.getDiagnostics() ?? { rigidBodyCount: 0, colliderCount: 0, collisionCount: 0 },
         expedition: planner.getEvaluation(),
         mission: missionController?.getObjectiveProgress() ?? null,
       });
-      if (squadController) {
+      if (squadController && threatController) {
         const availableFlareCount = squadController.manifest.items.filter((item) =>
           item.definitionId === "flare-pack" && missionController?.state.itemLocations[item.instanceId]?.kind === "crew",
         ).length;
@@ -593,6 +653,8 @@ async function bootstrap(root: HTMLElement): Promise<void> {
           definition: squadController.definition,
           hasFieldTerminal: squadController.hasFieldTerminal(),
           availableFlareCount,
+          threat: threatController.state,
+          elapsedSeconds: state.runtime.elapsedSeconds,
         });
       } else {
         squadPanel.update(null);
@@ -609,6 +671,14 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       render: renderSystem?.getDiagnostics() ?? null,
       domNodes: document.querySelectorAll("*").length,
       communicationRevision: squadController?.state.communicationRevision ?? 0,
+      threat: {
+        activeDroneCount: threatController?.getActiveDroneCount() ?? 0,
+        mode: threatController?.state.drone.mode ?? null,
+        transitionRevision: threatController?.state.drone.transitionRevision ?? 0,
+        reportRevision: threatController?.state.reportRevision ?? 0,
+        deliveryRevision: threatController?.state.deliveryRevision ?? 0,
+        pendingReportCount: threatController?.getPendingReportCount() ?? 0,
+      },
     }),
     teleportForQa: (x, z) => {
       const position = { x, y: 0.93, z };
@@ -630,6 +700,14 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     deployRelayForQa: () => runEquipmentAction("deploy-relay"),
     recoverRelayForQa: () => runEquipmentAction("recover-relay"),
     deployFlareForQa: () => runEquipmentAction("flare"),
+    setDronePositionForQa: (x, z, facingYaw) => {
+      threatController?.setDronePositionForQa({ x, y: threatController.definition.cruiseAltitude, z }, facingYaw);
+      refreshMissionInteractions();
+    },
+    disableThreatForQa: runThreatDisable,
+    threatReadback: () => threatController?.getDebugReadback(
+      squadController?.state.control.controlledAgentId ?? "player",
+    ) ?? null,
   };
   frameHandle = requestAnimationFrame(animate);
 
@@ -644,6 +722,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     activeInput.dispose();
     missionController?.dispose();
     squadController?.dispose();
+    threatController?.dispose();
     physics?.dispose();
     activeRenderSystem.dispose();
     resultPanel?.dispose();
@@ -663,7 +742,7 @@ function createQaNavigation(
 ): HTMLElement {
   const panel = document.createElement("aside");
   panel.className = "qa-navigation";
-  panel.setAttribute("aria-label", "Phase D QA navigation");
+  panel.setAttribute("aria-label", "Phase E QA navigation");
   for (const [target, label] of [
     ["phase-d-loadout", "QA Phase D 28U"],
     ["console", "QA 出撃コンソール"],
@@ -676,6 +755,7 @@ function createQaNavigation(
     ["cooling", "QA 冷却室"],
     ["underground", "QA 地下"],
     ["cooling-gate", "QA 短縮ゲート"],
+    ["drone", "QA SCOUT DRONE"],
     ["extract", "QA 抽出地点"],
   ] as const) {
     const button = document.createElement("button");

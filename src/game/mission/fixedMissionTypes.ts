@@ -3,6 +3,7 @@ import type { WorldColliderSpec } from "../../physics/physicsTypes";
 import type { InsertionAnchorDefinition, InsertionPresetDefinition } from "../insertion/InsertionPlanner";
 import type { NavigationGraphDefinition } from "../navigation/navigationTypes";
 import type { SignalZoneDefinition } from "../communication/communicationTypes";
+import type { ScoutDroneEncounterDefinition } from "../threat/threatTypes";
 
 export interface FixedSalvageSpawn {
   readonly sourceId: string;
@@ -57,4 +58,5 @@ export interface FixedMissionDefinition {
   readonly signalZones: readonly SignalZoneDefinition[];
   readonly searchZones: readonly SearchZoneDefinition[];
   readonly toolShortcuts: readonly ToolShortcutDefinition[];
+  readonly threatEncounter: ScoutDroneEncounterDefinition;
 }
