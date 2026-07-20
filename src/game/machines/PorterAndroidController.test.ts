@@ -133,4 +133,47 @@ describe("PorterAndroidController", () => {
     expect(mission.itemLocations.coil?.kind).toBe("mission-ground");
     expect(controller.state.failureReport).toContain("SAFE DROP");
   });
+
+  it("restores a friendly Porter at its safe anchor without repeating the handshake", () => {
+    const mission = createMissionPort();
+    const safeAnchor = { x: 3.45, y: 0.93, z: -4.65 };
+    const controller = new PorterAndroidController(
+      FLOODED_MARKET_MISSION.porterAndroid,
+      new WaypointNavigationService(FLOODED_MARKET_MISSION.navigation),
+      mission,
+      0,
+      { friendly: true, position: safeAnchor },
+    );
+    expect(controller.state).toMatchObject({
+      authenticated: true,
+      faction: "friendly",
+      mode: "friendly-idle",
+      position: safeAnchor,
+    });
+    expect(controller.getInteractions("coil").some((entry) => entry.action.type === "mission-porter-auth")).toBe(false);
+    expect(controller.beginAuthentication(authContext(), 0).code).toBe("ALREADY_AUTHENTICATED");
+    expect(controller.contributesPresence()).toBe(true);
+  });
+
+  it("keeps friendly presence without a terminal but rejects the advanced carry command", () => {
+    const mission = createMissionPort();
+    const controller = new PorterAndroidController(
+      FLOODED_MARKET_MISSION.porterAndroid,
+      new WaypointNavigationService(FLOODED_MARKET_MISSION.navigation),
+      mission,
+      0,
+      { friendly: true, position: FLOODED_MARKET_MISSION.porterAndroid.spawn },
+    );
+    expect(controller.getInteractions("coil", false).some((entry) => entry.action.type === "mission-porter-command" && entry.action.command === "carry-to")).toBe(false);
+    expect(controller.issueCommand(
+      "carry-to",
+      "player",
+      1,
+      "coil",
+      FLOODED_MARKET_MISSION.extractionPoint,
+      false,
+    ).code).toBe("FIELD_TERMINAL_REQUIRED");
+    expect(controller.contributesPresence()).toBe(true);
+    expect(controller.getGateEvaluation().accepted).toBe(false);
+  });
 });

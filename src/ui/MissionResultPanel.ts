@@ -13,11 +13,16 @@ export class MissionResultPanel {
   }
 
   show(result: FixedMissionResult): void {
-    const complete = result.outcome === "complete";
+    const outcomeLabel = result.outcome.toUpperCase();
+    const outcomeDescription = result.outcome === "complete"
+      ? "全必須資源を抽出しました。"
+      : result.outcome === "partial"
+        ? "確保済み資源だけを持ち帰ります。未回収資源は現地に残ります。"
+        : "回収物なしで帰還します。訪問中に成立した世界変更だけを精算します。";
     this.panel.innerHTML = `
       <div class="mission-result-frame" role="dialog" aria-modal="true" aria-labelledby="mission-result-title">
         <span class="panel-kicker">HABITAT RETURN LINK / SESSION SEALED</span>
-        <div class="mission-result-stamp ${complete ? "is-complete" : "is-partial"}">${complete ? "COMPLETE" : "PARTIAL"}</div>
+        <div class="mission-result-stamp is-${result.outcome}">${outcomeLabel}</div>
         <h2 id="mission-result-title">遠征回収報告</h2>
         <dl class="manifest-meta">
           <div><dt>MISSION</dt><dd>${escapeHtml(result.missionId)}</dd></div>
@@ -27,7 +32,7 @@ export class MissionResultPanel {
           <div><dt>LEFT BEHIND</dt><dd>${result.leftBehindEquipmentIds.length || "NONE"}</dd></div>
           <div><dt>CONSUMED</dt><dd>${result.consumedEquipmentIds.length || "NONE"}</dd></div>
         </dl>
-        <p>${complete ? "全必須資源を抽出しました。" : "確保済み資源だけを持ち帰ります。未回収資源は現地に残ります。"}</p>
+        <p>${outcomeDescription}</p>
         <p class="manifest-note">現地ショッピングカートはゲート対象外のため回収されません。</p>
         ${result.leftBehindEquipmentIds.length > 0 ? `<p class="manifest-note">置き去り装備: ${result.leftBehindEquipmentIds.map(escapeHtml).join(" / ")}</p>` : ""}
         ${result.alliedMachineOutcomes.map((outcome) => `<p class="manifest-note">PORTER GATE REJECTED // ${escapeHtml(outcome.machineId)} · ${escapeHtml(outcome.disposition)} · ASSISTED ${outcome.assistedItemIds.length}</p>`).join("")}

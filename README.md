@@ -155,6 +155,21 @@ Three.jsとRapierはゲームルールを所有しません。ゲート室の物
 - `src/main.ts`: 遅延ロードされる機械サービス、入力中断、UI・物理・描画・音の調停とQA readback
 - `src/game/{threat,machines,communication,mission}/*.test.ts`: 存在量、敵AI、干渉、リレー、Porter、回帰テスト
 
+## フェーズFで変更した主なファイル
+
+- `src/game/world/worldTypes.ts`: immutableな`WorldDefinition`、保存用`PersistedWorldStateV1`、安定した`WorldEntityId`、`WorldDelta`、`WorldVisitSettlement`の型
+- `src/game/world/floodedMarketWorld.ts`: 固定世界、2契約、扉・チェーン、Porter安全アンカー、固有資源、証拠の作者定義ID
+- `src/game/world/WorldState.ts`: 初期状態、純粋で不変・冪等なdelta適用、revision検査付き精算、契約解禁と精算効果
+- `src/game/world/worldStateCodec.ts`: unknown入力のschemaVersion 1検証、JSON境界、破損診断、将来migrationの入口
+- `src/game/world/WorldStateRepository.ts`: テスト用インメモリ実装と、単一readwrite transactionで精算するIndexedDB実装
+- `src/game/world/WorldVisit.ts`: 保存状態からの訪問投影、帰還結果からのdelta生成、残置装備の安全位置修復
+- `src/ui/WorldStatusPanel.ts`: visits、契約、Porter、経路、残置装備、証拠、直近結果と確認付き開発リセットの折り畳み表示
+- `src/game/mission/ExpeditionReservation.ts`: 世界に残っている同一ItemInstanceを再予約でき、回収時に船内へ一度だけ戻す所在精算
+- `src/game/machines/PorterAndroidController.ts`: friendly関係、安全アンカー、支援回数の復元と端末条件付き高度命令
+- `src/render/objects/createFloodedMarket.ts` / `src/physics/PhysicsWorld.ts` / `src/game/squad/DistributedSquadController.ts`: traversal、コライダー、ナビエッジ、active / disabled relayを同じ復元投影へ同期
+- `src/main.ts`: WorldStateロード、訪問開始時の順序付き復元、帰還時だけのcommit、リロード中断破棄、世界限定リセットの調停
+- `src/game/world/*.test.ts` と既存回帰テスト: schema、delta、精算、復元、Porter、残置装備、契約、reservationの自動検証
+
 ## フェーズB基準点の検証結果 — 2026-07-20
 
 - `npm run typecheck`: PASS
@@ -259,16 +274,71 @@ Viteの500 kB警告は継続しています。警告閾値は変更していま�
 
 初期チャンクは2,876.58 kB（gzip 1,011.02 kB）で、Phase Dの2,866.56 kB（gzip 1,007.98 kB）からの増分は10.02 kB（gzip 3.04 kB）だった。機械固有処理のdynamic import境界は維持している。Viteの500 kB警告は継続し、閾値は変更していない。Rapier開発実行時の `using deprecated parameters for the initialization function; pass a single object instead` は依存側初期化ラッパー由来で、60 Hz物理、遮蔽判定、3往復には影響しなかったため物理基盤を変更していない。
 
+## フェーズF 訪問間世界永続化の検証結果 — 2026-07-21
+
+- フェーズE基準点 `6473c6517a07da1bb251c6bef2c093c7557502cc` のクリーン状態で19ファイル・87テスト、型検査、ビルド、依存整合、diff検査を再検証した
+- `phase-e-machine-ecology` タグを同コミットへ作成し、`feat/phase-f-world-persistence` を同基準点から作成した。既存履歴、タグ、ブランチの強制更新は行っていない
+- `npm run typecheck`: PASS
+- `npm test`: PASS（24ファイル、122テスト）。Phase Eの全87テストに加え、schema、delta全種、不正ID、immutability、冪等精算、revision競合、書込失敗、complete / partial / aborted帰還、2訪問の累積契約、Porter復元、残置relay、render・Rapier・navigation一致を検証した
+- `npm run build`: PASS、`npm ls --depth=0`: PASS、`git diff --check`: PASS
+- 遅延チャンクはMachineFeedbackAudio 1.52 kB、MissionSession 7.88 kB、探索ビュー8.37 kB、Porter 9.18 kB、固定マップ9.79 kB、ScoutDrone 19.21 kB。固定マップと機械処理のdynamic import境界を維持した
+
+### 保存設計と中断境界
+
+- `WorldDefinition`は作者定義のimmutableデータ、`PersistedWorldStateV1`は訪問間スナップショットであり、ランタイムのThree.js UUID、Rapierハンドル、生成順、Map、Setを保存しない
+- schemaVersion 1はworld identity、revision、visitCount、traversal、machine relation、安全アンカー、固有資源、残置装備、証拠、契約、適用済みsettlement ID、直近outcomeを保存する
+- `WorldDelta`はPorter友好化、経路開放、装備残置・回収、固有資源抽出、証拠発見、契約目的回収を純粋関数へ渡す。ID不整合や不正transformは構造化違反となり、元スナップショットへ部分適用しない
+- settlementは`expectedRevision`を先に検査し、同じsettlement IDの再送をduplicateとして扱う。成功時だけrevisionとvisitCountを1増加し、新規貨物・回収装備・契約完了をeffectsとして一度だけ返す
+- IndexedDBは世界スナップショットのread、revision判定、writeを同じreadwrite transactionで行う。codecはunknownから検証し、破損・必須フィールド欠落・未来schemaを正常値として上書きせずsafe modeと診断へ送る。version 1から先は明示migrationを追加する境界だけを置き、推測変換は行わない
+- complete / partial / abortedの帰還操作は成立済みdeltaを精算できる。クラッシュ、強制終了、ページ再読込、ロード途中終了では未精算deltaを保存せず、基底revisionを維持する。ミッション途中再開はフェーズFの対象外
+- `ItemLocation`を所在の唯一の真実源として維持する。残置relayは同じItemInstanceIdで復元され船内在庫と二重化せず、回収帰還後だけ世界から削除して船内へ戻る。無効位置はnavigation投影、失敗時は作者定義安全アンカーへ修復し診断を残す
+- traversalはWorldStateロード後、静的マップ生成、扉・チェーン状態、Rapierコライダー、navigation edgeの順で適用する。その後に残置装備、Porter、契約資源、通信グラフ、隊員を復元する
+- Porterは初回認証後friendly、安全アンカー、支援訪問数を保存する。再訪はhandshakeを省き、端末なしでもfriendly presenceを維持する一方、`carry-to`は簡易端末がなければ拒絶する。Porter自身はゲート、船員、船内在庫へ追加しない
+- 第1契約「浄水フィルター回収」3点はpartialを累積し、完了後に既存区域を使う第2契約「旧式リレーコア回収」3点を解禁する。回収済み固有資源は再生成せず、冷却コイルは契約外の任意固有資源として一度だけ回収できる
+- `EvidenceState`は初回訪問IDを保持し、発見済み証拠を船内資料へ残す。再訪projectionから既発見証拠を除外し、初回通知を繰り返さない
+- 折り畳み式船内パネルに継続情報を限定し、世界リセットは確認後に固定世界だけを初期化する。実ブラウザでディザリングをOFFにした後もOFFが保持され、描画・音声・操作設定をリセットしないことを確認した
+
+### 3訪問とリロードの実ブラウザ検証
+
+- 第1訪問: Porterを端末で認証し、バールで冷却設備室の扉を開放、active relayを残置、浄水フィルター2/3でpartial帰還。船内で`VISIT 1 / REV 1`、契約2/3、friendly 1、opened route 1、left equipment 1を確認した
+- リロード後: `WORLD MEMORY RESTORED // VISIT 1 · REV 1`を確認。第2訪問は回収済みフィルター2点を生成せず残り1点だけを要求し、扉の描画・コライダー・navigation edge、Porter friendly安全アンカー、`LINK RECOGNIZED`、relay位置とactive状態を復元した。handshakeなしでPorterを利用でき、relayを回収してフィルター契約をcomplete、`VISIT 2 / REV 2`で第2契約を解禁した
+- 第3訪問: 第1契約の固有資源を再生成せず、旧式リレーコア3点を回収して第2契約をcomplete。Porter関係を維持し、証拠「濡れた搬入記録」を初回だけ共有して`VISIT 3 / REV 3`へ帰還した。船内資料、全契約完了、friendly contact、opened route、残置装備0を確認した
+- 追加の未精算第4訪問で同じ証拠区域を探索し、`NO SHARED REPORT`となって初回通知が重複しないことを確認した。そのままリロードすると世界は`VISIT 3 / REV 3`のままで、未精算訪問、貨物、報酬、装備、証拠が増えていない
+- 第2訪問前と第3訪問前にも進行中リロードを実施し、未精算deltaが破棄され基底revisionが維持されることを確認した。各帰還通知、契約進捗、回収装備は操作1回につき1回だけ反映された
+- 世界リセット後は`VISIT 0`、第1契約0/3、friendly 0、opened route 0、left equipment 0、evidence 0へ戻り、ディザリングOFFは保持された
+- ブラウザコンソールerror・未処理例外は0。warningは既知のRapier初期化非推奨1種類だけだった
+
+### 3訪問後のリソース・DOM計測
+
+| 項目 | 第3訪問帰還・リロード後 |
+| --- | ---: |
+| Rapier rigid bodies / colliders / contacts | 1 / 12 / 1 |
+| Scene objects | 60 |
+| WebGL draw calls / triangles | 66 / 1,468 |
+| renderer.info.memory geometries | 47 |
+| renderer.info.memory textures | 3 |
+| renderer.info.programs | 4 |
+| DOM totalNodes | 117 |
+| DOM persistentHudNodes | 67 |
+| DOM modalNodes | 0 |
+| DOM transientFeedbackNodes | 0 |
+| DOM resultHistoryNodes | 0 |
+
+開発リセット後にも同じRapier 1 / 12 / 1、Scene 60、WebGL 66 / 1,468、geometry 47、texture 3、program 4、DOM 117 / HUD 67 / modal 0 / transient 0を確認した。訪問間でRapier、Scene、GPU memory、DOMカテゴリの単調増加やイベント重複は観測されなかった。
+
+初期チャンクは2,900.15 kB（gzip 1,017.94 kB）で、Phase Eの2,876.58 kB（gzip 1,011.02 kB）から23.57 kB（gzip 6.92 kB）増加した。Viteの500 kB警告は継続し、閾値は変更していない。Rapier開発実行時の `using deprecated parameters for the initialization function; pass a single object instead` も依存側の既知警告として継続しており、今回の固定60 Hz物理、復元コライダー、3訪問には影響しなかった。
+
 ## 残課題
 
 | 目的 | 影響 | 要件 | 状態 | 担当 | 次の一手 |
 | --- | --- | --- | --- | --- | --- |
-| フェーズFの機械生態系拡張 | 標準敵は1体で、Porterの友好状態は再訪時に永続化しない | 現行のMachineAgentState、ItemLocation、AlliedMachineOutcomeを保ち、複数敵協調か再訪永続化を別スライスで選ぶ | フェーズE境界まで完了 | ゲームデザイン / シミュレーション | 人間評価後に一方だけをフェーズFとして仕様化する |
+| フェーズGの探索深化 | 固定世界と2契約は永続化したが、複数敵協調、プロシージャル生成、ミッション途中再開はない | schemaVersion 1、WorldDelta、ItemLocation、settlement revision境界を維持し、新規ゲーム機構を1スライスずつ選ぶ | フェーズF完了・次スライス未定 | ゲームデザイン / シミュレーション | 人間評価後にフェーズGの目的を1つに絞って仕様化する |
+| 保存migration実装 | schemaVersion 1以外は安全に拒絶するため、将来schemaをまだ読み込めない | versionごとの明示migrationとfixtureを追加し、破損値を推測変換しない | migration境界のみ実装・非ブロッキング | 保存基盤 | schemaVersion 2が必要になった時点でv1 fixtureからの移行テストを先に追加する |
 | 初期バンドル分割 | 初回ダウンロードが大きい | Three.js/Rapierのvendor分割、実機起動計測、キャッシュ戦略 | 非ブロッキング | 将来の性能作業 | 現在のdynamic import境界を維持して実測後に分割方針を決める |
 | Rapier非推奨警告の解消 | 開発コンソールに警告が残る | 依存版と初期化APIの互換性確認 | 非ブロッキング | 依存更新作業 | Rapier更新時に移行を再評価する |
-| 人間による感覚評価 | 自動検証では脅威圧、音量、視認性、搬送速度の最終判断はできない | 警告音の周波数上昇、再評価・退避音、走査光、Porter速度、命令UI密度の実機評価 | 実装済み・人間評価待ち | ゲームデザイン / UX | 音声ミュートを解除したデスクトップ実機でscatteredとPorter搬送を通し、調整値だけをデータ定義へ反映する |
+| 人間による感覚評価 | 自動検証では復元要約の密度、契約テンポ、脅威圧、音量、視認性、搬送速度の最終判断はできない | 3訪問のデスクトップ実機プレイと、警告・再評価・退避音をミュートなしで評価する | 実装済み・人間評価待ち | ゲームデザイン / UX | partial→reload→complete→第2契約を通し、調整値と文言だけをデータ定義・UIへ反映する |
 
-オンライン同期、HP、死亡、銃撃戦、敵による偽通信・音声模倣、Porterのカート操作、再訪時の恒久友好化は実装していません。フェーズEは不変マニフェスト、ItemLocation、NavigationService、CommunicationGraph、分隊知識の境界を保った非致死的な敵対ドローンと任意搬送支援までです。
+オンライン同期、HP、死亡、銃撃戦、敵による偽通信・音声模倣、Porterのカート操作、複数敵協調、プロシージャル世界、ミッション途中再開は実装していません。フェーズFは不変マニフェスト、ItemLocation、NavigationService、CommunicationGraph、分隊知識を維持したまま、固定世界の帰還精算と再訪復元までです。
 
 ## アセット方針
 

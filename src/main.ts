@@ -45,6 +45,15 @@ import { ExpeditionPanel } from "./ui/ExpeditionPanel";
 import { Hud } from "./ui/Hud";
 import { MissionResultPanel } from "./ui/MissionResultPanel";
 import { SquadPanel } from "./ui/SquadPanel";
+import { WorldStatusPanel } from "./ui/WorldStatusPanel";
+import {
+  FLOODED_MARKET_WORLD,
+  FLOODED_MARKET_WORLD_INSTANCE_ID,
+} from "./game/world/floodedMarketWorld";
+import { IndexedDbWorldStateRepository } from "./game/world/WorldStateRepository";
+import { buildWorldVisitSettlement, createWorldVisitProjection } from "./game/world/WorldVisit";
+import type { PersistedWorldStateV1 } from "./game/world/worldTypes";
+import { getActiveContract } from "./game/world/WorldState";
 
 declare global {
   interface Window {
@@ -72,6 +81,16 @@ declare global {
           carriedItemId: string | null;
           gateEvaluationCodes: readonly string[];
         };
+        persistence: {
+          revision: number;
+          visitCount: number;
+          activeContractId: string | null;
+          recoveredUniqueItemIds: readonly string[];
+          leftBehindEquipmentIds: readonly string[];
+          openedTraversalIds: readonly string[];
+          friendlyMachineIds: readonly string[];
+          discoveredEvidenceIds: readonly string[];
+        };
       };
       teleportForQa(x: number, z: number): void;
       setAgentPositionForQa(agentId: CrewId, x: number, z: number): void;
@@ -87,6 +106,8 @@ declare global {
       disableRelayForQa(itemInstanceId?: string): string;
       restartRelayForQa(itemInstanceId?: string): string;
       threatReadback(): ReturnType<ScoutDroneController["getDebugReadback"]> | null;
+      worldState(): PersistedWorldStateV1;
+      resetWorldStateForQa(): Promise<void>;
     };
   }
 }
@@ -98,6 +119,16 @@ void bootstrap(mount);
 
 async function bootstrap(root: HTMLElement): Promise<void> {
   const state = createInitialGameState();
+  const worldRepository = new IndexedDbWorldStateRepository();
+  const worldLoad = await worldRepository.loadOrCreate(FLOODED_MARKET_WORLD, FLOODED_MARKET_WORLD_INSTANCE_ID);
+  let persistedWorldState = worldLoad.state;
+  for (const equipment of persistedWorldState.leftBehindEquipment) {
+    state.inventory.itemLocations[equipment.itemInstanceId] = {
+      kind: "mission-ground",
+      position: { ...equipment.position },
+    };
+  }
+  state.world.completedExpeditions = persistedWorldState.visitCount;
   const query = new URLSearchParams(window.location.search);
   const audioEnabled = query.get("audio") !== "muted";
   const simulation = new GameSimulation(state);
@@ -127,6 +158,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   let cachedEcologyContext: ThreatEcologyContext | null = null;
   let porterWasAuthenticated = false;
   let handledFirstRetreatAnalysisRevision = 0;
+  let activeWorldVisitBase: PersistedWorldStateV1 | null = null;
 
   const releaseWorldInput = (): void => {
     input?.clearMovement();
@@ -176,7 +208,10 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       ...missionController.getInteractions(),
       ...(squadController?.getInteractions() ?? []),
       ...(threatController?.getInteractions() ?? []),
-      ...(porterController?.getInteractions(missionController.getResourceItemId("cooling-coil")) ?? []),
+      ...(porterController?.getInteractions(
+        missionController.getResourceItemId("cooling-coil"),
+        squadController?.hasFieldTerminal() ?? false,
+      ) ?? []),
     ]);
   };
 
@@ -276,6 +311,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       state.runtime.elapsedSeconds,
       missionController.getResourceItemId("cooling-coil"),
       missionController.definition.extractionPoint,
+      squadController.hasFieldTerminal(),
     );
     squadAudio.play(result.accepted);
     setSquadNotice(`${result.code} // ${result.reason}`);
@@ -289,6 +325,31 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     onRecoverRelay: () => { runEquipmentAction("recover-relay"); },
     onDeployFlare: () => { runEquipmentAction("flare"); },
   });
+
+  const resetWorldState = async (requireConfirmation: boolean): Promise<void> => {
+    if (state.world.mode !== "ship" || transitionInFlight) {
+      simulation.setNotice("世界状態の初期化は船内待機中のみ実行できます");
+      return;
+    }
+    if (requireConfirmation && !window.confirm(
+      "固定世界の訪問履歴・契約・Porter関係・経路・置き去り装備・証拠だけを初期化します。描画・音声・入力設定は保持されます。続行しますか？",
+    )) return;
+    const leftIds = persistedWorldState.leftBehindEquipment.map((entry) => entry.itemInstanceId);
+    persistedWorldState = await worldRepository.reset(FLOODED_MARKET_WORLD, FLOODED_MARKET_WORLD_INSTANCE_ID);
+    for (const itemId of leftIds) state.inventory.itemLocations[itemId] = { kind: "ship-inventory" };
+    state.world.completedExpeditions = 0;
+    worldStatusPanel.update(persistedWorldState, FLOODED_MARKET_WORLD, true);
+    simulation.setNotice("WORLD MEMORY RESET // 入力・音声・描画設定は保持されました");
+  };
+  const worldStatusPanel = new WorldStatusPanel(root, () => void resetWorldState(true));
+  if (worldLoad.status === "corrupt") {
+    console.error(`WORLD_STATE_LOAD_CORRUPT // ${worldLoad.diagnostic}`);
+    simulation.setNotice(`WORLD MEMORY SAFE MODE // ${worldLoad.diagnostic}`);
+  } else if (worldLoad.status === "loaded" && persistedWorldState.visitCount > 0) {
+    simulation.setNotice(
+      `WORLD MEMORY RESTORED // VISIT ${persistedWorldState.visitCount} · REV ${persistedWorldState.revision}`,
+    );
+  }
 
   const refreshDraftUi = (): void => {
     state.expedition.draft = planner.getDraftSnapshot();
@@ -482,6 +543,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         manifest,
         state.inventory.itemLocations,
         reservationId,
+        persistedWorldState.leftBehindEquipment.map((entry) => entry.itemInstanceId),
       );
       state.inventory.itemLocations = reservationCommit.locations;
     } catch (error) {
@@ -511,56 +573,55 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       if (appDisposed) return;
       const sessionId = crypto.randomUUID();
       const navigation = new WaypointNavigationService(FLOODED_MARKET_MISSION.navigation);
+      const worldVisit = createWorldVisitProjection(
+        persistedWorldState,
+        FLOODED_MARKET_WORLD,
+        FLOODED_MARKET_MISSION,
+        navigation,
+      );
+      const visitDefinition = worldVisit.definition;
       const insertionPlan = createInsertionPlan(
         manifest,
         launchOptions.insertionMode,
         launchOptions.insertionSeed,
         {
-          missionId: FLOODED_MARKET_MISSION.id,
-          extractionPoint: FLOODED_MARKET_MISSION.extractionPoint,
-          anchors: FLOODED_MARKET_MISSION.insertionAnchors,
-          presets: FLOODED_MARKET_MISSION.insertionPresets,
-          colliders: FLOODED_MARKET_MISSION.colliders,
+          missionId: visitDefinition.id,
+          extractionPoint: visitDefinition.extractionPoint,
+          anchors: visitDefinition.insertionAnchors,
+          presets: visitDefinition.insertionPresets,
+          colliders: visitDefinition.colliders,
           navigation,
         },
       );
       const nextMissionController = new DynamicMissionSessionController(
-        FLOODED_MARKET_MISSION,
+        visitDefinition,
         manifest,
         sessionId,
         reservationCommit.locations,
       );
       const nextSquadController = new DistributedSquadController(
-        FLOODED_MARKET_MISSION,
+        visitDefinition,
         manifest,
         insertionPlan,
         nextMissionController.state.itemLocations,
       );
       const nextThreatController = new DynamicScoutDroneController(
-        FLOODED_MARKET_MISSION.threatEncounter,
+        visitDefinition.threatEncounter,
         manifest.selectedAgentIds,
         nextSquadController.navigation,
         state.runtime.elapsedSeconds,
         query.get("drones") === "2" ? 2 : 1,
       );
-      const nextPorterController = new DynamicPorterAndroidController(
-        FLOODED_MARKET_MISSION.porterAndroid,
-        nextSquadController.navigation,
-        {
-          missionId: FLOODED_MARKET_MISSION.id,
-          itemLocations: nextMissionController.state.itemLocations,
-          transferResourceToMachine: (itemId, machineId) => nextMissionController.transferResourceToMachine(itemId, machineId),
-          placeMachineResourceAtExtraction: (itemId, machineId) => nextMissionController.placeMachineResourceAtExtraction(itemId, machineId),
-          placeMachineResourceSafely: (itemId, machineId, position) => nextMissionController.placeMachineResourceSafely(itemId, machineId, position),
-        },
-        state.runtime.elapsedSeconds,
-      );
+      for (const traversalId of worldVisit.restoredTraversalIds) {
+        const traversal = FLOODED_MARKET_WORLD.traversal.find((entry) => entry.id === traversalId);
+        if (traversal) nextSquadController.state.shortcutOpenById[traversal.shortcutId] = true;
+      }
       const controlledSpawn = nextSquadController.getControlledPosition();
       const controlledPlacement = insertionPlan.placements.find(
         (placement) => placement.agentId === nextSquadController.state.control.controlledAgentId,
       );
       const nextPhysics = await PhysicsWorld.create({
-        colliders: FLOODED_MARKET_MISSION.colliders,
+        colliders: visitDefinition.colliders,
         initialPlayerPosition: controlledSpawn,
         kinematicObjects: [{
           id: nextMissionController.state.cartId,
@@ -574,10 +635,41 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         return;
       }
 
+      for (const traversalId of worldVisit.restoredTraversalIds) {
+        const traversal = FLOODED_MARKET_WORLD.traversal.find((entry) => entry.id === traversalId);
+        if (!traversal) continue;
+        nextPhysics.setWorldColliderEnabled(traversal.colliderId, false);
+        nextSquadController.restoreOpenedShortcut(traversal.shortcutId);
+      }
+      for (const equipment of worldVisit.restoredEquipment) {
+        if (equipment.definitionId === "portable-relay") {
+          nextSquadController.restoreDeployedRelay(
+            equipment.itemInstanceId,
+            equipment.position,
+            equipment.operationalState,
+          );
+        }
+      }
+      const nextPorterController = new DynamicPorterAndroidController(
+        visitDefinition.porterAndroid,
+        nextSquadController.navigation,
+        {
+          missionId: visitDefinition.id,
+          itemLocations: nextMissionController.state.itemLocations,
+          transferResourceToMachine: (itemId, machineId) => nextMissionController.transferResourceToMachine(itemId, machineId),
+          placeMachineResourceAtExtraction: (itemId, machineId) => nextMissionController.placeMachineResourceAtExtraction(itemId, machineId),
+          placeMachineResourceSafely: (itemId, machineId, position) => nextMissionController.placeMachineResourceSafely(itemId, machineId, position),
+        },
+        state.runtime.elapsedSeconds,
+        worldVisit.friendlyPorter
+          ? { friendly: true, position: worldVisit.friendlyPorter.position }
+          : undefined,
+      );
+
       activeRenderSystem.enterMission(
         (materials) => createFloodedMarket(
           materials,
-          FLOODED_MARKET_MISSION,
+          visitDefinition,
           manifest,
           nextMissionController.state,
           nextSquadController.state,
@@ -597,6 +689,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       machineAudio?.dispose();
       machineAudio = new DynamicMachineFeedbackAudio(audioEnabled);
       activeReservation = reservationCommit.reservation;
+      activeWorldVisitBase = persistedWorldState;
       state.inventory.itemLocations = nextMissionController.state.itemLocations;
       state.mission.session = nextMissionController.state;
       state.mission.squad = nextSquadController.state;
@@ -605,17 +698,21 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       state.mission.lastResult = null;
       ecologyRefreshAccumulator = 0.2;
       cachedEcologyContext = null;
-      porterWasAuthenticated = false;
+      porterWasAuthenticated = nextPorterController.state.authenticated;
       handledFirstRetreatAnalysisRevision = 0;
       state.world.mode = "mission";
       simulation.teleportPlayer(controlledSpawn);
       refreshMissionInteractions();
       state.runtime.mode = "playing";
       simulation.setNotice(
-        `降下完了 // ${insertionPlan.mode.toUpperCase()} · TEAM ${manifest.selectedAgentIds.length} · GEAR ${manifest.items.length}`,
+        worldVisit.friendlyPorter
+          ? `LINK RECOGNIZED // PORTER FRIENDLY · VISIT ${persistedWorldState.visitCount + 1}`
+          : `降下完了 // ${insertionPlan.mode.toUpperCase()} · TEAM ${manifest.selectedAgentIds.length} · GEAR ${manifest.items.length}`,
       );
+      for (const diagnostic of worldVisit.diagnostics) console.warn(diagnostic);
     } catch (error) {
       state.inventory.itemLocations = rollbackExpeditionReservation(reservationCommit.reservation);
+      activeWorldVisitBase = null;
       state.world.mode = "ship";
       state.runtime.mode = "playing";
       simulation.setInteractions(SHIP_INTERACTIONS);
@@ -631,6 +728,9 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       transitionInFlight ||
       !missionController ||
       !activeReservation ||
+      !activeWorldVisitBase ||
+      !squadController ||
+      !porterController ||
       !state.mission.lastResult ||
       appDisposed
     ) return;
@@ -638,11 +738,32 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     state.runtime.mode = "paused";
     releaseWorldInput();
     simulation.setNotice("飛空居住船への帰還シーケンスを開始");
+    let nextPhysics: PhysicsWorld | null = null;
     try {
-      const nextPhysics = await PhysicsWorld.create({
+      nextPhysics = await PhysicsWorld.create({
         colliders: SHIP_COLLIDERS,
         initialPlayerPosition: INITIAL_PLAYER_POSITION,
       });
+      const worldSettlement = buildWorldVisitSettlement({
+        visitId: missionController.state.sessionId,
+        baseState: activeWorldVisitBase,
+        world: FLOODED_MARKET_WORLD,
+        result: state.mission.lastResult,
+        manifest: squadController.manifest,
+        itemLocations: missionController.state.itemLocations,
+        squad: squadController.state,
+        porter: porterController.state,
+      });
+      const worldCommit = await worldRepository.commit(worldSettlement, FLOODED_MARKET_WORLD);
+      if (worldCommit.status === "revision-conflict") {
+        throw new Error(
+          `WORLD_REVISION_CONFLICT // expected ${worldCommit.expectedRevision}, actual ${worldCommit.actualRevision}`,
+        );
+      }
+      if (worldCommit.status === "invalid") {
+        throw new Error(`WORLD_DELTA_INVALID // ${worldCommit.violations.map((entry) => entry.code).join(", ")}`);
+      }
+      persistedWorldState = worldCommit.state;
       const settledLocations = settleExpeditionReservation(
         activeReservation,
         missionController.state.itemLocations,
@@ -651,6 +772,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       activeRenderSystem.returnToShip();
       physics?.dispose();
       physics = nextPhysics;
+      nextPhysics = null;
       missionController.dispose();
       missionController = null;
       squadController?.dispose();
@@ -663,21 +785,23 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       machineAudio = null;
       cachedEcologyContext = null;
       activeReservation = null;
+      activeWorldVisitBase = null;
       state.inventory.itemLocations = settledLocations;
       state.mission.session = null;
       state.mission.squad = null;
       state.mission.threat = null;
       state.mission.porter = null;
       state.world.mode = "ship";
-      state.world.completedExpeditions += 1;
+      state.world.completedExpeditions = persistedWorldState.visitCount;
       simulation.teleportPlayer(INITIAL_PLAYER_POSITION);
       simulation.setInteractions(SHIP_INTERACTIONS);
       resultPanel?.hide();
       simulation.setModal("none");
       simulation.setNotice(
-        `船内へ帰還しました // ${state.mission.lastResult.outcome.toUpperCase()} · RUN ${state.world.completedExpeditions}`,
+        `船内へ帰還しました // ${state.mission.lastResult.outcome.toUpperCase()} · VISIT ${persistedWorldState.visitCount} · WORLD REV ${persistedWorldState.revision}`,
       );
     } catch (error) {
+      nextPhysics?.dispose();
       setModal("mission-result");
       simulation.setNotice(`帰還に失敗しました: ${error instanceof Error ? error.message : String(error)}`);
       console.error(error);
@@ -890,6 +1014,16 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         physics: physics?.getDiagnostics() ?? { rigidBodyCount: 0, colliderCount: 0, collisionCount: 0 },
         expedition: planner.getEvaluation(),
         mission: missionController?.getObjectiveProgress() ?? null,
+        worldContract: (() => {
+          const active = getActiveContract(persistedWorldState, FLOODED_MARKET_WORLD);
+          return active
+            ? {
+                label: active.definition.label,
+                recoveredBeforeVisit: active.progress.recoveredObjectiveIds.length,
+                objectiveCount: active.definition.objectiveIds.length,
+              }
+            : null;
+        })(),
         dom: measureDomDiagnostics(),
       });
       if (squadController && threatController && porterController) {
@@ -908,6 +1042,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       } else {
         squadPanel.update(null);
       }
+      worldStatusPanel.update(persistedWorldState, FLOODED_MARKET_WORLD, state.world.mode === "ship");
     }
     frameHandle = requestAnimationFrame(animate);
   };
@@ -935,6 +1070,24 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         authenticated: porterController?.state.authenticated ?? false,
         carriedItemId: porterController?.state.carriedItemId ?? null,
         gateEvaluationCodes: porterController?.state.gateEvaluationCodes ?? [],
+      },
+      persistence: {
+        revision: persistedWorldState.revision,
+        visitCount: persistedWorldState.visitCount,
+        activeContractId: persistedWorldState.contractProgress.find((entry) => entry.state === "active")?.contractId ?? null,
+        recoveredUniqueItemIds: persistedWorldState.uniqueItemStates
+          .filter((entry) => entry.recovered)
+          .map((entry) => entry.entityId),
+        leftBehindEquipmentIds: persistedWorldState.leftBehindEquipment.map((entry) => entry.itemInstanceId),
+        openedTraversalIds: persistedWorldState.traversalStates
+          .filter((entry) => entry.state === "opened")
+          .map((entry) => entry.entityId),
+        friendlyMachineIds: persistedWorldState.machineRelations
+          .filter((entry) => entry.relation === "friendly")
+          .map((entry) => entry.machineId),
+        discoveredEvidenceIds: persistedWorldState.evidenceStates
+          .filter((entry) => entry.discovered)
+          .map((entry) => entry.entityId),
       },
     }),
     teleportForQa: (x, z) => {
@@ -977,6 +1130,8 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     threatReadback: () => threatController?.getDebugReadback(
       squadController?.state.control.controlledAgentId ?? "player",
     ) ?? null,
+    worldState: () => structuredClone(persistedWorldState),
+    resetWorldStateForQa: () => resetWorldState(false),
   };
   frameHandle = requestAnimationFrame(animate);
 
@@ -998,6 +1153,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     activeRenderSystem.dispose();
     resultPanel?.dispose();
     squadPanel.dispose();
+    worldStatusPanel.dispose();
     squadAudio.dispose();
     qaPanel?.remove();
     delete window.__LOWPASS_DEBUG__;
@@ -1013,7 +1169,7 @@ function createQaNavigation(
 ): HTMLElement {
   const panel = document.createElement("aside");
   panel.className = "qa-navigation";
-  panel.setAttribute("aria-label", "Phase E QA navigation");
+  panel.setAttribute("aria-label", "Phase F QA navigation");
   for (const [target, label] of [
     ["phase-d-loadout", "QA Phase D 28U"],
     ["console", "QA 出撃コンソール"],
@@ -1021,6 +1177,9 @@ function createQaNavigation(
     ["filter-02", "QA フィルター02"],
     ["filter-03", "QA フィルター03"],
     ["cooling-coil", "QA 冷却コイル"],
+    ["relay-core-01", "QA リレーコア01"],
+    ["relay-core-02", "QA リレーコア02"],
+    ["relay-core-03", "QA リレーコア03"],
     ["cart", "QA カート"],
     ["sales", "QA 売場"],
     ["cooling", "QA 冷却室"],

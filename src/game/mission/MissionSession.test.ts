@@ -77,6 +77,13 @@ describe("MissionSession", () => {
     expect(resolution.result?.recoveredResourceIds).toHaveLength(1);
   });
 
+  it("supports an aborted gate return with no recovered resources", () => {
+    const { controller } = createSession("aborted-run");
+    const resolution = controller.handleInteraction({ type: "mission-extract" });
+    expect(resolution.notice).toContain("ABORTED");
+    expect(resolution.result).toMatchObject({ outcome: "aborted", recoveredResourceIds: [] });
+  });
+
   it("can reserve, run, settle, and dispose three consecutive sessions", () => {
     let persistentLocations = createInitialItemLocations();
     for (let cycle = 1; cycle <= 3; cycle += 1) {

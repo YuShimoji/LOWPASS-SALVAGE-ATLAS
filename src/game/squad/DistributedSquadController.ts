@@ -301,6 +301,34 @@ export class DistributedSquadController {
     this.setFeedback("INTERFERENCE_PULSE", `${targetAgentId}の通信はBURSTへ制限されています`);
   }
 
+  restoreOpenedShortcut(shortcutId: string): EquipmentActionResolution {
+    const shortcut = this.definition.toolShortcuts.find((candidate) => candidate.id === shortcutId);
+    if (!shortcut) return this.rejectEquipment("UNKNOWN_SHORTCUT", "復元対象の短縮路がありません");
+    this.state.shortcutOpenById[shortcut.id] = true;
+    const failure = this.navigation.setEdgeEnabled(shortcut.navigationEdgeId, true);
+    if (failure) return this.rejectEquipment(failure.code, failure.reason);
+    return { accepted: true, code: "SHORTCUT_RESTORED", reason: "開放済み経路を復元しました", itemInstanceId: null };
+  }
+
+  restoreDeployedRelay(
+    itemInstanceId: string,
+    position: Vec3,
+    operationalState: "active" | "disabled",
+  ): EquipmentActionResolution {
+    this.itemLocations[itemInstanceId] = { kind: "mission-ground", position: copyVec3(position) };
+    if (!this.state.deployedRelayItemIds.includes(itemInstanceId)) this.state.deployedRelayItemIds.push(itemInstanceId);
+    const disabledIndex = this.state.disabledRelayItemIds.indexOf(itemInstanceId);
+    if (operationalState === "disabled" && disabledIndex < 0) this.state.disabledRelayItemIds.push(itemInstanceId);
+    if (operationalState === "active" && disabledIndex >= 0) this.state.disabledRelayItemIds.splice(disabledIndex, 1);
+    this.evaluateCommunication(this.state.communicationEvaluatedAtSeconds);
+    return {
+      accepted: true,
+      code: operationalState === "disabled" ? "RELAY_RESTORED_DISABLED" : "RELAY_RESTORED_ACTIVE",
+      reason: "置き去り携帯リレーを復元しました",
+      itemInstanceId,
+    };
+  }
+
   disableRelay(itemInstanceId: string, elapsedSeconds: number): EquipmentActionResolution {
     const location = this.itemLocations[itemInstanceId];
     if (!this.state.deployedRelayItemIds.includes(itemInstanceId) || location?.kind !== "mission-ground") {

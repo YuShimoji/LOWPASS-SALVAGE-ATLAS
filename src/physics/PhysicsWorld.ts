@@ -185,6 +185,10 @@ export class PhysicsWorld {
     return true;
   }
 
+  isWorldColliderEnabled(id: string): boolean | null {
+    return this.worldColliders.get(id)?.isEnabled() ?? null;
+  }
+
   teleportCharacter(position: Vec3): void {
     this.verticalVelocity = 0;
     this.grounded = false;

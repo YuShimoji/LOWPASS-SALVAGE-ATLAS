@@ -45,6 +45,30 @@ export const FLOODED_MARKET_MISSION = Object.freeze({
       required: true,
       position: { x: 0, y: 0.38, z: -1.7 },
     },
+    {
+      sourceId: "relay-core-01",
+      label: "旧式リレーコア 01",
+      resourceType: "relay-core",
+      carryMode: "hand",
+      required: false,
+      position: { x: -3.45, y: 0.32, z: -4.65 },
+    },
+    {
+      sourceId: "relay-core-02",
+      label: "旧式リレーコア 02",
+      resourceType: "relay-core",
+      carryMode: "hand",
+      required: false,
+      position: { x: 3.45, y: 0.32, z: -4.65 },
+    },
+    {
+      sourceId: "relay-core-03",
+      label: "旧式リレーコア 03",
+      resourceType: "relay-core",
+      carryMode: "hand",
+      required: false,
+      position: { x: 0.8, y: 0.32, z: -6.15 },
+    },
   ],
   colliders: [
     { id: "market-floor", center: { x: 0, y: -0.25, z: 0 }, halfExtents: { x: 7, y: 0.25, z: 7 }, surface: "floor", visible: true },
@@ -56,6 +80,7 @@ export const FLOODED_MARKET_MISSION = Object.freeze({
     { id: "shelf-west", center: { x: -4.6, y: 0.8, z: -1.2 }, halfExtents: { x: 0.55, y: 0.8, z: 2.8 }, surface: "fixture", visible: true },
     { id: "shelf-east", center: { x: 4.6, y: 0.8, z: -1.2 }, halfExtents: { x: 0.55, y: 0.8, z: 2.8 }, surface: "fixture", visible: true },
     { id: "cooling-shortcut-gate", center: { x: 0, y: 1, z: -2.65 }, halfExtents: { x: 1.05, y: 1, z: 0.12 }, surface: "fixture", visible: true },
+    { id: "loading-chain-gate", center: { x: 2.2, y: 1, z: -3.05 }, halfExtents: { x: 0.12, y: 1, z: 1.05 }, surface: "fixture", visible: true },
   ],
   insertionAnchors: [
     { id: "south-center", position: { x: 0, y: 0.93, z: 4.8 }, cameraPosition: { x: 0, y: 3.2, z: 6.2 }, navigationNodeId: "extract", toolFreeExit: true },
@@ -109,6 +134,7 @@ export const FLOODED_MARKET_MISSION = Object.freeze({
       { id: "loading-cooling", from: "loading", to: "cooling", bidirectional: true, enabledByDefault: true },
       { id: "cooling-underground", from: "cooling", to: "underground", bidirectional: true, enabledByDefault: true },
       { id: "cooling-shortcut", from: "sales-center", to: "cooling", bidirectional: true, enabledByDefault: false },
+      { id: "loading-chain-shortcut", from: "east-corridor", to: "cooling", bidirectional: true, enabledByDefault: false },
     ],
   },
   signalZones: [
@@ -126,7 +152,8 @@ export const FLOODED_MARKET_MISSION = Object.freeze({
     { id: "underground", label: "地下サービス通路", entrance: { x: 0, y: 0.93, z: -5.55 }, searchPoints: [{ x: -0.8, y: 0.93, z: -6.15 }, { x: 0.8, y: 0.93, z: -6.15 }], discoveries: [{ id: "underground-signal", kind: "evidence", label: "旧式中継器の残響", position: { x: 0.8, y: 0.93, z: -6.15 } }] },
   ],
   toolShortcuts: [
-    { id: "cooling-gate", label: "冷却設備室の短縮ゲート", requiredDefinitionIds: ["crowbar", "bolt-cutter"], interactionPosition: { x: 0, y: 0.93, z: -2.1 }, colliderId: "cooling-shortcut-gate", navigationEdgeId: "cooling-shortcut" },
+    { id: "cooling-gate", label: "冷却設備室の固着ドア", requiredDefinitionIds: ["crowbar"], interactionPosition: { x: 0, y: 0.93, z: -2.1 }, colliderId: "cooling-shortcut-gate", navigationEdgeId: "cooling-shortcut" },
+    { id: "loading-chain", label: "搬入口の封鎖チェーン", requiredDefinitionIds: ["bolt-cutter"], interactionPosition: { x: 2.2, y: 0.93, z: -2.45 }, colliderId: "loading-chain-gate", navigationEdgeId: "loading-chain-shortcut" },
   ],
   threatEncounter: {
     id: "scout-drone-market-01",

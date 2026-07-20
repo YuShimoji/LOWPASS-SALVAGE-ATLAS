@@ -12,6 +12,11 @@ export interface HudDiagnostics {
   physics: PhysicsDiagnostics;
   expedition: ExpeditionGateEvaluation;
   mission: MissionObjectiveProgress | null;
+  worldContract: {
+    readonly label: string;
+    readonly recoveredBeforeVisit: number;
+    readonly objectiveCount: number;
+  } | null;
   dom: DomDiagnostics;
 }
 
@@ -43,7 +48,7 @@ export class Hud {
     this.root.className = "ui-layer";
     this.root.innerHTML = `
       <header class="brand-chip" aria-label="Game title">
-        <span class="brand-kicker">PHASE E / HOSTILE CONTACT</span>
+        <span class="brand-kicker">PHASE F / WORLD MEMORY</span>
         <strong>LOWPASS</strong><span class="brand-subtitle">SALVAGE ATLAS</span>
       </header>
       <section class="objective-chip" aria-label="Current objective">
@@ -119,9 +124,17 @@ export class Hud {
       this.status.textContent = squad
         ? `CTRL ${squad.control.controlledAgentId.toUpperCase()} · LEAD ${squad.control.fieldLeadAgentId.toUpperCase()}`
         : `TEAM ${state.expedition.confirmedManifest.selectedAgentIds.length} · GEAR ${state.expedition.confirmedManifest.items.length}`;
+      const contractRecovered = diagnostics.worldContract
+        ? Math.min(
+            diagnostics.worldContract.objectiveCount,
+            diagnostics.worldContract.recoveredBeforeVisit + diagnostics.mission.securedResources,
+          )
+        : diagnostics.mission.securedResources;
       this.objective.textContent = squad?.rallyObjective.active
         ? `${squad.rallyObjective.label} · ${Math.round(squad.rallyObjective.progress * 100)}%`
-        : `浄水フィルター ${diagnostics.mission.filtersSecured}/${diagnostics.mission.filtersRequired} · 冷却コイル ${diagnostics.mission.coolingCoilLoaded ? "積載済" : "未積載"}`;
+        : diagnostics.worldContract
+          ? `${diagnostics.worldContract.label} ${contractRecovered}/${diagnostics.worldContract.objectiveCount} · 冷却コイル ${diagnostics.mission.coolingCoilLoaded ? "積載済" : "未積載"}`
+          : `全契約完了 · 任意サルベージ ${diagnostics.mission.securedResources}点`;
     } else {
       this.status.textContent = state.expedition.confirmedManifest
         ? `MANIFEST · ${state.expedition.confirmedManifest.totalCapacityUnits}/28U · RUN ${state.world.completedExpeditions}`
@@ -146,7 +159,7 @@ export class Hud {
       const { player, runtime } = state;
       const { render, physics } = diagnostics;
       this.debug.textContent = [
-        "PHASE E DIAGNOSTICS  [F1]",
+        "PHASE F DIAGNOSTICS  [F1]",
         `WORLD ${state.world.mode.toUpperCase()}  RUNS ${state.world.completedExpeditions}`,
         `FPS ${diagnostics.fps.toFixed(0).padStart(3)}  FIXED 60Hz  TICK ${runtime.tick}`,
         `POS ${format(player.position.x)}  ${format(player.position.y)}  ${format(player.position.z)}`,
@@ -158,7 +171,9 @@ export class Hud {
         `DROPPED CATCH-UP ${diagnostics.droppedSimulationFrames}`,
         `GATE DRAFT ${diagnostics.expedition.accepted ? "VALID" : "BLOCKED"}  ${diagnostics.expedition.capacity.usedUnits}/28U`,
         diagnostics.mission
-          ? `SALVAGE ${diagnostics.mission.securedResources}/${diagnostics.mission.requiredResources}  CART ${diagnostics.mission.cartAtExtraction ? "EXTRACT" : "FIELD"}`
+          ? diagnostics.worldContract
+            ? `SALVAGE ${diagnostics.worldContract.label} ${diagnostics.mission.securedResources}/${diagnostics.mission.requiredResources}  CART ${diagnostics.mission.cartAtExtraction ? "EXTRACT" : "FIELD"}`
+            : `SALVAGE OPTIONAL ${diagnostics.mission.securedResources} ITEMS  CART ${diagnostics.mission.cartAtExtraction ? "EXTRACT" : "FIELD"}`
           : "SALVAGE INACTIVE",
         state.mission.squad
           ? `COMMS ${Object.values(state.mission.squad.agents).map((agent) => `${agent.id}:${agent.communicationBand}`).join(" ")}`

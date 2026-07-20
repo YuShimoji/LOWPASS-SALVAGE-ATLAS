@@ -7,7 +7,7 @@ import { applyInterferencePulse, type InterferencePulseResult } from "../threat/
 import type { ExpeditionManifest } from "./expeditionTypes";
 import type { FixedMissionDefinition, FixedSalvageSpawn } from "./fixedMissionTypes";
 
-export type FixedMissionOutcome = "complete" | "partial";
+export type FixedMissionOutcome = "complete" | "partial" | "aborted";
 
 export interface FixedMissionResult {
   readonly missionId: string;
@@ -177,7 +177,7 @@ export class MissionSessionController {
         || location?.kind === "machine-carried"
         || location?.kind === "extraction-pad"
         || location?.kind === "recovered-to-ship";
-      if (secured) securedResources += 1;
+      if (secured && resource.required) securedResources += 1;
       if (secured && resource.resourceType === "water-filter") filtersSecured += 1;
       if (
         resource.resourceType === "cooling-coil"
@@ -306,10 +306,6 @@ export class MissionSessionController {
       if (recovered) recoveredResourceIds.push(itemId);
       if (resource.required && !recovered) complete = false;
     }
-    if (recoveredResourceIds.length === 0) {
-      return this.record("回収物がありません。少なくとも1点を確保してください");
-    }
-
     for (const itemId of recoveredResourceIds) {
       this.state.itemLocations[itemId] = {
         kind: "recovered-to-ship",
@@ -322,7 +318,7 @@ export class MissionSessionController {
       missionId: this.definition.id,
       sessionId: this.state.sessionId,
       manifestId: this.manifest.manifestId,
-      outcome: complete ? "complete" : "partial",
+      outcome: complete ? "complete" : recoveredResourceIds.length > 0 ? "partial" : "aborted",
       recoveredResourceIds,
       returnedCrewIds: [...this.manifest.selectedAgentIds],
       elapsedSeconds: this.state.elapsedSeconds,
@@ -338,10 +334,12 @@ export class MissionSessionController {
         assistedItemIds: [...outcome.assistedItemIds],
       })),
     });
-    return this.record(
-      complete ? "COMPLETE // 全必須資源を回収しました" : "PARTIAL // 回収済み資源を確保して帰還します",
-      this.state.result,
-    );
+    const notice = complete
+      ? "COMPLETE // 全必須資源を回収しました"
+      : recoveredResourceIds.length > 0
+        ? "PARTIAL // 回収済み資源を確保して帰還します"
+        : "ABORTED // 回収物なしで帰還します";
+    return this.record(notice, this.state.result);
   }
 
   private isCartAtExtraction(): boolean {

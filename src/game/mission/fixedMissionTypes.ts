@@ -9,7 +9,7 @@ import type { PorterAndroidDefinition } from "../machines/machineTypes";
 export interface FixedSalvageSpawn {
   readonly sourceId: string;
   readonly label: string;
-  readonly resourceType: "water-filter" | "cooling-coil";
+  readonly resourceType: "water-filter" | "cooling-coil" | "relay-core";
   readonly carryMode: "hand" | "cart-only";
   readonly required: boolean;
   readonly position: Vec3;

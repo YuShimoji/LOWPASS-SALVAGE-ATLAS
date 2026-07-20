@@ -69,4 +69,32 @@ describe("expedition reservation transaction", () => {
     expect(settled["relay-01"]).toEqual({ kind: "mission-ground", position: { x: 0, y: 0.93, z: -2 } });
     expect(settled["radio-01"]?.kind).toBe("ship-inventory");
   });
+
+  it("can reserve an immutable manifest when its relay already persists in the world", () => {
+    const relayDraft = createInitialExpeditionDraft();
+    relayDraft.itemInstanceIds.push("relay-01");
+    relayDraft.assignments.push({ itemInstanceId: "relay-01", agentId: "player" });
+    const relayManifest = createExpeditionManifest(relayDraft, context, {
+      manifestId: "manifest-persisted-relay",
+      createdAtIso: "2026-07-21T00:00:00.000Z",
+    });
+    const locations = createInitialItemLocations();
+    locations["relay-01"] = { kind: "mission-ground", position: { x: 1, y: 0.93, z: -1 } };
+    const commit = reserveExpeditionItems(relayManifest, locations, "reservation-persisted", ["relay-01"]);
+    expect(commit.locations["relay-01"]).toEqual(locations["relay-01"]);
+    expect(commit.reservation.persistedWorldItemIds).toEqual(["relay-01"]);
+    commit.locations["relay-01"] = { kind: "crew", crewId: "player" };
+    const settled = settleExpeditionReservation(commit.reservation, commit.locations, "flooded-market-01");
+    expect(settled["relay-01"]).toEqual({ kind: "ship-inventory" });
+  });
+
+  it("returns recovered persistent equipment even when it is not in the new manifest", () => {
+    const locations = createInitialItemLocations();
+    locations["relay-01"] = { kind: "mission-ground", position: { x: 1, y: 0.93, z: -1 } };
+    const commit = reserveExpeditionItems(manifest, locations, "reservation-world-only", ["relay-01"]);
+    expect(commit.reservation.persistedWorldItemIds).toEqual(["relay-01"]);
+    commit.locations["relay-01"] = { kind: "crew", crewId: "player" };
+    const settled = settleExpeditionReservation(commit.reservation, commit.locations, "flooded-market-01");
+    expect(settled["relay-01"]).toEqual({ kind: "ship-inventory" });
+  });
 });

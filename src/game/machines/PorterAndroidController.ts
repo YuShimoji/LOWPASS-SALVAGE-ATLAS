@@ -37,6 +37,11 @@ export interface PorterActionResolution {
   readonly reason: string;
 }
 
+export interface PorterRestoreOptions {
+  readonly friendly: boolean;
+  readonly position: Vec3;
+}
+
 export class PorterAndroidController {
   readonly state: PorterAndroidState;
   private handshakeAgentId: CrewId | null = null;
@@ -50,6 +55,7 @@ export class PorterAndroidController {
     private readonly navigation: Pick<WaypointNavigationService, "findPath" | "projectToNavigablePoint">,
     private readonly mission: PorterMissionPort,
     startedAtSeconds = 0,
+    restore?: PorterRestoreOptions,
   ) {
     this.state = {
       id: definition.id,
@@ -77,9 +83,15 @@ export class PorterAndroidController {
       failureReport: null,
       gateEvaluationCodes: [],
     };
+    if (restore?.friendly) {
+      this.state.faction = "friendly";
+      this.state.mode = "friendly-idle";
+      this.state.position = copyVec3(restore.position);
+      this.state.authenticated = true;
+    }
   }
 
-  getInteractions(coolingCoilItemId: string | null): readonly InteractionDefinition[] {
+  getInteractions(coolingCoilItemId: string | null, hasFieldTerminal = true): readonly InteractionDefinition[] {
     if (this.state.mode === "dormant" || this.state.mode === "handshake") {
       return [{
         id: `porter-auth:${this.state.id}`,
@@ -95,7 +107,7 @@ export class PorterAndroidController {
       this.commandInteraction("follow", "FOLLOW"),
       this.commandInteraction("hold", "HOLD"),
     ];
-    if (coolingCoilItemId && this.mission.itemLocations[coolingCoilItemId]?.kind === "mission-ground") {
+    if (hasFieldTerminal && coolingCoilItemId && this.mission.itemLocations[coolingCoilItemId]?.kind === "mission-ground") {
       commands.push(this.commandInteraction("carry-to", "CARRY COOLING COIL TO EXTRACTION"));
     }
     return commands;
@@ -121,6 +133,7 @@ export class PorterAndroidController {
     elapsedSeconds: number,
     coolingCoilItemId: string | null,
     extractionPoint: Vec3,
+    hasFieldTerminal = true,
   ): PorterActionResolution {
     if (!this.state.authenticated) return this.reject("PORTER_NOT_AUTHENTICATED", "先に簡易端末で認証してください");
     if (command === "follow") {
@@ -138,6 +151,7 @@ export class PorterAndroidController {
       this.transition("holding", elapsedSeconds);
       return { accepted: true, code: "PORTER_HOLD", reason: "荷役補助機が待機します" };
     }
+    if (!hasFieldTerminal) return this.reject("FIELD_TERMINAL_REQUIRED", "高度な搬送命令には簡易フィールド端末が必要です");
     if (!coolingCoilItemId || this.mission.itemLocations[coolingCoilItemId]?.kind !== "mission-ground") {
       return this.reject("CARRY_ITEM_UNAVAILABLE", "搬送可能な冷却コイルがありません");
     }

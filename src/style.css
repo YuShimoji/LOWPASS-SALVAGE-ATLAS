@@ -1203,6 +1203,10 @@ input:focus-visible {
   color: var(--ui-warm);
 }
 
+.mission-result-stamp.is-aborted {
+  color: #9aa29c;
+}
+
 .mission-result-frame .resume-button {
   width: 100%;
   margin-top: 14px;
@@ -1228,6 +1232,73 @@ input:focus-visible {
   color: #91aaa0;
   background: #111d1c;
   font-size: 8px;
+  cursor: pointer;
+}
+
+.world-status-panel {
+  position: fixed;
+  right: 24px;
+  bottom: 22px;
+  z-index: 7;
+  display: none;
+  width: min(330px, calc(100vw - 48px));
+  border: 1px solid #40564d;
+  color: #9fb0a5;
+  background: rgba(7, 15, 16, 0.9);
+  font: 9px/1.45 "Courier New", monospace;
+}
+
+.world-status-panel.is-visible {
+  display: block;
+}
+
+.world-status-panel summary {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 9px;
+  color: #87a99a;
+  cursor: pointer;
+  list-style: none;
+}
+
+.world-status-panel summary strong {
+  color: var(--ui-amber);
+}
+
+.world-status-body {
+  border-top: 1px solid #33473f;
+  padding: 7px 9px;
+}
+
+.world-status-body dl,
+.world-status-body dd {
+  margin: 0;
+}
+
+.world-status-body div {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.world-status-body dt {
+  color: #647b70;
+}
+
+.world-status-body dd {
+  color: #c8d4ca;
+  text-align: right;
+}
+
+.world-reset-button {
+  width: calc(100% - 18px);
+  margin: 0 9px 9px;
+  border: 1px solid #744c45;
+  padding: 6px;
+  color: #ca8f82;
+  background: #1c1717;
+  font: inherit;
   cursor: pointer;
 }
 

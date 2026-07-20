@@ -136,12 +136,18 @@ export function createFloodedMarket(
   });
 
   const relayViews = new Map<string, Group>();
-  for (const relay of manifest.items.filter((item) => item.definitionId === "portable-relay")) {
+  const relayIds = new Set([
+    ...manifest.items.filter((item) => item.definitionId === "portable-relay").map((item) => item.instanceId),
+    ...Object.entries(session.itemLocations)
+      .filter(([itemId, location]) => itemId.startsWith("relay-") && location.kind === "mission-ground")
+      .map(([itemId]) => itemId),
+  ]);
+  for (const relayId of relayIds) {
     const view = createRelay(materials);
-    view.name = `portable-relay-${relay.instanceId}`;
+    view.name = `portable-relay-${relayId}`;
     view.visible = false;
     root.add(view);
-    relayViews.set(relay.instanceId, view);
+    relayViews.set(relayId, view);
   }
   const beaconViews = new Map<string, Group>();
   const scoutDrone = createScoutDrone(materials);
