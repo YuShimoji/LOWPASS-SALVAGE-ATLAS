@@ -1,6 +1,7 @@
 import type { FixedMissionDefinition } from "../game/mission/fixedMissionTypes";
 import type { CrewId, DistributedSquadState, SquadOrderType } from "../game/squad/squadTypes";
 import type { ThreatEncounterState } from "../game/threat/threatTypes";
+import type { PorterAndroidState } from "../game/machines/machineTypes";
 
 export interface SquadPanelViewModel {
   readonly state: DistributedSquadState;
@@ -9,6 +10,7 @@ export interface SquadPanelViewModel {
   readonly availableFlareCount: number;
   readonly threat: ThreatEncounterState;
   readonly elapsedSeconds: number;
+  readonly porter: PorterAndroidState;
 }
 
 export interface SquadPanelCallbacks {
@@ -56,11 +58,13 @@ export class SquadPanel {
     const rally = state.rallyObjective;
     const threatKnowledge = controlled ? view.threat.byAgent[controlled.id] : null;
     const threatContact = threatKnowledge?.contact ?? null;
+    const lockOnControlled = view.threat.drone.mode === "lock-on" && view.threat.drone.targetAgentId === controlled?.id;
+    const interferenceRemaining = Math.max(0, (state.interferenceUntilByAgentId[controlled?.id ?? ""] ?? 0) - view.elapsedSeconds);
     this.root.classList.toggle("has-threat", Boolean(threatContact));
     this.summary.innerHTML = `
       <span class="squad-summary-kicker">SQUAD / ${connectedCount} LINKED</span>
       <strong>${escapeHtml(controlled?.id.toUpperCase() ?? "UNKNOWN")}</strong>
-      <span>${threatContact ? `CONTACT ${threatContact.freshness.toUpperCase()}` : rally.achieved ? "CREW LINKED" : rally.active ? `RALLY ${Math.round(rally.progress * 100)}%` : "STABLE"}</span>
+      <span>${lockOnControlled ? `△ LOCK-ON ${Math.round(view.threat.drone.lockOnProgress * 100)}%` : interferenceRemaining > 0 ? `◇ INTERFERENCE ${interferenceRemaining.toFixed(1)}s` : threatContact ? `CONTACT ${threatContact.freshness.toUpperCase()}` : rally.achieved ? "CREW LINKED" : rally.active ? `RALLY ${Math.round(rally.progress * 100)}%` : "STABLE"}</span>
     `;
 
     const revisionKey = [
@@ -75,6 +79,9 @@ export class SquadPanel {
       threatContact?.freshness ?? "unknown",
       view.hasFieldTerminal,
       view.availableFlareCount,
+      view.porter.mode,
+      view.porter.carriedItemId ?? "none",
+      interferenceRemaining.toFixed(1),
       agents.map((agent) => `${agent.id}:${agent.currentOrder?.order.type ?? "none"}:${agent.statusLabel}`).join("|"),
     ].join(":");
     if (revisionKey === this.lastRevisionKey) return;
@@ -127,6 +134,11 @@ export class SquadPanel {
       <section class="squad-report-strip">
         <span>REPORT</span><strong>${escapeHtml(latestReport?.label ?? "NO SHARED REPORT")}</strong>
         <small>${beacon ? `FLARE ACTIVE · ${beacon.recognizedByAgentIds.length}/${agents.length} DETECTED` : `FLARES ${view.availableFlareCount}`}</small>
+      </section>
+      <section class="squad-report-strip machine-report-strip">
+        <span>FRIENDLY MACHINE</span>
+        <strong>▰ PORTER // ${escapeHtml(view.porter.mode.toUpperCase())}</strong>
+        <small>${view.porter.authenticated ? `VOICE NODE · COMMAND ${escapeHtml(view.porter.command.toUpperCase())} · CARRY ${escapeHtml(view.porter.carriedItemId ?? "NONE")}` : "FIELD TERMINAL AUTH REQUIRED"}</small>
       </section>
       <div class="squad-equipment-actions">
         <button type="button" data-deploy-relay>RELAY DEPLOY</button>

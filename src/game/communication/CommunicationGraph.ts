@@ -9,6 +9,7 @@ import type {
 
 const LOCAL_INSTRUCTION_RANGE = 2.4;
 const MAX_RADIO_RANGE = 28;
+const FRIENDLY_MACHINE_VOICE_RANGE = 8;
 
 export class CommunicationGraph {
   private readonly nodes = new Map<string, CommunicationNode>();
@@ -116,11 +117,16 @@ export class CommunicationGraph {
     if (left.id === right.id) return 1;
     if (left.kind === "agent-radio" && right.kind === "agent-radio" && left.agentId === right.agentId) return 1;
     const distance = Math.sqrt(distanceSquared(left.position, right.position));
+    if (
+      (left.kind === "friendly-machine" || right.kind === "friendly-machine")
+      && distance > FRIENDLY_MACHINE_VOICE_RANGE
+    ) return 0;
     if (distance > MAX_RADIO_RANGE) return 0;
     const zonePenalty = Math.max(this.attenuationAt(left.position), this.attenuationAt(right.position));
     const relayBonus = left.kind === "portable-relay" || right.kind === "portable-relay" ? 0.42 : 0;
     const beaconBonus = left.kind === "extraction-beacon" || right.kind === "extraction-beacon" ? 0.08 : 0;
-    return clamp(1 - distance / MAX_RADIO_RANGE - zonePenalty + relayBonus + beaconBonus, 0, 1);
+    const machineVoiceFloor = left.kind === "friendly-machine" || right.kind === "friendly-machine" ? 0.52 : 0;
+    return clamp(Math.max(machineVoiceFloor, 1 - distance / MAX_RADIO_RANGE - zonePenalty + relayBonus + beaconBonus), 0, 1);
   }
 
   private attenuationAt(position: Vec3): number {

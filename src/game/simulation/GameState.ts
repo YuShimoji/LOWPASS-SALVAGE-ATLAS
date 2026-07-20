@@ -7,6 +7,7 @@ import type { ItemLocationLedger } from "../items/itemLocation";
 import type { FixedMissionResult, MissionSessionState } from "../mission/MissionSession";
 import type { DistributedSquadState } from "../squad/squadTypes";
 import type { ThreatEncounterState } from "../threat/threatTypes";
+import type { PorterAndroidState } from "../machines/machineTypes";
 
 export type RuntimeMode = "playing" | "paused";
 
@@ -68,6 +69,7 @@ export interface GameState {
     session: MissionSessionState | null;
     squad: DistributedSquadState | null;
     threat: ThreatEncounterState | null;
+    porter: PorterAndroidState | null;
     lastResult: FixedMissionResult | null;
   };
   ui: {
@@ -117,6 +119,7 @@ export function createInitialGameState(): GameState {
       session: null,
       squad: null,
       threat: null,
+      porter: null,
       lastResult: null,
     },
     ui: {

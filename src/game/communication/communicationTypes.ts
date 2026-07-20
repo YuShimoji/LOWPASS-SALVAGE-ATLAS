@@ -4,6 +4,7 @@ export type CommunicationNodeKind =
   | "agent-radio"
   | "field-terminal"
   | "portable-relay"
+  | "friendly-machine"
   | "extraction-beacon";
 
 export type CommunicationBand = "none" | "burst" | "voice" | "telemetry";

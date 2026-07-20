@@ -1,5 +1,6 @@
 import "./style.css";
 import { FrameStats } from "./diagnostics/FrameStats";
+import { measureDomDiagnostics, type DomDiagnostics } from "./diagnostics/DomDiagnostics";
 import { SHIP_COLLIDERS, SHIP_INTERACTIONS } from "./game/content/shipLayout";
 import { InputController } from "./game/input/InputController";
 import {
@@ -20,13 +21,15 @@ import {
   type ExpeditionReservation,
 } from "./game/mission/ExpeditionReservation";
 import { evaluateItemForGate } from "./game/mission/gateEvaluator";
-import { MissionSessionController } from "./game/mission/MissionSession";
+import type { MissionSessionController } from "./game/mission/MissionSession";
 import type { ExpeditionManifest } from "./game/mission/expeditionTypes";
 import { createInsertionPlan, type MissionLaunchOptions } from "./game/insertion/InsertionPlanner";
 import { WaypointNavigationService } from "./game/navigation/WaypointNavigationService";
 import { DistributedSquadController } from "./game/squad/DistributedSquadController";
 import { CREW_DEFINITIONS, type CrewId, type SquadOrderType } from "./game/squad/squadTypes";
-import { ScoutDroneController } from "./game/threat/ScoutDroneController";
+import type { ScoutDroneController, ThreatEcologyContext } from "./game/threat/ScoutDroneController";
+import type { PorterAndroidController } from "./game/machines/PorterAndroidController";
+import type { MachineFeedbackAudio } from "./render/audio/MachineFeedbackAudio";
 import { FixedStepRunner } from "./game/simulation/FixedStepRunner";
 import { GameSimulation } from "./game/simulation/GameSimulation";
 import {
@@ -51,7 +54,7 @@ declare global {
         world: string;
         physics: ReturnType<PhysicsWorld["getDiagnostics"]> | null;
         render: ReturnType<RenderSystem["getDiagnostics"]> | null;
-        domNodes: number;
+        dom: DomDiagnostics;
         communicationRevision: number;
         threat: {
           activeDroneCount: number;
@@ -60,6 +63,14 @@ declare global {
           reportRevision: number;
           deliveryRevision: number;
           pendingReportCount: number;
+          firstRetreatAnalysisRevision: number;
+          interferenceRevision: number;
+        };
+        porter: {
+          mode: string | null;
+          authenticated: boolean;
+          carriedItemId: string | null;
+          gateEvaluationCodes: readonly string[];
         };
       };
       teleportForQa(x: number, z: number): void;
@@ -71,6 +82,10 @@ declare global {
       deployFlareForQa(): string;
       setDronePositionForQa(x: number, z: number, facingYaw?: number): void;
       disableThreatForQa(): string;
+      authenticatePorterForQa(): string;
+      porterCommandForQa(command: "follow" | "hold" | "carry-to"): string;
+      disableRelayForQa(itemInstanceId?: string): string;
+      restartRelayForQa(itemInstanceId?: string): string;
       threatReadback(): ReturnType<ScoutDroneController["getDebugReadback"]> | null;
     };
   }
@@ -101,11 +116,16 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   let missionController: MissionSessionController | null = null;
   let squadController: DistributedSquadController | null = null;
   let threatController: ScoutDroneController | null = null;
+  let porterController: PorterAndroidController | null = null;
+  let machineAudio: MachineFeedbackAudio | null = null;
   let activeReservation: ExpeditionReservation | null = null;
   let transitionInFlight = false;
   let appDisposed = false;
   let frameHandle = 0;
   let qaPanel: HTMLElement | null = null;
+  let ecologyRefreshAccumulator = 0;
+  let cachedEcologyContext: ThreatEcologyContext | null = null;
+  let porterWasAuthenticated = false;
 
   const releaseWorldInput = (): void => {
     input?.clearMovement();
@@ -155,6 +175,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       ...missionController.getInteractions(),
       ...(squadController?.getInteractions() ?? []),
       ...(threatController?.getInteractions() ?? []),
+      ...(porterController?.getInteractions(missionController.getResourceItemId("cooling-coil")) ?? []),
     ]);
   };
 
@@ -217,6 +238,43 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       squadController.hasHeldItemDefinition(controlledId, "field-terminal"),
       state.runtime.elapsedSeconds,
       (from, to) => physics?.hasLineOfSight(from, to) ?? false,
+    );
+    squadAudio.play(result.accepted);
+    setSquadNotice(`${result.code} // ${result.reason}`);
+    return result.code;
+  };
+
+  const porterAuthenticationContext = () => {
+    if (!squadController || !missionController) return null;
+    const controlledId = squadController.state.control.controlledAgentId;
+    const controlled = squadController.state.agents[controlledId];
+    if (!controlled) return null;
+    return {
+      agentId: controlledId,
+      position: squadController.getControlledPosition(),
+      operable: controlled.controlMode !== "incapacitated",
+      hasFieldTerminal: squadController.hasHeldItemDefinition(controlledId, "field-terminal"),
+      exclusiveOperationActive: missionController.state.cartAttached,
+    };
+  };
+
+  const runPorterAuthentication = (): string => {
+    const context = porterAuthenticationContext();
+    if (!porterController || !context) return "PORTER_SESSION_MISSING";
+    const result = porterController.beginAuthentication(context, state.runtime.elapsedSeconds);
+    squadAudio.play(result.accepted);
+    setSquadNotice(`${result.code} // ${result.reason}`);
+    return result.code;
+  };
+
+  const runPorterCommand = (command: "follow" | "hold" | "carry-to"): string => {
+    if (!porterController || !squadController || !missionController) return "PORTER_SESSION_MISSING";
+    const result = porterController.issueCommand(
+      command,
+      squadController.state.control.controlledAgentId,
+      state.runtime.elapsedSeconds,
+      missionController.getResourceItemId("cooling-coil"),
+      missionController.definition.extractionPoint,
     );
     squadAudio.play(result.accepted);
     setSquadNotice(`${result.code} // ${result.reason}`);
@@ -334,11 +392,66 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         configureQaPhaseDLoadout();
         return;
       }
+      if (target === "isolate-contact" && squadController && threatController) {
+        const isolated = { x: 3.45, y: 0.93, z: -3.5 };
+        squadController.setAgentPositionForQa("player", isolated);
+        squadController.setAgentPositionForQa("mara", { x: -6, y: 0.93, z: 6 });
+        squadController.setAgentPositionForQa("ito", { x: -5.5, y: 0.93, z: 6 });
+        threatController.armIsolatedContactForQa(
+          { x: 3.45, y: threatController.definition.cruiseAltitude, z: -4.65 },
+          state.runtime.elapsedSeconds,
+          Math.PI,
+        );
+        physics?.teleportCharacter(isolated);
+        simulation.teleportPlayer(isolated);
+        simulation.setNotice("QA // ISOLATED CONTACT CONFIGURED");
+        return;
+      }
+      if (target === "reinforce-contact" && squadController) {
+        const targetAgent = squadController.state.agents.player;
+        if (targetAgent) squadController.setAgentPositionForQa("mara", { ...targetAgent.position, x: targetAgent.position.x - 0.7 });
+        simulation.setNotice("QA // ALLIED REINFORCEMENT ARRIVED");
+        return;
+      }
+      if (target === "withdraw-contact" && squadController) {
+        squadController.setAgentPositionForQa("mara", { x: -6, y: 0.93, z: 6 });
+        simulation.setNotice("QA // ALLIED REINFORCEMENT WITHDREW");
+        return;
+      }
+      if (target === "deploy-relay") {
+        runEquipmentAction("deploy-relay");
+        return;
+      }
+      if (target === "disable-relay" && squadController) {
+        const result = squadController.disableRelay("relay-01", state.runtime.elapsedSeconds);
+        setSquadNotice(`${result.code} // ${result.reason}`);
+        return;
+      }
+      if (target === "restart-relay" && squadController) {
+        const result = squadController.beginRelayRestart("relay-01", state.runtime.elapsedSeconds);
+        setSquadNotice(`${result.code} // ${result.reason}`);
+        return;
+      }
+      if (target === "porter-auth") {
+        const position = porterController?.state.position;
+        if (position) {
+          physics?.teleportCharacter(position);
+          simulation.teleportPlayer(position);
+          squadController?.setAgentPositionForQa(squadController.state.control.controlledAgentId, position);
+        }
+        runPorterAuthentication();
+        return;
+      }
+      if (target === "porter-carry") {
+        runPorterCommand("carry-to");
+        return;
+      }
       let position = SHIP_INTERACTIONS.find((interaction) => interaction.id === "expedition-console")?.position;
       if (missionController) {
         if (target === "extract") position = missionController.definition.extractionPoint;
         else if (target === "cart") position = missionController.getCartPosition();
         else if (target === "drone") position = threatController?.state.drone.position;
+        else if (target === "porter") position = porterController?.state.position;
         else position = missionController.definition.salvage.find((resource) => resource.sourceId === target)?.position
           ?? missionController.definition.searchZones.find((zone) => zone.id === target)?.entrance
           ?? missionController.definition.toolShortcuts.find((shortcut) => shortcut.id === target)?.interactionPosition;
@@ -379,9 +492,20 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     }
 
     try {
-      const [{ FLOODED_MARKET_MISSION }, { createFloodedMarket }] = await Promise.all([
+      const [
+        { FLOODED_MARKET_MISSION },
+        { createFloodedMarket },
+        { ScoutDroneController: DynamicScoutDroneController },
+        { PorterAndroidController: DynamicPorterAndroidController },
+        { MachineFeedbackAudio: DynamicMachineFeedbackAudio },
+        { MissionSessionController: DynamicMissionSessionController },
+      ] = await Promise.all([
         import("./game/mission/fixed/floodedMarket"),
         import("./render/objects/createFloodedMarket"),
+        import("./game/threat/ScoutDroneController"),
+        import("./game/machines/PorterAndroidController"),
+        import("./render/audio/MachineFeedbackAudio"),
+        import("./game/mission/MissionSession"),
       ]);
       if (appDisposed) return;
       const sessionId = crypto.randomUUID();
@@ -399,7 +523,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
           navigation,
         },
       );
-      const nextMissionController = new MissionSessionController(
+      const nextMissionController = new DynamicMissionSessionController(
         FLOODED_MARKET_MISSION,
         manifest,
         sessionId,
@@ -411,10 +535,23 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         insertionPlan,
         nextMissionController.state.itemLocations,
       );
-      const nextThreatController = new ScoutDroneController(
+      const nextThreatController = new DynamicScoutDroneController(
         FLOODED_MARKET_MISSION.threatEncounter,
         manifest.selectedAgentIds,
         nextSquadController.navigation,
+        state.runtime.elapsedSeconds,
+        query.get("drones") === "2" ? 2 : 1,
+      );
+      const nextPorterController = new DynamicPorterAndroidController(
+        FLOODED_MARKET_MISSION.porterAndroid,
+        nextSquadController.navigation,
+        {
+          missionId: FLOODED_MARKET_MISSION.id,
+          itemLocations: nextMissionController.state.itemLocations,
+          transferResourceToMachine: (itemId, machineId) => nextMissionController.transferResourceToMachine(itemId, machineId),
+          placeMachineResourceAtExtraction: (itemId, machineId) => nextMissionController.placeMachineResourceAtExtraction(itemId, machineId),
+          placeMachineResourceSafely: (itemId, machineId, position) => nextMissionController.placeMachineResourceSafely(itemId, machineId, position),
+        },
         state.runtime.elapsedSeconds,
       );
       const controlledSpawn = nextSquadController.getControlledPosition();
@@ -444,6 +581,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
           nextMissionController.state,
           nextSquadController.state,
           nextThreatController.state,
+          nextPorterController.state,
         ),
         controlledPlacement
           ? { playerPosition: controlledPlacement.position, cameraPosition: controlledPlacement.cameraPosition }
@@ -454,12 +592,19 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       missionController = nextMissionController;
       squadController = nextSquadController;
       threatController = nextThreatController;
+      porterController = nextPorterController;
+      machineAudio?.dispose();
+      machineAudio = new DynamicMachineFeedbackAudio(audioEnabled);
       activeReservation = reservationCommit.reservation;
       state.inventory.itemLocations = nextMissionController.state.itemLocations;
       state.mission.session = nextMissionController.state;
       state.mission.squad = nextSquadController.state;
       state.mission.threat = nextThreatController.state;
+      state.mission.porter = nextPorterController.state;
       state.mission.lastResult = null;
+      ecologyRefreshAccumulator = 0.2;
+      cachedEcologyContext = null;
+      porterWasAuthenticated = false;
       state.world.mode = "mission";
       simulation.teleportPlayer(controlledSpawn);
       refreshMissionInteractions();
@@ -510,11 +655,17 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       squadController = null;
       threatController?.dispose();
       threatController = null;
+      porterController?.dispose();
+      porterController = null;
+      machineAudio?.dispose();
+      machineAudio = null;
+      cachedEcologyContext = null;
       activeReservation = null;
       state.inventory.itemLocations = settledLocations;
       state.mission.session = null;
       state.mission.squad = null;
       state.mission.threat = null;
+      state.mission.porter = null;
       state.world.mode = "ship";
       state.world.completedExpeditions += 1;
       simulation.teleportPlayer(INITIAL_PLAYER_POSITION);
@@ -550,6 +701,23 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       if (action.type === "mission-threat-disable" && threatController && action.threatId === threatController.state.drone.id) {
         runThreatDisable();
         return;
+      }
+      if (action.type === "mission-relay-restart" && squadController) {
+        const resolution = squadController.beginRelayRestart(action.itemInstanceId, state.runtime.elapsedSeconds);
+        setSquadNotice(`${resolution.code} // ${resolution.reason}`);
+        return;
+      }
+      if (action.type === "mission-porter-auth" && porterController && action.machineId === porterController.state.id) {
+        runPorterAuthentication();
+        return;
+      }
+      if (action.type === "mission-porter-command" && porterController && action.machineId === porterController.state.id) {
+        runPorterCommand(action.command);
+        return;
+      }
+      if (action.type === "mission-extract") {
+        const machineOutcome = porterController?.getOutcome();
+        missionController.setAlliedMachineOutcomes(machineOutcome ? [machineOutcome] : []);
       }
       const resolution = missionController.handleInteraction(
         action,
@@ -605,7 +773,68 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         if (missionController) {
           missionController.fixedUpdate(dt, state.player.position, state.player.facingYaw);
           squadController?.fixedUpdate(dt, state.player.position, state.runtime.elapsedSeconds, state.player.facingYaw);
+          if (squadController && porterController) {
+            porterController.fixedUpdate(
+              dt,
+              state.runtime.elapsedSeconds,
+              porterAuthenticationContext(),
+              squadController.getAgentPositions(),
+            );
+            squadController.setFriendlyMachineVoiceNode(
+              porterController.state.id,
+              porterController.state.position,
+              porterController.state.authenticated,
+            );
+            if (porterController.state.authenticated && !porterWasAuthenticated) {
+              porterWasAuthenticated = true;
+              machineAudio?.playPorterAuthenticated();
+              simulation.setNotice("PORTER AUTHORIZED // SHORT-RANGE VOICE NODE ONLINE");
+            }
+          }
           if (squadController && threatController) {
+            ecologyRefreshAccumulator += dt;
+            if (!cachedEcologyContext || ecologyRefreshAccumulator >= 0.2) {
+              ecologyRefreshAccumulator %= 0.2;
+              const activeSession = missionController;
+              const activeSquad = squadController;
+              cachedEcologyContext = {
+                extractionPoint: activeSession.definition.extractionPoint,
+                stimuli: Object.values(activeSquad.state.signals.beacons).map((beacon) => ({
+                  id: beacon.id,
+                  kind: "flare" as const,
+                  position: { ...beacon.position },
+                  active: beacon.expiresAtSeconds > state.runtime.elapsedSeconds,
+                })),
+                relays: activeSquad.state.deployedRelayItemIds.flatMap((itemId) => {
+                  const location = activeSession.state.itemLocations[itemId];
+                  if (location?.kind !== "mission-ground") return [];
+                  return [{
+                    id: itemId,
+                    kind: "relay" as const,
+                    position: { ...location.position },
+                    active: true,
+                    disabled: activeSquad.isRelayDisabled(itemId),
+                  }];
+                }),
+                friendlyMachine: porterController?.state ?? null,
+                onInterdict: (targetAgentId) => {
+                  const target = activeSquad.state.agents[targetAgentId];
+                  if (!target) return;
+                  const pulse = activeSession.applyInterference(targetAgentId, target.position, state.runtime.elapsedSeconds);
+                  activeSquad.applyInterference(targetAgentId, pulse.communicationLimitedUntilSeconds);
+                  if (activeSquad.state.control.controlledAgentId === targetAgentId) {
+                    state.interaction.activatedAction = null;
+                    input?.clearMovement();
+                  }
+                  porterController?.interruptExclusiveOperation(targetAgentId, state.runtime.elapsedSeconds);
+                  simulation.setNotice(`INTERFERENCE PULSE // ${targetAgentId.toUpperCase()} · COMMS BURST 8 SEC`);
+                },
+                onRelaySabotage: (relayItemId) => {
+                  const result = activeSquad.disableRelay(relayItemId, state.runtime.elapsedSeconds);
+                  simulation.setNotice(`${result.code} // ${result.reason}`);
+                },
+              };
+            }
             threatController.fixedUpdate(
               dt,
               state.runtime.elapsedSeconds,
@@ -615,6 +844,12 @@ async function bootstrap(root: HTMLElement): Promise<void> {
                 band: "none",
                 localInstructionAllowed: false,
               },
+              cachedEcologyContext,
+            );
+            machineAudio?.update(
+              threatController.state.drone.mode,
+              threatController.state.drone.lockOnProgress,
+              state.runtime.elapsedSeconds,
             );
           }
           currentPhysics.setKinematicObjectPosition(
@@ -643,8 +878,9 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         physics: physics?.getDiagnostics() ?? { rigidBodyCount: 0, colliderCount: 0, collisionCount: 0 },
         expedition: planner.getEvaluation(),
         mission: missionController?.getObjectiveProgress() ?? null,
+        dom: measureDomDiagnostics(),
       });
-      if (squadController && threatController) {
+      if (squadController && threatController && porterController) {
         const availableFlareCount = squadController.manifest.items.filter((item) =>
           item.definitionId === "flare-pack" && missionController?.state.itemLocations[item.instanceId]?.kind === "crew",
         ).length;
@@ -655,6 +891,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
           availableFlareCount,
           threat: threatController.state,
           elapsedSeconds: state.runtime.elapsedSeconds,
+          porter: porterController.state,
         });
       } else {
         squadPanel.update(null);
@@ -669,7 +906,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       world: state.world.mode,
       physics: physics?.getDiagnostics() ?? null,
       render: renderSystem?.getDiagnostics() ?? null,
-      domNodes: document.querySelectorAll("*").length,
+      dom: measureDomDiagnostics(),
       communicationRevision: squadController?.state.communicationRevision ?? 0,
       threat: {
         activeDroneCount: threatController?.getActiveDroneCount() ?? 0,
@@ -678,6 +915,14 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         reportRevision: threatController?.state.reportRevision ?? 0,
         deliveryRevision: threatController?.state.deliveryRevision ?? 0,
         pendingReportCount: threatController?.getPendingReportCount() ?? 0,
+        firstRetreatAnalysisRevision: threatController?.state.firstRetreatAnalysisRevision ?? 0,
+        interferenceRevision: threatController?.state.interferenceRevision ?? 0,
+      },
+      porter: {
+        mode: porterController?.state.mode ?? null,
+        authenticated: porterController?.state.authenticated ?? false,
+        carriedItemId: porterController?.state.carriedItemId ?? null,
+        gateEvaluationCodes: porterController?.state.gateEvaluationCodes ?? [],
       },
     }),
     teleportForQa: (x, z) => {
@@ -705,6 +950,18 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       refreshMissionInteractions();
     },
     disableThreatForQa: runThreatDisable,
+    authenticatePorterForQa: runPorterAuthentication,
+    porterCommandForQa: runPorterCommand,
+    disableRelayForQa: (itemInstanceId = "relay-01") => {
+      const result = squadController?.disableRelay(itemInstanceId, state.runtime.elapsedSeconds);
+      refreshMissionInteractions();
+      return result?.code ?? "SQUAD_SESSION_MISSING";
+    },
+    restartRelayForQa: (itemInstanceId = "relay-01") => {
+      const result = squadController?.beginRelayRestart(itemInstanceId, state.runtime.elapsedSeconds);
+      refreshMissionInteractions();
+      return result?.code ?? "SQUAD_SESSION_MISSING";
+    },
     threatReadback: () => threatController?.getDebugReadback(
       squadController?.state.control.controlledAgentId ?? "player",
     ) ?? null,
@@ -723,6 +980,8 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     missionController?.dispose();
     squadController?.dispose();
     threatController?.dispose();
+    porterController?.dispose();
+    machineAudio?.dispose();
     physics?.dispose();
     activeRenderSystem.dispose();
     resultPanel?.dispose();
@@ -756,6 +1015,15 @@ function createQaNavigation(
     ["underground", "QA 地下"],
     ["cooling-gate", "QA 短縮ゲート"],
     ["drone", "QA SCOUT DRONE"],
+    ["porter", "QA PORTER"],
+    ["isolate-contact", "QA ISOLATE"],
+    ["reinforce-contact", "QA REINFORCE"],
+    ["withdraw-contact", "QA WITHDRAW"],
+    ["deploy-relay", "QA RELAY DEPLOY"],
+    ["disable-relay", "QA RELAY DISABLE"],
+    ["restart-relay", "QA RELAY RESTART"],
+    ["porter-auth", "QA PORTER AUTH"],
+    ["porter-carry", "QA PORTER CARRY"],
     ["extract", "QA 抽出地点"],
   ] as const) {
     const button = document.createElement("button");

@@ -9,7 +9,11 @@ import { FLOODED_MARKET_MISSION } from "../mission/fixed/floodedMarket";
 import { WaypointNavigationService } from "../navigation/WaypointNavigationService";
 import { DistributedSquadController } from "../squad/DistributedSquadController";
 import { CREW_DEFINITIONS } from "../squad/squadTypes";
-import { ScoutDroneController, type ThreatLineOfSightQuery } from "./ScoutDroneController";
+import {
+  ScoutDroneController,
+  type ThreatEcologyContext,
+  type ThreatLineOfSightQuery,
+} from "./ScoutDroneController";
 
 const draft: ExpeditionDraft = {
   revision: 9,
@@ -61,6 +65,7 @@ function updateThreat(
   elapsedSeconds: number,
   lineOfSight: ThreatLineOfSightQuery,
   dt = 0.1,
+  ecology: ThreatEcologyContext | null = null,
 ): void {
   threat.fixedUpdate(
     dt,
@@ -68,39 +73,143 @@ function updateThreat(
     squad.state,
     lineOfSight,
     (sourceId, targetId) => squad.getCommunicationStatus(sourceId, targetId),
+    ecology,
   );
 }
 
 describe("ScoutDrone deterministic encounter", () => {
-  it("moves through investigate, track, last-known search, and non-combat disengagement", () => {
+  it("stalks an isolated agent, locks on, and immediately disengages when reinforcement arrives", () => {
     const { squad, threat } = createControllers();
-    squad.setAgentPositionForQa("ito", { x: 3.45, y: 0.93, z: -2.15 });
+    squad.setAgentPositionForQa("ito", { x: 3.45, y: 0.93, z: -3.5 });
+    squad.setAgentPositionForQa("player", { x: -6, y: 0.93, z: 6 });
+    squad.setAgentPositionForQa("mara", { x: -5.5, y: 0.93, z: 6 });
     const clear = () => true;
+    const ecology: ThreatEcologyContext = {
+      extractionPoint: FLOODED_MARKET_MISSION.extractionPoint,
+      stimuli: [],
+      relays: [],
+      friendlyMachine: null,
+    };
 
     updateThreat(squad, threat, 0.8, clear);
     expect(threat.state.drone.mode).toBe("patrol");
-    updateThreat(squad, threat, 0.9, clear);
-    expect(threat.state.drone.mode).toBe("investigate");
+    updateThreat(squad, threat, 1.05, clear, 0.25, ecology);
+    expect(threat.state.drone.mode).toBe("stalk");
     expect(threat.state.drone.targetAgentId).toBe("ito");
-    updateThreat(squad, threat, 1.6, clear);
-    expect(threat.state.drone.mode).toBe("track");
+    updateThreat(squad, threat, 1.3, clear, 0.25, ecology);
+    expect(threat.state.drone.mode).toBe("lock-on");
 
-    const blocked = () => false;
-    squad.setAgentPositionForQa("ito", { x: -3.45, y: 0.93, z: 4.3 });
-    updateThreat(squad, threat, 2.5, blocked);
-    expect(threat.state.drone.mode).toBe("search_last_known");
-    expect(threat.state.drone.lastKnownTargetPosition).toEqual({ x: 3.45, y: 0.93, z: -2.15 });
-    expect(threat.state.drone.lastKnownTargetPosition).not.toEqual(squad.state.agents.ito?.position);
-    updateThreat(squad, threat, 3, blocked);
-    expect(threat.state.byAgent.ito?.contact?.freshness).toBe("stale");
-    updateThreat(squad, threat, 8.1, blocked);
+    squad.setAgentPositionForQa("mara", { x: 3, y: 0.93, z: -3.5 });
+    updateThreat(squad, threat, 1.35, clear, 0.05, ecology);
     expect(threat.state.drone.mode).toBe("disengage");
-    for (let step = 0; step < 300 && threat.state.drone.active; step += 1) {
-      updateThreat(squad, threat, 8.2 + step / 60, blocked, 1 / 60);
-    }
-    expect(threat.state.resolution).toBe("disengaged");
-    expect(threat.getActiveDroneCount()).toBe(0);
-    expect(threat.state.drone.visible).toBe(false);
+    expect(threat.state.firstRetreatAnalysisRevision).toBe(1);
+    expect(threat.state.drone.cooldowns["reacquire:ito"]).toBeGreaterThan(5);
+  });
+
+  it("completes a two-second lock-on and emits one nonlethal interdict callback", () => {
+    const { squad, threat } = createControllers();
+    squad.setAgentPositionForQa("ito", { x: 3.45, y: 0.93, z: -3.5 });
+    squad.setAgentPositionForQa("player", { x: -6, y: 0.93, z: 6 });
+    squad.setAgentPositionForQa("mara", { x: -5.5, y: 0.93, z: 6 });
+    const hits: string[] = [];
+    const ecology: ThreatEcologyContext = {
+      extractionPoint: FLOODED_MARKET_MISSION.extractionPoint,
+      stimuli: [],
+      relays: [],
+      friendlyMachine: null,
+      onInterdict: (agentId) => hits.push(agentId),
+    };
+    updateThreat(squad, threat, 0.8, () => true, 0.25, ecology);
+    updateThreat(squad, threat, 1.05, () => true, 0.25, ecology);
+    updateThreat(squad, threat, 1.3, () => true, 0.25, ecology);
+    expect(threat.state.drone.mode).toBe("lock-on");
+    updateThreat(squad, threat, 3.31, () => true, 0.1, ecology);
+    expect(threat.state.drone.mode).toBe("interdict");
+    expect(hits).toEqual(["ito"]);
+  });
+
+  it("aborts lock-on when line of sight is cut and honors same-target reacquire cooldown", () => {
+    const { squad, threat } = createControllers();
+    squad.setAgentPositionForQa("ito", { x: 3.45, y: 0.93, z: -3.5 });
+    squad.setAgentPositionForQa("player", { x: -6, y: 0.93, z: 6 });
+    squad.setAgentPositionForQa("mara", { x: -5.5, y: 0.93, z: 6 });
+    const ecology = { extractionPoint: FLOODED_MARKET_MISSION.extractionPoint, stimuli: [], relays: [], friendlyMachine: null };
+    updateThreat(squad, threat, 0.8, () => true, 0.25, ecology);
+    updateThreat(squad, threat, 1.05, () => true, 0.25, ecology);
+    updateThreat(squad, threat, 1.3, () => true, 0.25, ecology);
+    expect(threat.state.drone.mode).toBe("lock-on");
+    updateThreat(squad, threat, 1.4, () => false, 0.1, ecology);
+    expect(threat.state.drone.mode).toBe("stalk");
+    squad.setAgentPositionForQa("mara", { x: 3, y: 0.93, z: -3.5 });
+    updateThreat(squad, threat, 1.65, () => true, 0.25, ecology);
+    expect(threat.state.drone.mode).toBe("disengage");
+    squad.setAgentPositionForQa("mara", { x: -5.5, y: 0.93, z: 6 });
+    expect(threat.state.drone.cooldowns["reacquire:ito"]).toBeCloseTo(5.65);
+  });
+
+  it("investigates an isolated flare but only observes a flare at a grouped position", () => {
+    const isolated = createControllers();
+    isolated.squad.setAgentPositionForQa("player", { x: -6, y: 0.93, z: 6 });
+    isolated.squad.setAgentPositionForQa("mara", { x: -5.5, y: 0.93, z: 6 });
+    isolated.squad.setAgentPositionForQa("ito", { x: -5, y: 0.93, z: 6 });
+    const stimulus = { id: "flare-test", kind: "flare" as const, position: { x: 3.4, y: 0.93, z: -1.5 }, active: true };
+    const noCrewSight: ThreatLineOfSightQuery = (from) => from.y < 1.4;
+    const ecology = { extractionPoint: FLOODED_MARKET_MISSION.extractionPoint, stimuli: [stimulus], relays: [], friendlyMachine: null };
+    updateThreat(isolated.squad, isolated.threat, 0.8, noCrewSight, 0.25, ecology);
+    updateThreat(isolated.squad, isolated.threat, 1.05, noCrewSight, 0.25, ecology);
+    expect(isolated.threat.state.drone.mode).toBe("investigate");
+
+    const grouped = createControllers();
+    grouped.squad.setAgentPositionForQa("player", { x: 3.4, y: 0.93, z: -1.5 });
+    grouped.squad.setAgentPositionForQa("mara", { x: 3.8, y: 0.93, z: -1.5 });
+    grouped.squad.setAgentPositionForQa("ito", { x: -6, y: 0.93, z: 6 });
+    updateThreat(grouped.squad, grouped.threat, 0.8, noCrewSight, 0.25, ecology);
+    updateThreat(grouped.squad, grouped.threat, 1.05, noCrewSight, 0.25, ecology);
+    expect(grouped.threat.state.drone.mode).toBe("observe");
+  });
+
+  it("sabotages an undefended active relay, but never attacks inside the extraction safe zone", () => {
+    const { squad, threat } = createControllers();
+    squad.setAgentPositionForQa("player", { x: -6, y: 0.93, z: 6 });
+    squad.setAgentPositionForQa("mara", { x: -5.5, y: 0.93, z: 6 });
+    squad.setAgentPositionForQa("ito", { x: -5, y: 0.93, z: 6 });
+    threat.setDronePositionForQa({ x: 3.45, y: 1.55, z: -4.65 });
+    const disabled: string[] = [];
+    const relay = { id: "relay-01", kind: "relay" as const, position: { x: 3.45, y: 0.93, z: -4.65 }, active: true, disabled: false };
+    const ecology: ThreatEcologyContext = {
+      extractionPoint: FLOODED_MARKET_MISSION.extractionPoint,
+      stimuli: [],
+      relays: [relay],
+      friendlyMachine: null,
+      onRelaySabotage: (id) => disabled.push(id),
+    };
+    updateThreat(squad, threat, 0.8, () => false, 0.25, ecology);
+    updateThreat(squad, threat, 1.05, () => false, 0.25, ecology);
+    expect(threat.state.drone.mode).toBe("sabotage-relay");
+    updateThreat(squad, threat, 3.6, () => false, 0.25, ecology);
+    expect(disabled).toEqual(["relay-01"]);
+
+    const safe = createControllers();
+    safe.threat.setDronePositionForQa({ x: 0, y: 1.55, z: 3.8 }, Math.PI);
+    safe.squad.setAgentPositionForQa("ito", { x: 0, y: 0.93, z: 4.4 });
+    safe.squad.setAgentPositionForQa("player", { x: -6, y: 0.93, z: -6 });
+    safe.squad.setAgentPositionForQa("mara", { x: 6, y: 0.93, z: -6 });
+    updateThreat(safe.squad, safe.threat, 0.8, () => true, 0.25, { ...ecology, relays: [] });
+    updateThreat(safe.squad, safe.threat, 1.05, () => true, 0.25, { ...ecology, relays: [] });
+    expect(safe.threat.state.drone.mode).toBe("patrol");
+  });
+
+  it("does not sabotage a relay defended by nearby crew", () => {
+    const { squad, threat } = createControllers();
+    threat.setDronePositionForQa({ x: 3.45, y: 1.55, z: -4.65 });
+    squad.setAgentPositionForQa("player", { x: 3.45, y: 0.93, z: -4.3 });
+    squad.setAgentPositionForQa("mara", { x: -6, y: 0.93, z: 6 });
+    squad.setAgentPositionForQa("ito", { x: -5.5, y: 0.93, z: 6 });
+    const relay = { id: "relay-01", kind: "relay" as const, position: { x: 3.45, y: 0.93, z: -4.65 }, active: true, disabled: false };
+    const ecology = { extractionPoint: FLOODED_MARKET_MISSION.extractionPoint, stimuli: [], relays: [relay], friendlyMachine: null };
+    updateThreat(squad, threat, 0.8, () => false, 0.25, ecology);
+    updateThreat(squad, threat, 1.05, () => false, 0.25, ecology);
+    expect(threat.state.drone.mode).toBe("patrol");
   });
 
   it("reproduces the same registered encounter for fixed insertion seeds in all three modes", () => {

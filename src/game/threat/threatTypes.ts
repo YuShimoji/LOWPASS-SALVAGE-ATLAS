@@ -1,15 +1,10 @@
 import type { CommunicationBand } from "../communication/communicationTypes";
 import type { Vec3 } from "../core/types";
 import type { CrewId } from "../squad/squadTypes";
+import type { HostileDroneMode, MachineAgentState } from "../machines/machineTypes";
+import type { PresenceAssessment } from "./PresenceService";
 
-export type ScoutDroneMode =
-  | "dormant"
-  | "patrol"
-  | "investigate"
-  | "track"
-  | "search_last_known"
-  | "disengage"
-  | "disabled";
+export type ScoutDroneMode = HostileDroneMode;
 
 export type ThreatContactFreshness = "live" | "stale";
 export type ThreatReportRoute = "direct" | "local" | CommunicationBand;
@@ -31,6 +26,19 @@ export interface ScoutDroneEncounterDefinition {
   readonly searchSeconds: number;
   readonly staleAfterSeconds: number;
   readonly disableRange: number;
+  readonly decisionIntervalSeconds: number;
+  readonly perceptionIntervalSeconds: number;
+  readonly presenceRadius: number;
+  readonly presenceHysteresisSeconds: number;
+  readonly sameTargetCooldownSeconds: number;
+  readonly lockOnSeconds: number;
+  readonly interdictRange: number;
+  readonly interdictCooldownSeconds: number;
+  readonly relaySabotageRange: number;
+  readonly relaySabotageSeconds: number;
+  readonly relayDefenseRadius: number;
+  readonly safeZoneRadius: number;
+  readonly retreatHoldSeconds: number;
 }
 
 export interface ThreatContact {
@@ -63,11 +71,9 @@ export interface AgentThreatKnowledge {
   lastLocalReportPosition: Vec3 | null;
 }
 
-export interface ScoutDroneRuntimeState {
+export interface ScoutDroneRuntimeState extends MachineAgentState<HostileDroneMode> {
   readonly id: string;
   readonly label: string;
-  mode: ScoutDroneMode;
-  position: Vec3;
   facingYaw: number;
   targetAgentId: CrewId | null;
   lastKnownTargetPosition: Vec3 | null;
@@ -78,15 +84,21 @@ export interface ScoutDroneRuntimeState {
   patrolIndex: number;
   active: boolean;
   visible: boolean;
+  lockOnProgress: number;
+  sabotageRelayId: string | null;
+  presence: PresenceAssessment | null;
 }
 
 export interface ThreatEncounterState {
   readonly drone: ScoutDroneRuntimeState;
+  readonly additionalDrones: ScoutDroneRuntimeState[];
   readonly byAgent: Record<string, AgentThreatKnowledge>;
   communicationRevisionHandled: number;
   reportRevision: number;
   deliveryRevision: number;
   resolution: "active" | "disengaged" | "disabled";
+  firstRetreatAnalysisRevision: number;
+  interferenceRevision: number;
 }
 
 export interface ThreatCommunicationStatus {

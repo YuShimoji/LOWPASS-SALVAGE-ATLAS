@@ -128,4 +128,28 @@ describe("MissionSession", () => {
     expect(result?.leftBehindEquipmentIds).toEqual(["relay-01"]);
     expect(Object.isFrozen(result)).toBe(true);
   });
+
+  it("extracts a porter-placed coil and records an immutable friendly-left-behind outcome", () => {
+    const { controller } = createSession("porter-run");
+    const coilId = missionItemId("porter-run", "cooling-coil");
+    expect(controller.transferResourceToMachine(coilId, "porter-market-01")).toBe(true);
+    expect(controller.state.itemLocations[coilId]).toEqual({ kind: "machine-carried", machineId: "porter-market-01" });
+    expect(controller.placeMachineResourceAtExtraction(coilId, "porter-market-01")).toBe(true);
+    controller.setAlliedMachineOutcomes([{
+      machineId: "porter-market-01",
+      disposition: "friendly-left-behind",
+      assistedItemIds: [coilId],
+    }]);
+    const result = controller.handleInteraction({ type: "mission-extract" }).result;
+    expect(result?.outcome).toBe("partial");
+    expect(result?.recoveredResourceIds).toEqual([coilId]);
+    expect(result?.alliedMachineOutcomes).toEqual([{
+      machineId: "porter-market-01",
+      disposition: "friendly-left-behind",
+      assistedItemIds: [coilId],
+    }]);
+    expect(Object.isFrozen(result?.alliedMachineOutcomes[0])).toBe(true);
+    controller.state.alliedMachineOutcomes[0]?.assistedItemIds.slice();
+    expect(result?.alliedMachineOutcomes[0]?.disposition).toBe("friendly-left-behind");
+  });
 });

@@ -10,6 +10,7 @@ import { WaypointNavigationService } from "../../game/navigation/WaypointNavigat
 import { CREW_DEFINITIONS } from "../../game/squad/squadTypes";
 import { DistributedSquadController } from "../../game/squad/DistributedSquadController";
 import { ScoutDroneController } from "../../game/threat/ScoutDroneController";
+import { PorterAndroidController } from "../../game/machines/PorterAndroidController";
 import { Ps1MaterialFactory } from "../materials/Ps1MaterialFactory";
 import { createFloodedMarket } from "./createFloodedMarket";
 
@@ -50,6 +51,17 @@ describe("flooded market render adapter", () => {
         manifest.selectedAgentIds,
         squad.navigation,
       );
+      const porter = new PorterAndroidController(
+        FLOODED_MARKET_MISSION.porterAndroid,
+        squad.navigation,
+        {
+          missionId: FLOODED_MARKET_MISSION.id,
+          itemLocations: session.state.itemLocations,
+          transferResourceToMachine: (itemId, machineId) => session.transferResourceToMachine(itemId, machineId),
+          placeMachineResourceAtExtraction: (itemId, machineId) => session.placeMachineResourceAtExtraction(itemId, machineId),
+          placeMachineResourceSafely: (itemId, machineId, position) => session.placeMachineResourceSafely(itemId, machineId, position),
+        },
+      );
       const view = createFloodedMarket(
         materials,
         FLOODED_MARKET_MISSION,
@@ -57,13 +69,15 @@ describe("flooded market render adapter", () => {
         session.state,
         squad.state,
         threat.state,
+        porter.state,
       );
       expect(view.root.children.length).toBeGreaterThan(0);
-      view.update(session.state, squad.state, threat.state, 1);
+      view.update(session.state, squad.state, threat.state, porter.state, 1);
       view.dispose();
       expect(view.root.children).toHaveLength(0);
       materials.dispose();
       threat.dispose();
+      porter.dispose();
       squad.dispose();
       session.dispose();
     }

@@ -122,6 +122,13 @@ export interface DistributedSquadState {
   readonly signals: SignalBeaconState;
   readonly rallyObjective: RallyObjectiveState;
   readonly deployedRelayItemIds: string[];
+  readonly disabledRelayItemIds: string[];
+  readonly relayRestartByItemId: Record<string, {
+    readonly startedByAgentId: CrewId;
+    readonly startedAtSeconds: number;
+  }>;
+  readonly interferenceUntilByAgentId: Record<string, number>;
+  readonly friendlyMachineVoiceNodes: Record<string, Vec3>;
   readonly shortcutOpenById: Record<string, boolean>;
   readonly feedback: SquadFeedbackState;
 }

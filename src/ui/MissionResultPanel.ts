@@ -30,6 +30,7 @@ export class MissionResultPanel {
         <p>${complete ? "全必須資源を抽出しました。" : "確保済み資源だけを持ち帰ります。未回収資源は現地に残ります。"}</p>
         <p class="manifest-note">現地ショッピングカートはゲート対象外のため回収されません。</p>
         ${result.leftBehindEquipmentIds.length > 0 ? `<p class="manifest-note">置き去り装備: ${result.leftBehindEquipmentIds.map(escapeHtml).join(" / ")}</p>` : ""}
+        ${result.alliedMachineOutcomes.map((outcome) => `<p class="manifest-note">PORTER GATE REJECTED // ${escapeHtml(outcome.machineId)} · ${escapeHtml(outcome.disposition)} · ASSISTED ${outcome.assistedItemIds.length}</p>`).join("")}
         <button type="button" class="resume-button" data-return-to-ship>飛空居住船へ帰還</button>
       </div>
     `;

@@ -3,6 +3,7 @@ import type { RenderDiagnostics } from "../render/app/RenderSystem";
 import type { GameState, VisualSettings } from "../game/simulation/GameState";
 import type { ExpeditionGateEvaluation } from "../game/mission/gateEvaluator";
 import type { MissionObjectiveProgress } from "../game/mission/MissionSession";
+import type { DomDiagnostics } from "../diagnostics/DomDiagnostics";
 
 export interface HudDiagnostics {
   fps: number;
@@ -11,6 +12,7 @@ export interface HudDiagnostics {
   physics: PhysicsDiagnostics;
   expedition: ExpeditionGateEvaluation;
   mission: MissionObjectiveProgress | null;
+  dom: DomDiagnostics;
 }
 
 export interface HudCallbacks {
@@ -162,8 +164,12 @@ export class Hud {
           ? `COMMS ${Object.values(state.mission.squad.agents).map((agent) => `${agent.id}:${agent.communicationBand}`).join(" ")}`
           : "COMMS INACTIVE",
         state.mission.threat
-          ? `THREAT ${state.mission.threat.drone.mode.toUpperCase()}  TARGET ${state.mission.threat.drone.targetAgentId ?? "NONE"}  REV ${state.mission.threat.drone.transitionRevision}`
+          ? `THREAT ${state.mission.threat.drone.mode.toUpperCase()}  TARGET ${state.mission.threat.drone.targetAgentId ?? "NONE"}  PRES ${state.mission.threat.drone.presence?.band.toUpperCase() ?? "NONE"}`
           : "THREAT INACTIVE",
+        state.mission.porter
+          ? `PORTER ${state.mission.porter.mode.toUpperCase()}  CARRY ${state.mission.porter.carriedItemId ?? "NONE"}`
+          : "PORTER INACTIVE",
+        `DOM ${diagnostics.dom.totalNodes}  HUD ${diagnostics.dom.persistentHudNodes}  MODAL ${diagnostics.dom.modalNodes}  FX ${diagnostics.dom.transientFeedbackNodes}  HISTORY ${diagnostics.dom.resultHistoryNodes}`,
       ].join("\n");
     }
   }

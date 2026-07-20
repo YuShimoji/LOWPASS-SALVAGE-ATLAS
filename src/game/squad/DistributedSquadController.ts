@@ -27,6 +27,7 @@ import type {
 const COMMUNICATION_INTERVAL_SECONDS = 0.25;
 const AUTONOMOUS_SPEED = 1.85;
 const WAYPOINT_RADIUS = 0.28;
+const RELAY_RESTART_SECONDS = 1.5;
 
 export interface SquadOrderRequest {
   readonly type: SquadOrderType;
@@ -114,6 +115,10 @@ export class DistributedSquadController {
         progress: insertionPlan.mode === "stable" ? 1 : 0,
       },
       deployedRelayItemIds: [],
+      disabledRelayItemIds: [],
+      relayRestartByItemId: {},
+      interferenceUntilByAgentId: {},
+      friendlyMachineVoiceNodes: {},
       shortcutOpenById: Object.fromEntries(definition.toolShortcuts.map((shortcut) => [shortcut.id, false])),
       feedback: { revision: 0, code: "INSERTION_COMPLETE", message: `${insertionPlan.mode.toUpperCase()}配置で降下しました` },
     };
@@ -134,6 +139,7 @@ export class DistributedSquadController {
       this.updateAutonomousAgent(agent, dt, elapsedSeconds);
     }
     this.updateRallyObjective(dt);
+    this.updateInterferenceAndRelayRestart(elapsedSeconds);
     this.communicationAccumulator += dt;
     if (this.communicationAccumulator >= COMMUNICATION_INTERVAL_SECONDS) {
       this.communicationAccumulator %= COMMUNICATION_INTERVAL_SECONDS;
@@ -222,6 +228,9 @@ export class DistributedSquadController {
     if (!relayId) return this.rejectEquipment("NO_RELAY_IN_RANGE", "回収範囲に携帯リレーがありません");
     this.itemLocations[relayId] = { kind: "crew", crewId: controlled.id };
     this.state.deployedRelayItemIds.splice(this.state.deployedRelayItemIds.indexOf(relayId), 1);
+    const disabledIndex = this.state.disabledRelayItemIds.indexOf(relayId);
+    if (disabledIndex >= 0) this.state.disabledRelayItemIds.splice(disabledIndex, 1);
+    delete this.state.relayRestartByItemId[relayId];
     this.communication.removeNode(`relay:${relayId}`);
     this.evaluateCommunication(this.state.communicationEvaluatedAtSeconds);
     this.setFeedback("RELAY_RECOVERED", `${relayId}を回収しました`);
@@ -253,7 +262,7 @@ export class DistributedSquadController {
   }
 
   getInteractions(): readonly InteractionDefinition[] {
-    return this.definition.toolShortcuts
+    const shortcuts = this.definition.toolShortcuts
       .filter((shortcut) => !this.state.shortcutOpenById[shortcut.id])
       .map((shortcut) => ({
         id: `shortcut-${shortcut.id}`,
@@ -263,6 +272,77 @@ export class DistributedSquadController {
         response: shortcut.label,
         action: { type: "mission-shortcut" as const, shortcutId: shortcut.id },
       }));
+    const relayRestarts = this.state.disabledRelayItemIds.flatMap((itemInstanceId) => {
+      const location = this.itemLocations[itemInstanceId];
+      if (location?.kind !== "mission-ground") return [];
+      const restarting = this.state.relayRestartByItemId[itemInstanceId];
+      return [{
+        id: `relay-restart-${itemInstanceId}`,
+        position: copyVec3(location.position),
+        radius: 1.6,
+        prompt: restarting ? "RELAY RESTART // 1.5 SEC" : "E  携帯リレーを再起動",
+        response: "携帯リレー再起動",
+        action: { type: "mission-relay-restart" as const, itemInstanceId },
+      }];
+    });
+    return [...shortcuts, ...relayRestarts];
+  }
+
+  applyInterference(targetAgentId: CrewId, untilSeconds: number): void {
+    if (!this.state.agents[targetAgentId]) return;
+    this.state.interferenceUntilByAgentId[targetAgentId] = Math.max(
+      this.state.interferenceUntilByAgentId[targetAgentId] ?? 0,
+      untilSeconds,
+    );
+    this.evaluateCommunication(this.state.communicationEvaluatedAtSeconds);
+    this.setFeedback("INTERFERENCE_PULSE", `${targetAgentId}の通信はBURSTへ制限されています`);
+  }
+
+  disableRelay(itemInstanceId: string, elapsedSeconds: number): EquipmentActionResolution {
+    const location = this.itemLocations[itemInstanceId];
+    if (!this.state.deployedRelayItemIds.includes(itemInstanceId) || location?.kind !== "mission-ground") {
+      return this.rejectEquipment("RELAY_NOT_ACTIVE", "対象リレーはactiveではありません");
+    }
+    if (!this.state.disabledRelayItemIds.includes(itemInstanceId)) this.state.disabledRelayItemIds.push(itemInstanceId);
+    delete this.state.relayRestartByItemId[itemInstanceId];
+    this.communication.removeNode(`relay:${itemInstanceId}`);
+    this.evaluateCommunication(elapsedSeconds);
+    this.setFeedback("RELAY_DISABLED", `${itemInstanceId}が妨害されました。現地で再起動できます`);
+    return { accepted: true, code: "RELAY_DISABLED", reason: "携帯リレーを一時停止しました", itemInstanceId };
+  }
+
+  beginRelayRestart(itemInstanceId: string, elapsedSeconds: number): EquipmentActionResolution {
+    const controlled = this.requireControlledAgent();
+    const location = this.itemLocations[itemInstanceId];
+    if (!this.state.disabledRelayItemIds.includes(itemInstanceId) || location?.kind !== "mission-ground") {
+      return this.rejectEquipment("RELAY_NOT_DISABLED", "再起動対象の停止リレーがありません");
+    }
+    if (distanceSquared(controlled.position, location.position) > 1.6 ** 2) {
+      return this.rejectEquipment("RELAY_OUT_OF_RANGE", "リレー再起動範囲外です");
+    }
+    this.state.relayRestartByItemId[itemInstanceId] = {
+      startedByAgentId: controlled.id,
+      startedAtSeconds: elapsedSeconds,
+    };
+    this.setFeedback("RELAY_RESTARTING", `${itemInstanceId}を再起動中 // 1.5 SEC`);
+    return { accepted: true, code: "RELAY_RESTARTING", reason: "再起動シーケンスを開始しました", itemInstanceId };
+  }
+
+  setFriendlyMachineVoiceNode(machineId: string, position: Vec3, enabled: boolean): void {
+    const previous = this.state.friendlyMachineVoiceNodes[machineId];
+    if (enabled && previous && distanceSquared(previous, position) < 0.4 ** 2) return;
+    if (!enabled && !previous) return;
+    if (enabled) this.state.friendlyMachineVoiceNodes[machineId] = copyVec3(position);
+    else delete this.state.friendlyMachineVoiceNodes[machineId];
+    this.evaluateCommunication(this.state.communicationEvaluatedAtSeconds);
+  }
+
+  getInterferenceRemaining(agentId: CrewId, elapsedSeconds: number): number {
+    return Math.max(0, (this.state.interferenceUntilByAgentId[agentId] ?? 0) - elapsedSeconds);
+  }
+
+  isRelayDisabled(itemInstanceId: string): boolean {
+    return this.state.disabledRelayItemIds.includes(itemInstanceId);
   }
 
   getControlledPosition(): Vec3 {
@@ -275,13 +355,14 @@ export class DistributedSquadController {
 
   getCommunicationStatus(sourceAgentId: CrewId, targetAgentId: CrewId): AgentCommunicationStatus {
     const status = this.communication.evaluateAgentLinks(sourceAgentId, [targetAgentId])[targetAgentId];
-    return status ?? {
+    const resolved = status ?? {
       agentId: targetAgentId,
       quality: 0,
       band: "none",
       routeNodeIds: [],
       localInstructionAllowed: false,
     };
+    return this.capCommunicationForInterference(targetAgentId, resolved, this.state.communicationEvaluatedAtSeconds);
   }
 
   hasHeldItemDefinition(agentId: CrewId, definitionId: string): boolean {
@@ -546,6 +627,15 @@ export class DistributedSquadController {
         kind: "portable-relay",
         position: copyVec3(location.position),
         agentId: null,
+        enabled: !this.state.disabledRelayItemIds.includes(relayId),
+      });
+    }
+    for (const [machineId, position] of Object.entries(this.state.friendlyMachineVoiceNodes)) {
+      this.communication.setNode({
+        id: `machine:${machineId}`,
+        kind: "friendly-machine",
+        position: copyVec3(position),
+        agentId: null,
         enabled: true,
       });
     }
@@ -554,14 +644,47 @@ export class DistributedSquadController {
     for (const agent of Object.values(this.state.agents)) {
       const status = statuses[agent.id];
       if (!status) continue;
-      agent.communicationBand = status.band;
-      agent.communicationQuality = status.quality;
-      agent.localInstructionAllowed = status.localInstructionAllowed;
+      const capped = this.capCommunicationForInterference(agent.id, status, elapsedSeconds);
+      agent.communicationBand = capped.band;
+      agent.communicationQuality = capped.quality;
+      agent.localInstructionAllowed = capped.localInstructionAllowed;
       if (status.band !== "none") agent.lastKnownPosition = copyVec3(agent.position);
       this.knowledge.flushPending(agent.id, status.localInstructionAllowed || communicationBandRank(status.band) >= 1);
     }
     this.state.communicationEvaluatedAtSeconds = elapsedSeconds;
     this.state.communicationRevision += 1;
+  }
+
+  private capCommunicationForInterference(
+    agentId: CrewId,
+    status: AgentCommunicationStatus,
+    elapsedSeconds: number,
+  ): AgentCommunicationStatus {
+    if ((this.state.interferenceUntilByAgentId[agentId] ?? 0) <= elapsedSeconds) return status;
+    return {
+      ...status,
+      quality: Math.min(status.quality, 0.41),
+      band: status.band === "none" ? "none" : "burst",
+      localInstructionAllowed: false,
+    };
+  }
+
+  private updateInterferenceAndRelayRestart(elapsedSeconds: number): void {
+    let communicationChanged = false;
+    for (const [agentId, until] of Object.entries(this.state.interferenceUntilByAgentId)) {
+      if (until > elapsedSeconds) continue;
+      delete this.state.interferenceUntilByAgentId[agentId];
+      communicationChanged = true;
+    }
+    for (const [relayId, restart] of Object.entries(this.state.relayRestartByItemId)) {
+      if (elapsedSeconds - restart.startedAtSeconds < RELAY_RESTART_SECONDS) continue;
+      const disabledIndex = this.state.disabledRelayItemIds.indexOf(relayId);
+      if (disabledIndex >= 0) this.state.disabledRelayItemIds.splice(disabledIndex, 1);
+      delete this.state.relayRestartByItemId[relayId];
+      this.setFeedback("RELAY_RESTARTED", `${relayId}を再起動しました`);
+      communicationChanged = true;
+    }
+    if (communicationChanged) this.evaluateCommunication(elapsedSeconds);
   }
 
   private updateRallyObjective(dt: number): void {

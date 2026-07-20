@@ -13,6 +13,7 @@ import type { FixedMissionDefinition } from "../../game/mission/fixedMissionType
 import type { MissionSessionState } from "../../game/mission/MissionSession";
 import type { DistributedSquadState } from "../../game/squad/squadTypes";
 import type { ThreatEncounterState } from "../../game/threat/threatTypes";
+import type { PorterAndroidState } from "../../game/machines/machineTypes";
 import type { Ps1MaterialFactory } from "../materials/Ps1MaterialFactory";
 import { disposeObjectTree } from "./disposeObjectTree";
 import type { MissionWorldView } from "./missionWorldView";
@@ -24,6 +25,7 @@ export function createFloodedMarket(
   session: MissionSessionState,
   squad: DistributedSquadState,
   threat: ThreatEncounterState,
+  porter: PorterAndroidState,
 ): MissionWorldView {
   const root = new Group();
   root.name = "phase-d-flooded-market";
@@ -145,6 +147,15 @@ export function createFloodedMarket(
   const scoutDrone = createScoutDrone(materials);
   scoutDrone.root.name = "phase-e-hostile-scout-drone";
   root.add(scoutDrone.root);
+  const additionalDroneViews = threat.additionalDrones.map((drone) => {
+    const view = createScoutDrone(materials);
+    view.root.name = `phase-e-hostile-scout-drone-${drone.id}`;
+    root.add(view.root);
+    return view;
+  });
+  const porterView = createPorterAndroid(materials);
+  porterView.root.name = "phase-e-friendly-porter-android";
+  root.add(porterView.root);
   const lastKnownMarker = new Mesh(
     new TorusGeometry(0.7, 0.045, 5, 16),
     materials.createEmissive("#df9259", 0.58),
@@ -158,6 +169,7 @@ export function createFloodedMarket(
     activeSession: MissionSessionState,
     activeSquad: DistributedSquadState,
     activeThreat: ThreatEncounterState,
+    activePorter: PorterAndroidState,
     elapsedSeconds: number,
   ): void => {
     const cartLocation = activeSession.itemLocations[activeSession.cartId];
@@ -173,6 +185,12 @@ export function createFloodedMarket(
       } else if (location?.kind === "cart") {
         view.visible = true;
         view.position.set(cart.position.x, cart.position.y + 0.58, cart.position.z);
+      } else if (location?.kind === "machine-carried" && location.machineId === activePorter.id) {
+        view.visible = true;
+        view.position.set(activePorter.position.x, activePorter.position.y + 1.05, activePorter.position.z);
+      } else if (location?.kind === "extraction-pad") {
+        view.visible = true;
+        view.position.set(location.position.x, location.position.y + 0.28, location.position.z);
       } else {
         view.visible = false;
       }
@@ -195,6 +213,7 @@ export function createFloodedMarket(
       if (location?.kind === "mission-ground") {
         view.position.set(location.position.x, location.position.y, location.position.z);
         view.rotation.y = elapsedSeconds * 0.35;
+        view.scale.setScalar(activeSquad.disabledRelayItemIds.includes(relayId) ? 0.82 : 1);
       }
     }
     for (const [shortcutId, view] of shortcutViews) {
@@ -224,6 +243,11 @@ export function createFloodedMarket(
     scoutDrone.root.position.set(drone.position.x, drone.position.y, drone.position.z);
     scoutDrone.root.rotation.y = drone.facingYaw;
     scoutDrone.root.rotation.z = drone.mode === "disabled" ? 0.72 : 0;
+    scoutDrone.root.rotation.x = drone.mode === "lock-on" ? -0.24 : 0;
+    scoutDrone.scanBeam.visible = drone.mode === "lock-on" && Boolean(drone.lastKnownTargetPosition);
+    if (scoutDrone.scanBeam.visible && drone.lastKnownTargetPosition) {
+      orientScanBeam(scoutDrone.scanBeam, drone.position, drone.lastKnownTargetPosition);
+    }
     scoutDrone.rotor.rotation.y = elapsedSeconds * (drone.active ? 8 : 0.25);
     const controlledKnowledge = activeThreat.byAgent[activeSquad.control.controlledAgentId];
     const controlledContact = controlledKnowledge?.contact ?? null;
@@ -234,9 +258,22 @@ export function createFloodedMarket(
       lastKnownMarker.position.set(controlledContact.position.x, 0.12, controlledContact.position.z);
       lastKnownMarker.rotation.z = elapsedSeconds * 0.35;
     }
+    activeThreat.additionalDrones.forEach((additional, index) => {
+      const view = additionalDroneViews[index];
+      if (!view) return;
+      view.root.visible = additional.visible;
+      view.root.position.set(additional.position.x, additional.position.y, additional.position.z);
+      view.root.rotation.y = additional.facingYaw;
+      view.rotor.rotation.y = elapsedSeconds * 7.2;
+    });
+    porterView.root.position.set(activePorter.position.x, activePorter.position.y - 0.93, activePorter.position.z);
+    porterView.root.rotation.y = activePorter.facing;
+    porterView.statusLight.visible = activePorter.authenticated;
+    porterView.loadArms.rotation.x = activePorter.carriedItemId ? -0.34 : Math.sin(elapsedSeconds * 2) * 0.03;
+    porterView.root.rotation.z = activePorter.mode === "gate-rejected" ? Math.sin(elapsedSeconds * 8) * 0.025 : 0;
   };
 
-  update(session, squad, threat, 0);
+  update(session, squad, threat, porter, 0);
   return {
     root,
     cameraOccluders,
@@ -251,6 +288,7 @@ function createScoutDrone(materials: Ps1MaterialFactory): {
   readonly root: Group;
   readonly rotor: Group;
   readonly contactHalo: Mesh;
+  readonly scanBeam: Mesh;
 } {
   const root = new Group();
   const hull = new Mesh(new BoxGeometry(0.74, 0.28, 0.5), materials.create({ color: "#3d4641", metalness: 0.48 }));
@@ -273,8 +311,45 @@ function createScoutDrone(materials: Ps1MaterialFactory): {
   contactHalo.rotation.x = Math.PI / 2;
   contactHalo.position.y = 0.42;
   contactHalo.visible = false;
-  root.add(hull, optic, rotor, contactHalo);
-  return { root, rotor, contactHalo };
+  const scanBeam = new Mesh(
+    new BoxGeometry(0.055, 0.055, 1),
+    materials.createEmissive("#ef745f", 1.15),
+  );
+  scanBeam.visible = false;
+  root.add(hull, optic, rotor, contactHalo, scanBeam);
+  return { root, rotor, contactHalo, scanBeam };
+}
+
+function createPorterAndroid(materials: Ps1MaterialFactory): {
+  readonly root: Group;
+  readonly loadArms: Group;
+  readonly statusLight: Mesh;
+} {
+  const root = new Group();
+  const chassis = new Mesh(new BoxGeometry(0.92, 1.15, 0.7), materials.create({ color: "#66716a", metalness: 0.34 }));
+  chassis.position.y = 0.78;
+  const base = new Mesh(new BoxGeometry(1.15, 0.28, 0.86), materials.create({ color: "#252d2b" }));
+  base.position.y = 0.14;
+  const statusLight = new Mesh(new BoxGeometry(0.42, 0.12, 0.05), materials.createEmissive("#70d6b3", 0.78));
+  statusLight.position.set(0, 1.12, -0.38);
+  statusLight.visible = false;
+  const loadArms = new Group();
+  for (const x of [-0.52, 0.52]) {
+    const arm = new Mesh(new BoxGeometry(0.18, 0.82, 0.18), materials.create({ color: "#9b8058", metalness: 0.22 }));
+    arm.position.set(x, 0.68, -0.28);
+    loadArms.add(arm);
+  }
+  root.add(chassis, base, statusLight, loadArms);
+  return { root, loadArms, statusLight };
+}
+
+function orientScanBeam(beam: Mesh, from: { x: number; y: number; z: number }, to: { x: number; y: number; z: number }): void {
+  const dx = to.x - from.x;
+  const dz = to.z - from.z;
+  const distance = Math.max(0.1, Math.hypot(dx, dz));
+  beam.position.set(dx * 0.5, (to.y - from.y) * 0.5, dz * 0.5);
+  beam.rotation.y = Math.atan2(-dx, -dz);
+  beam.scale.z = distance;
 }
 
 function createRelay(materials: Ps1MaterialFactory): Group {

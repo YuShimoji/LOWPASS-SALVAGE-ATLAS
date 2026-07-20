@@ -4,6 +4,7 @@ import type { InsertionAnchorDefinition, InsertionPresetDefinition } from "../in
 import type { NavigationGraphDefinition } from "../navigation/navigationTypes";
 import type { SignalZoneDefinition } from "../communication/communicationTypes";
 import type { ScoutDroneEncounterDefinition } from "../threat/threatTypes";
+import type { PorterAndroidDefinition } from "../machines/machineTypes";
 
 export interface FixedSalvageSpawn {
   readonly sourceId: string;
@@ -59,4 +60,5 @@ export interface FixedMissionDefinition {
   readonly searchZones: readonly SearchZoneDefinition[];
   readonly toolShortcuts: readonly ToolShortcutDefinition[];
   readonly threatEncounter: ScoutDroneEncounterDefinition;
+  readonly porterAndroid: PorterAndroidDefinition;
 }

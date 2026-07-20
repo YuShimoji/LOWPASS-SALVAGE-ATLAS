@@ -1,7 +1,9 @@
 import { distanceSquared, type Vec3 } from "../core/types";
 import type { InteractionAction, InteractionDefinition } from "../interaction/interactionTypes";
 import { cloneItemLocationLedger, type ItemLocationLedger } from "../items/itemLocation";
+import type { AlliedMachineOutcome } from "../machines/machineTypes";
 import type { CrewId } from "../squad/squadTypes";
+import { applyInterferencePulse, type InterferencePulseResult } from "../threat/InterferenceService";
 import type { ExpeditionManifest } from "./expeditionTypes";
 import type { FixedMissionDefinition, FixedSalvageSpawn } from "./fixedMissionTypes";
 
@@ -18,6 +20,7 @@ export interface FixedMissionResult {
   readonly cartRecovered: false;
   readonly leftBehindEquipmentIds: readonly string[];
   readonly consumedEquipmentIds: readonly string[];
+  readonly alliedMachineOutcomes: readonly AlliedMachineOutcome[];
 }
 
 export interface MissionSessionState {
@@ -33,6 +36,7 @@ export interface MissionSessionState {
   eventRevision: number;
   lastEvent: string;
   result: FixedMissionResult | null;
+  alliedMachineOutcomes: AlliedMachineOutcome[];
 }
 
 export interface MissionObjectiveProgress {
@@ -84,6 +88,7 @@ export class MissionSessionController {
       eventRevision: 0,
       lastEvent: "降下完了。回収対象を確認してください",
       result: null,
+      alliedMachineOutcomes: [],
     };
   }
 
@@ -167,10 +172,22 @@ export class MissionSessionController {
       if (resource.required) requiredResources += 1;
       if (resource.resourceType === "water-filter") filtersRequired += Number(resource.required);
       const location = this.state.itemLocations[itemId];
-      const secured = location?.kind === "crew" || location?.kind === "cart" || location?.kind === "recovered-to-ship";
+      const secured = location?.kind === "crew"
+        || location?.kind === "cart"
+        || location?.kind === "machine-carried"
+        || location?.kind === "extraction-pad"
+        || location?.kind === "recovered-to-ship";
       if (secured) securedResources += 1;
       if (secured && resource.resourceType === "water-filter") filtersSecured += 1;
-      if (resource.resourceType === "cooling-coil" && location?.kind === "cart") coolingCoilLoaded = true;
+      if (
+        resource.resourceType === "cooling-coil"
+        && (
+          location?.kind === "cart"
+          || location?.kind === "machine-carried"
+          || location?.kind === "extraction-pad"
+          || location?.kind === "recovered-to-ship"
+        )
+      ) coolingCoilLoaded = true;
     }
     return {
       securedResources,
@@ -188,6 +205,65 @@ export class MissionSessionController {
       throw new Error("Cart location is missing from MissionSession");
     }
     return location.position;
+  }
+
+  getResourceItemId(sourceId: string): string | null {
+    return [...this.resourceByInstanceId.entries()].find(([, resource]) => resource.sourceId === sourceId)?.[0] ?? null;
+  }
+
+  transferResourceToMachine(itemId: string, machineId: string): boolean {
+    const resource = this.resourceByInstanceId.get(itemId);
+    const location = this.state.itemLocations[itemId];
+    if (!resource || resource.carryMode !== "cart-only" || location?.kind !== "mission-ground") return false;
+    this.state.itemLocations[itemId] = { kind: "machine-carried", machineId };
+    this.record(`${resource.label}を${machineId}が保持しました`);
+    return true;
+  }
+
+  placeMachineResourceAtExtraction(itemId: string, machineId: string): boolean {
+    const resource = this.resourceByInstanceId.get(itemId);
+    const location = this.state.itemLocations[itemId];
+    if (!resource || location?.kind !== "machine-carried" || location.machineId !== machineId) return false;
+    this.state.itemLocations[itemId] = {
+      kind: "extraction-pad",
+      missionId: this.definition.id,
+      position: copyExtractionPosition(this.definition.extractionPoint),
+    };
+    this.record(`${resource.label}を抽出台へ配置しました`);
+    return true;
+  }
+
+  placeMachineResourceSafely(itemId: string, machineId: string, position: Vec3): boolean {
+    const location = this.state.itemLocations[itemId];
+    if (location?.kind !== "machine-carried" || location.machineId !== machineId) return false;
+    this.state.itemLocations[itemId] = { kind: "mission-ground", position: copyExtractionPosition(position) };
+    this.record(`${itemId}を安全地点へ配置しました`);
+    return true;
+  }
+
+  applyInterference(targetAgentId: CrewId, targetPosition: Vec3, elapsedSeconds: number): InterferencePulseResult {
+    const handResourceIds = [...this.resourceByInstanceId.entries()]
+      .filter(([, resource]) => resource.carryMode === "hand")
+      .map(([itemId]) => itemId);
+    const result = applyInterferencePulse(
+      targetAgentId,
+      targetPosition,
+      elapsedSeconds,
+      handResourceIds,
+      this.state.itemLocations,
+    );
+    this.state.cartAttached = false;
+    this.record(result.droppedItemId
+      ? `INTERFERENCE // ${result.droppedItemId}を落としました`
+      : "INTERFERENCE // 通信と操作が一時妨害されました");
+    return result;
+  }
+
+  setAlliedMachineOutcomes(outcomes: readonly AlliedMachineOutcome[]): void {
+    this.state.alliedMachineOutcomes = outcomes.map((outcome) => ({
+      ...outcome,
+      assistedItemIds: [...outcome.assistedItemIds],
+    }));
   }
 
   dispose(): void {
@@ -224,7 +300,9 @@ export class MissionSessionController {
     let complete = true;
     for (const [itemId, resource] of this.resourceByInstanceId) {
       const location = this.state.itemLocations[itemId];
-      const recovered = location?.kind === "crew" || (location?.kind === "cart" && cartAtExtraction);
+      const recovered = location?.kind === "crew"
+        || location?.kind === "extraction-pad"
+        || (location?.kind === "cart" && cartAtExtraction);
       if (recovered) recoveredResourceIds.push(itemId);
       if (resource.required && !recovered) complete = false;
     }
@@ -255,6 +333,10 @@ export class MissionSessionController {
       consumedEquipmentIds: this.manifest.items
         .map((item) => item.instanceId)
         .filter((itemId) => this.state.itemLocations[itemId]?.kind === "consumed"),
+      alliedMachineOutcomes: this.state.alliedMachineOutcomes.map((outcome) => ({
+        ...outcome,
+        assistedItemIds: [...outcome.assistedItemIds],
+      })),
     });
     return this.record(
       complete ? "COMPLETE // 全必須資源を回収しました" : "PARTIAL // 回収済み資源を確保して帰還します",
@@ -289,4 +371,8 @@ function deepFreeze<T>(value: T): T {
   if (typeof value !== "object" || value === null || Object.isFrozen(value)) return value;
   for (const nested of Object.values(value)) deepFreeze(nested);
   return Object.freeze(value);
+}
+
+function copyExtractionPosition(value: Vec3): Vec3 {
+  return { x: value.x, y: Math.max(0.32, value.y), z: value.z };
 }

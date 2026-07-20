@@ -8,6 +8,9 @@ export type InteractionAction =
   | { readonly type: "mission-cart-toggle" }
   | { readonly type: "mission-shortcut"; readonly shortcutId: string }
   | { readonly type: "mission-threat-disable"; readonly threatId: string }
+  | { readonly type: "mission-relay-restart"; readonly itemInstanceId: string }
+  | { readonly type: "mission-porter-auth"; readonly machineId: string }
+  | { readonly type: "mission-porter-command"; readonly machineId: string; readonly command: "follow" | "hold" | "carry-to" }
   | { readonly type: "mission-extract" };
 
 export interface InteractionDefinition {

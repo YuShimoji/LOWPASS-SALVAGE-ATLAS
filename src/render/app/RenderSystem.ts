@@ -131,11 +131,12 @@ export class RenderSystem {
       this.lastGateScanRevision = gateScan.revision;
       this.gateAudio.play(gateScan.evaluation.accepted);
     }
-    if (this.missionView && state.mission.session && state.mission.squad && state.mission.threat) {
+    if (this.missionView && state.mission.session && state.mission.squad && state.mission.threat && state.mission.porter) {
       this.missionView.update(
         state.mission.session,
         state.mission.squad,
         state.mission.threat,
+        state.mission.porter,
         state.runtime.elapsedSeconds,
       );
     } else {
