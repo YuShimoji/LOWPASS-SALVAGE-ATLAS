@@ -12,6 +12,16 @@
 
 この文書を含む最新の引き継ぎコミットはブランチ先端です。再開時は `git rev-parse HEAD` と `git status -sb` で、`origin/feat/phase-f-world-persistence` と一致することを確認してください。
 
+## リモート反映
+
+- origin: `https://github.com/YuShimoji/LOWPASS-SALVAGE-ATLAS.git`
+- GitHub visibility: public（既存repository設定）
+- default branch: `main`（Phase B統合基準）
+- 再開branch: `feat/phase-f-world-persistence`
+- review gate: draft PR [#1](https://github.com/YuShimoji/LOWPASS-SALVAGE-ATLAS/pull/1)（Phase C〜F → `main`）
+- ローカルに存在したPhase C〜Fの全branchとPhase B〜Eの全tagはoriginへpush済み
+- deployment / releaseは未実施。draft PRのmergeと公開リリースは人間判断に残す
+
 ## 別端末での最短再開
 
 ```powershell
