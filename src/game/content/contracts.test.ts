@@ -15,4 +15,9 @@ describe("vertical-slice content contracts", () => {
     expect(ITEM_DEFINITIONS["advanced-terminal"].logicLoad).toBe(6);
     expect(ITEM_DEFINITIONS["shopping-cart"].volumeLoad).toBe(8);
   });
+
+  it("keeps fixed mission definitions behind a lazy import boundary", () => {
+    const fixedMissionModules = import.meta.glob("../mission/fixed/*.ts");
+    expect(typeof fixedMissionModules["../mission/fixed/floodedMarket.ts"]).toBe("function");
+  });
 });

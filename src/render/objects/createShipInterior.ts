@@ -10,11 +10,13 @@ import {
 } from "three";
 import { SHIP_COLLIDERS } from "../../game/content/shipLayout";
 import type { Ps1MaterialFactory } from "../materials/Ps1MaterialFactory";
+import { disposeObjectTree } from "./disposeObjectTree";
 
 export interface ShipInteriorView {
   root: Group;
   cameraOccluders: readonly Object3D[];
   animate(elapsedSeconds: number, gateFeedback: GateVisualFeedback | null): void;
+  dispose(): void;
 }
 
 export interface GateVisualFeedback {
@@ -193,6 +195,9 @@ export function createShipInterior(materials: Ps1MaterialFactory): ShipInteriorV
       gateLight.intensity = lightIntensity;
       gateLight.color.set(gateFeedback?.accepted ? "#55e59c" : gateFeedback ? "#ff594d" : "#5caaa0");
       gateSurface.rotation.z = elapsedSeconds * 0.025;
+    },
+    dispose(): void {
+      disposeObjectTree(root);
     },
   };
 }

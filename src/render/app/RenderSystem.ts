@@ -13,7 +13,9 @@ import {
 import type { GameState, VisualSettings } from "../../game/simulation/GameState";
 import { Ps1MaterialFactory } from "../materials/Ps1MaterialFactory";
 import { createPlayerAvatar } from "../objects/createPlayerAvatar";
-import { createShipInterior } from "../objects/createShipInterior";
+import { createShipInterior, type ShipInteriorView } from "../objects/createShipInterior";
+import type { MissionWorldView } from "../objects/missionWorldView";
+import { disposeObjectTree } from "../objects/disposeObjectTree";
 import { interpolatePlayerPosition } from "../adapters/renderBridge";
 import { ThirdPersonCamera } from "./ThirdPersonCamera";
 import { Scene } from "three";
@@ -24,6 +26,10 @@ export interface RenderDiagnostics {
   triangles: number;
   renderWidth: number;
   renderHeight: number;
+  sceneObjects: number;
+  geometries: number;
+  textures: number;
+  programs: number;
 }
 
 export class RenderSystem {
@@ -33,11 +39,12 @@ export class RenderSystem {
   private readonly renderer: WebGLRenderer;
   private readonly materials = new Ps1MaterialFactory();
   private readonly avatar = createPlayerAvatar(this.materials);
-  private readonly ship = createShipInterior(this.materials);
+  private ship: ShipInteriorView | null = createShipInterior(this.materials);
+  private missionView: MissionWorldView | null = null;
   private readonly interpolatedPlayer = new Vector3();
   private readonly drawingBufferSize = new Vector2();
   private readonly fog = new Fog(0x091114, 9, 31);
-  private readonly gateAudio = new GateFeedbackAudio();
+  private readonly gateAudio: GateFeedbackAudio;
   private lastGateScanRevision = -1;
   private lastLowResolution: boolean | null = null;
   private disposed = false;
@@ -45,7 +52,9 @@ export class RenderSystem {
   constructor(
     private readonly mount: HTMLElement,
     private readonly onContextStatus: (message: string) => void,
+    audioEnabled = true,
   ) {
+    this.gateAudio = new GateFeedbackAudio(audioEnabled);
     this.renderer = new WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
     this.canvas = this.renderer.domElement;
     this.canvas.className = "game-canvas";
@@ -60,7 +69,9 @@ export class RenderSystem {
 
     this.scene.background = new Color("#091114");
     this.scene.fog = this.fog;
-    this.scene.add(this.ship.root, this.avatar);
+    const initialShip = this.ship;
+    if (!initialShip) throw new Error("Ship view failed to initialize");
+    this.scene.add(initialShip.root, this.avatar);
 
     const ambient = new AmbientLight(0x8ea6a2, 1.5);
     this.scene.add(ambient);
@@ -85,33 +96,75 @@ export class RenderSystem {
     this.cameraRig.applyLookDelta(deltaX, deltaY);
   }
 
+  enterMission(
+    createView: (materials: Ps1MaterialFactory) => MissionWorldView,
+    cameraStart?: { readonly playerPosition: { x: number; y: number; z: number }; readonly cameraPosition: { x: number; y: number; z: number } },
+  ): void {
+    const view = createView(this.materials);
+    this.removeCurrentWorld();
+    this.missionView = view;
+    this.scene.add(view.root);
+    if (cameraStart) this.cameraRig.resetFromStart(cameraStart.playerPosition, cameraStart.cameraPosition);
+    else this.cameraRig.reset();
+  }
+
+  returnToShip(): void {
+    this.removeCurrentWorld();
+    this.ship = createShipInterior(this.materials);
+    this.scene.add(this.ship.root);
+    this.cameraRig.reset();
+  }
+
+  rebindControlledAgent(): void {
+    this.cameraRig.reset();
+  }
+
   render(state: GameState, interpolationAlpha: number, frameSeconds: number): void {
     this.applySettings(state.settings);
     interpolatePlayerPosition(state.player, interpolationAlpha, this.interpolatedPlayer);
     this.avatar.position.copy(this.interpolatedPlayer);
     this.avatar.rotation.y = state.player.facingYaw;
-    this.cameraRig.update(this.interpolatedPlayer, frameSeconds, this.ship.cameraOccluders);
+    const cameraOccluders = this.missionView?.cameraOccluders ?? this.ship?.cameraOccluders ?? [];
+    this.cameraRig.update(this.interpolatedPlayer, frameSeconds, cameraOccluders);
     const gateScan = state.expedition.gateScan;
     if (gateScan && gateScan.revision !== this.lastGateScanRevision) {
       this.lastGateScanRevision = gateScan.revision;
       this.gateAudio.play(gateScan.evaluation.accepted);
     }
-    this.ship.animate(
-      state.runtime.elapsedSeconds,
-      gateScan
-        ? { accepted: gateScan.evaluation.accepted, startedAtSeconds: gateScan.scannedAtSeconds }
-        : null,
-    );
+    if (this.missionView && state.mission.session && state.mission.squad && state.mission.threat && state.mission.porter) {
+      this.missionView.update(
+        state.mission.session,
+        state.mission.squad,
+        state.mission.threat,
+        state.mission.porter,
+        state.runtime.elapsedSeconds,
+      );
+    } else {
+      this.ship?.animate(
+        state.runtime.elapsedSeconds,
+        gateScan
+          ? { accepted: gateScan.evaluation.accepted, startedAtSeconds: gateScan.scannedAtSeconds }
+          : null,
+      );
+    }
     this.renderer.render(this.scene, this.cameraRig.camera);
   }
 
   getDiagnostics(): RenderDiagnostics {
     this.renderer.getDrawingBufferSize(this.drawingBufferSize);
+    let sceneObjects = 0;
+    this.scene.traverse(() => {
+      sceneObjects += 1;
+    });
     return {
       drawCalls: this.renderer.info.render.calls,
       triangles: this.renderer.info.render.triangles,
       renderWidth: this.drawingBufferSize.x,
       renderHeight: this.drawingBufferSize.y,
+      sceneObjects,
+      geometries: this.renderer.info.memory.geometries,
+      textures: this.renderer.info.memory.textures,
+      programs: this.renderer.info.programs?.length ?? 0,
     };
   }
 
@@ -123,7 +176,24 @@ export class RenderSystem {
     this.canvas.removeEventListener("webglcontextrestored", this.handleContextRestored);
     this.renderer.dispose();
     this.gateAudio.dispose();
+    this.removeCurrentWorld();
+    this.scene.remove(this.avatar);
+    disposeObjectTree(this.avatar);
+    this.materials.dispose();
     this.canvas.remove();
+  }
+
+  private removeCurrentWorld(): void {
+    if (this.ship) {
+      this.scene.remove(this.ship.root);
+      this.ship.dispose();
+      this.ship = null;
+    }
+    if (this.missionView) {
+      this.scene.remove(this.missionView.root);
+      this.missionView.dispose();
+      this.missionView = null;
+    }
   }
 
   private applySettings(settings: VisualSettings): void {

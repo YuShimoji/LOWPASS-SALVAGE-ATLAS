@@ -25,7 +25,6 @@ export interface ItemInstance {
   readonly id: ItemInstanceId;
   readonly definitionId: ItemDefinitionId;
   readonly condition: "serviceable" | "worn" | "damaged";
-  readonly location: "ship-inventory" | "gate-demonstrator";
 }
 
 export const ITEM_DEFINITIONS = {
@@ -113,16 +112,16 @@ export const ITEM_DEFINITIONS = {
 } as const satisfies Record<ItemDefinitionId, ItemDefinition>;
 
 export const SHIP_INVENTORY: readonly ItemInstance[] = [
-  { id: "flare-01", definitionId: "flare-pack", condition: "serviceable", location: "ship-inventory" },
-  { id: "flare-02", definitionId: "flare-pack", condition: "serviceable", location: "ship-inventory" },
-  { id: "crowbar-01", definitionId: "crowbar", condition: "worn", location: "ship-inventory" },
-  { id: "radio-01", definitionId: "radio", condition: "serviceable", location: "ship-inventory" },
-  { id: "radio-02", definitionId: "radio", condition: "serviceable", location: "ship-inventory" },
-  { id: "medkit-01", definitionId: "medical-kit", condition: "serviceable", location: "ship-inventory" },
-  { id: "medkit-02", definitionId: "medical-kit", condition: "serviceable", location: "ship-inventory" },
-  { id: "cutter-01", definitionId: "bolt-cutter", condition: "worn", location: "ship-inventory" },
-  { id: "relay-01", definitionId: "portable-relay", condition: "serviceable", location: "ship-inventory" },
-  { id: "terminal-01", definitionId: "field-terminal", condition: "serviceable", location: "ship-inventory" },
+  { id: "flare-01", definitionId: "flare-pack", condition: "serviceable" },
+  { id: "flare-02", definitionId: "flare-pack", condition: "serviceable" },
+  { id: "crowbar-01", definitionId: "crowbar", condition: "worn" },
+  { id: "radio-01", definitionId: "radio", condition: "serviceable" },
+  { id: "radio-02", definitionId: "radio", condition: "serviceable" },
+  { id: "medkit-01", definitionId: "medical-kit", condition: "serviceable" },
+  { id: "medkit-02", definitionId: "medical-kit", condition: "serviceable" },
+  { id: "cutter-01", definitionId: "bolt-cutter", condition: "worn" },
+  { id: "relay-01", definitionId: "portable-relay", condition: "serviceable" },
+  { id: "terminal-01", definitionId: "field-terminal", condition: "serviceable" },
 ] as const;
 
 export const GATE_DEMONSTRATOR_ITEMS: readonly ItemInstance[] = [
@@ -130,18 +129,22 @@ export const GATE_DEMONSTRATOR_ITEMS: readonly ItemInstance[] = [
     id: "scan-field-terminal",
     definitionId: "field-terminal",
     condition: "serviceable",
-    location: "gate-demonstrator",
   },
   {
     id: "scan-advanced-terminal",
     definitionId: "advanced-terminal",
     condition: "serviceable",
-    location: "gate-demonstrator",
   },
   {
     id: "scan-shopping-cart",
     definitionId: "shopping-cart",
     condition: "worn",
-    location: "gate-demonstrator",
   },
 ] as const;
+
+export function createInitialItemLocations(): import("./itemLocation").ItemLocationLedger {
+  return Object.fromEntries([
+    ...SHIP_INVENTORY.map((item) => [item.id, { kind: "ship-inventory" } as const]),
+    ...GATE_DEMONSTRATOR_ITEMS.map((item) => [item.id, { kind: "gate-demonstrator" } as const]),
+  ]);
+}

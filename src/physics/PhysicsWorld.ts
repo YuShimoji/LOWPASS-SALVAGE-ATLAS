@@ -3,15 +3,31 @@ import type { MovementIntent } from "../game/input/InputActions";
 import type { PhysicsSnapshot } from "../game/simulation/GameSimulation";
 import { INITIAL_PLAYER_POSITION } from "../game/simulation/GameState";
 import { SHIP_COLLIDERS } from "../game/content/shipLayout";
+import type { Vec3 } from "../game/core/types";
+import type { KinematicObjectSpec, WorldColliderSpec } from "./physicsTypes";
 
 const WALK_SPEED = 3.2;
 const SPRINT_SPEED = 5.1;
 const GRAVITY = -18;
 
 export interface PhysicsDiagnostics {
+  rigidBodyCount: number;
   colliderCount: number;
   collisionCount: number;
 }
+
+export interface PhysicsWorldConfig {
+  readonly colliders: readonly WorldColliderSpec[];
+  readonly initialPlayerPosition: Vec3;
+  readonly kinematicObjects?: readonly KinematicObjectSpec[];
+}
+
+const DEFAULT_CONFIG: PhysicsWorldConfig = {
+  colliders: SHIP_COLLIDERS,
+  initialPlayerPosition: INITIAL_PLAYER_POSITION,
+};
+
+let rapierInitialization: Promise<void> | null = null;
 
 export class PhysicsWorld {
   private verticalVelocity = 0;
@@ -23,14 +39,19 @@ export class PhysicsWorld {
     private readonly playerBody: RAPIER.RigidBody,
     private readonly playerCollider: RAPIER.Collider,
     private readonly characterController: RAPIER.KinematicCharacterController,
+    private readonly colliderCount: number,
+    private readonly kinematicBodies: ReadonlyMap<string, RAPIER.RigidBody>,
+    private readonly worldColliders: ReadonlyMap<string, RAPIER.Collider>,
   ) {}
 
-  static async create(): Promise<PhysicsWorld> {
-    await RAPIER.init();
+  static async create(config: PhysicsWorldConfig = DEFAULT_CONFIG): Promise<PhysicsWorld> {
+    rapierInitialization ??= RAPIER.init();
+    await rapierInitialization;
 
     const world = new RAPIER.World({ x: 0, y: GRAVITY, z: 0 });
-    for (const collider of SHIP_COLLIDERS) {
-      world.createCollider(
+    const worldColliders = new Map<string, RAPIER.Collider>();
+    for (const collider of config.colliders) {
+      const instance = world.createCollider(
         RAPIER.ColliderDesc.cuboid(
           collider.halfExtents.x,
           collider.halfExtents.y,
@@ -39,13 +60,14 @@ export class PhysicsWorld {
           .setTranslation(collider.center.x, collider.center.y, collider.center.z)
           .setFriction(0.8),
       );
+      worldColliders.set(collider.id, instance);
     }
 
     const playerBody = world.createRigidBody(
       RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(
-        INITIAL_PLAYER_POSITION.x,
-        INITIAL_PLAYER_POSITION.y,
-        INITIAL_PLAYER_POSITION.z,
+        config.initialPlayerPosition.x,
+        config.initialPlayerPosition.y,
+        config.initialPlayerPosition.z,
       ),
     );
     const playerCollider = world.createCollider(
@@ -58,9 +80,37 @@ export class PhysicsWorld {
     characterController.enableSnapToGround(0.2);
     characterController.setMaxSlopeClimbAngle(Math.PI * 0.28);
 
+    const kinematicBodies = new Map<string, RAPIER.RigidBody>();
+    for (const object of config.kinematicObjects ?? []) {
+      const body = world.createRigidBody(
+        RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(
+          object.position.x,
+          object.position.y,
+          object.position.z,
+        ),
+      );
+      world.createCollider(
+        RAPIER.ColliderDesc.cuboid(
+          object.halfExtents.x,
+          object.halfExtents.y,
+          object.halfExtents.z,
+        ).setSensor(object.sensor ?? false),
+        body,
+      );
+      kinematicBodies.set(object.id, body);
+    }
+
     world.timestep = 1 / 60;
     world.step();
-    return new PhysicsWorld(world, playerBody, playerCollider, characterController);
+    return new PhysicsWorld(
+      world,
+      playerBody,
+      playerCollider,
+      characterController,
+      config.colliders.length + 1 + kinematicBodies.size,
+      kinematicBodies,
+      worldColliders,
+    );
   }
 
   stepCharacter(input: MovementIntent, dt: number): PhysicsSnapshot {
@@ -98,9 +148,52 @@ export class PhysicsWorld {
 
   getDiagnostics(): PhysicsDiagnostics {
     return {
-      colliderCount: SHIP_COLLIDERS.length + 1,
+      rigidBodyCount: this.world.bodies.len(),
+      colliderCount: this.colliderCount,
       collisionCount: this.collisionCount,
     };
+  }
+
+  hasLineOfSight(from: Vec3, to: Vec3): boolean {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const dz = to.z - from.z;
+    const distance = Math.hypot(dx, dy, dz);
+    if (distance <= 0.001) return true;
+    const ray = new RAPIER.Ray(from, { x: dx / distance, y: dy / distance, z: dz / distance });
+    const hit = this.world.castRay(
+      ray,
+      Math.max(0, distance - 0.12),
+      true,
+      RAPIER.QueryFilterFlags.EXCLUDE_SENSORS,
+      undefined,
+      this.playerCollider,
+    );
+    return hit === null;
+  }
+
+  setKinematicObjectPosition(id: string, position: Vec3): void {
+    const body = this.kinematicBodies.get(id);
+    if (!body) return;
+    body.setNextKinematicTranslation(position);
+  }
+
+  setWorldColliderEnabled(id: string, enabled: boolean): boolean {
+    const collider = this.worldColliders.get(id);
+    if (!collider) return false;
+    collider.setEnabled(enabled);
+    return true;
+  }
+
+  isWorldColliderEnabled(id: string): boolean | null {
+    return this.worldColliders.get(id)?.isEnabled() ?? null;
+  }
+
+  teleportCharacter(position: Vec3): void {
+    this.verticalVelocity = 0;
+    this.grounded = false;
+    this.playerBody.setTranslation(position, true);
+    this.playerBody.setNextKinematicTranslation(position);
   }
 
   dispose(): void {

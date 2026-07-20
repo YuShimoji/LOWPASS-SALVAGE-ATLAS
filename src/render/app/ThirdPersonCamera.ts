@@ -23,6 +23,20 @@ export class ThirdPersonCamera {
     return this.yaw;
   }
 
+  reset(yaw = 0, pitch = 0.28): void {
+    this.yaw = yaw;
+    this.pitch = MathUtils.clamp(pitch, MIN_PITCH, MAX_PITCH);
+    this.initialized = false;
+  }
+
+  resetFromStart(playerPosition: { x: number; y: number; z: number }, cameraPosition: { x: number; y: number; z: number }): void {
+    const dx = cameraPosition.x - playerPosition.x;
+    const dz = cameraPosition.z - playerPosition.z;
+    const horizontal = Math.hypot(dx, dz);
+    const pitch = Math.atan2(cameraPosition.y - (playerPosition.y + 1.03), Math.max(horizontal, 0.001));
+    this.reset(Math.atan2(dx, dz), pitch);
+  }
+
   update(playerPosition: Vector3, frameSeconds: number, occluders: readonly Object3D[]): void {
     this.target.set(playerPosition.x, playerPosition.y + 0.38, playerPosition.z);
     const horizontalDistance = Math.cos(this.pitch) * this.distance;

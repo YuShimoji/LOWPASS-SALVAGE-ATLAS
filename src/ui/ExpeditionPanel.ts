@@ -2,6 +2,7 @@ import type { ItemDefinition, ItemInstance } from "../game/items/itemDefinitions
 import type { ExpeditionDraft, ExpeditionManifest } from "../game/mission/expeditionTypes";
 import type { ExpeditionGateEvaluation } from "../game/mission/gateEvaluator";
 import type { CrewDefinition, CrewId } from "../game/squad/squadTypes";
+import type { MissionLaunchOptions } from "../game/insertion/InsertionPlanner";
 
 export interface ExpeditionPanelCallbacks {
   onClose(): void;
@@ -10,6 +11,7 @@ export interface ExpeditionPanelCallbacks {
   onAssignItem(itemInstanceId: string, agentId: CrewId): void;
   onReturnItem(itemInstanceId: string): void;
   onConfirm(): void;
+  onDeploy(manifest: ExpeditionManifest, options: MissionLaunchOptions): void;
 }
 
 export interface ExpeditionPanelCatalog {
@@ -21,6 +23,7 @@ export interface ExpeditionPanelCatalog {
 export class ExpeditionPanel {
   private readonly overlay = document.createElement("section");
   private readonly panel = document.createElement("div");
+  private launchOptions: MissionLaunchOptions = { insertionMode: "stable", insertionSeed: "atlas-01" };
 
   constructor(
     mount: HTMLElement,
@@ -184,7 +187,7 @@ export class ExpeditionPanel {
     this.panel.innerHTML = `
       <div class="manifest-frame" role="dialog" aria-modal="true" aria-labelledby="manifest-title">
         <header class="expedition-header">
-          <div><span class="panel-kicker">DEVELOPMENT HANDOFF / PHASE C NOT LOADED</span><h2 id="manifest-title">ExpeditionManifest 確定</h2></div>
+          <div><span class="panel-kicker">PHASE D / DISTRIBUTED INSERTION READY</span><h2 id="manifest-title">ExpeditionManifest 確定</h2></div>
           <button type="button" class="icon-close" data-expedition-close aria-label="サマリーを閉じる">×</button>
         </header>
         <div class="manifest-stamp">GATE AUTHORIZED</div>
@@ -195,11 +198,37 @@ export class ExpeditionPanel {
           <div><dt>SOURCE REVISION</dt><dd>${manifest.sourceDraftRevision}</dd></div>
         </dl>
         <section class="manifest-loadouts"><h3>確定ロードアウト</h3><div>${loadoutMarkup}</div></section>
-        <p class="manifest-note">探索マップへの遷移はフェーズCの範囲です。この画面では不変マニフェストの内容だけを表示しています。</p>
-        <button type="button" class="resume-button" data-expedition-close>船内へ戻る</button>
+        <section class="manifest-launch-options" aria-labelledby="insertion-options-title">
+          <h3 id="insertion-options-title">降下設定</h3>
+          <label>INSERTION MODE
+            <select data-insertion-mode>
+              <option value="stable" ${this.launchOptions.insertionMode === "stable" ? "selected" : ""}>STABLE / 密集</option>
+              <option value="paired" ${this.launchOptions.insertionMode === "paired" ? "selected" : ""}>PAIRED / 2+1</option>
+              <option value="scattered" ${this.launchOptions.insertionMode === "scattered" ? "selected" : ""}>SCATTERED / 分散</option>
+            </select>
+          </label>
+          <label>DETERMINISTIC SEED
+            <input type="text" data-insertion-seed maxlength="48" value="${escapeHtml(this.launchOptions.insertionSeed)}" />
+          </label>
+        </section>
+        <p class="manifest-note">この不変マニフェストを入力として固定探索マップを読み込みます。帰還後も同じ内容で再出撃できます。</p>
+        <div class="manifest-actions">
+          <button type="button" class="secondary-button" data-expedition-close>船内へ戻る</button>
+          <button type="button" class="resume-button" data-deploy-expedition>固定探索マップへ降下</button>
+        </div>
       </div>
     `;
     this.bindCloseEvents();
+    const deployButton = this.panel.querySelector<HTMLButtonElement>("[data-deploy-expedition]");
+    if (deployButton) bindButtonActivation(deployButton, () => {
+      const mode = this.panel.querySelector<HTMLSelectElement>("[data-insertion-mode]")?.value;
+      const seed = this.panel.querySelector<HTMLInputElement>("[data-insertion-seed]")?.value.trim();
+      this.launchOptions = {
+        insertionMode: mode === "paired" || mode === "scattered" ? mode : "stable",
+        insertionSeed: seed || "atlas-01",
+      };
+      this.callbacks.onDeploy(manifest, this.launchOptions);
+    });
   }
 
   hide(): void {

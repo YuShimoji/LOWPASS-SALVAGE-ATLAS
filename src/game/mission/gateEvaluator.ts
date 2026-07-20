@@ -39,6 +39,7 @@ export interface GateEvaluationContext {
   readonly agents: readonly CrewDefinition[];
   readonly itemDefinitions: Readonly<Record<string, ItemDefinition>>;
   readonly itemInstances: readonly ItemInstance[];
+  readonly shipInventoryItemIds: readonly string[];
 }
 
 export interface ItemGateEvaluation {

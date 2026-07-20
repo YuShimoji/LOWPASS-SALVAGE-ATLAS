@@ -56,8 +56,9 @@ export class ExpeditionPlanner {
 
   getAvailableInventory(): readonly ItemInstance[] {
     const assigned = new Set(this.draft.itemInstanceIds);
+    const shipInventory = new Set(this.context.shipInventoryItemIds);
     return this.context.itemInstances.filter(
-      (instance) => instance.location === "ship-inventory" && !assigned.has(instance.id),
+      (instance) => shipInventory.has(instance.id) && !assigned.has(instance.id),
     );
   }
 
@@ -96,7 +97,8 @@ export class ExpeditionPlanner {
       throw new Error(`Cannot assign an item to unselected agent ${agentId}`);
     }
     const knownItem = this.context.itemInstances.some(
-      (instance) => instance.id === itemInstanceId && instance.location === "ship-inventory",
+      (instance) =>
+        instance.id === itemInstanceId && this.context.shipInventoryItemIds.includes(instance.id),
     );
     if (!knownItem) throw new Error(`Unknown ship inventory item ${itemInstanceId}`);
 
@@ -180,8 +182,9 @@ export function createGateEvaluationContext(
   agents: readonly CrewDefinition[],
   itemDefinitions: Readonly<Record<string, ItemDefinition>>,
   itemInstances: readonly ItemInstance[],
+  shipInventoryItemIds: readonly string[] = itemInstances.map((item) => item.id),
 ): GateEvaluationContext {
-  return { agents, itemDefinitions, itemInstances };
+  return { agents, itemDefinitions, itemInstances, shipInventoryItemIds };
 }
 
 function cloneDraft(draft: ExpeditionDraft): ExpeditionDraft {

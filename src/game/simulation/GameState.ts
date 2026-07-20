@@ -1,7 +1,13 @@
 import type { EntityId, TransformState } from "../core/types";
 import { createInitialExpeditionDraft, type ExpeditionDraft, type ExpeditionManifest } from "../mission/expeditionTypes";
 import type { ItemGateEvaluation } from "../mission/gateEvaluator";
-import type { InteractionAction } from "../content/shipLayout";
+import type { InteractionAction } from "../interaction/interactionTypes";
+import { createInitialItemLocations } from "../items/itemDefinitions";
+import type { ItemLocationLedger } from "../items/itemLocation";
+import type { FixedMissionResult, MissionSessionState } from "../mission/MissionSession";
+import type { DistributedSquadState } from "../squad/squadTypes";
+import type { ThreatEncounterState } from "../threat/threatTypes";
+import type { PorterAndroidState } from "../machines/machineTypes";
 
 export type RuntimeMode = "playing" | "paused";
 
@@ -35,7 +41,7 @@ export interface GateScanState {
   evaluation: ItemGateEvaluation;
 }
 
-export type ActiveModal = "none" | "settings" | "expedition" | "manifest-summary";
+export type ActiveModal = "none" | "settings" | "expedition" | "manifest-summary" | "mission-result";
 
 export interface ExpeditionState {
   draft: ExpeditionDraft;
@@ -52,6 +58,20 @@ export interface GameState {
   player: PlayerState;
   interaction: InteractionState;
   expedition: ExpeditionState;
+  world: {
+    mode: "ship" | "mission-loading" | "mission";
+    completedExpeditions: number;
+  };
+  inventory: {
+    itemLocations: ItemLocationLedger;
+  };
+  mission: {
+    session: MissionSessionState | null;
+    squad: DistributedSquadState | null;
+    threat: ThreatEncounterState | null;
+    porter: PorterAndroidState | null;
+    lastResult: FixedMissionResult | null;
+  };
   ui: {
     activeModal: ActiveModal;
   };
@@ -87,6 +107,20 @@ export function createInitialGameState(): GameState {
       draft: createInitialExpeditionDraft(),
       confirmedManifest: null,
       gateScan: null,
+    },
+    world: {
+      mode: "ship",
+      completedExpeditions: 0,
+    },
+    inventory: {
+      itemLocations: createInitialItemLocations(),
+    },
+    mission: {
+      session: null,
+      squad: null,
+      threat: null,
+      porter: null,
+      lastResult: null,
     },
     ui: {
       activeModal: "none",

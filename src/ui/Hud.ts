@@ -2,6 +2,8 @@ import type { PhysicsDiagnostics } from "../physics/PhysicsWorld";
 import type { RenderDiagnostics } from "../render/app/RenderSystem";
 import type { GameState, VisualSettings } from "../game/simulation/GameState";
 import type { ExpeditionGateEvaluation } from "../game/mission/gateEvaluator";
+import type { MissionObjectiveProgress } from "../game/mission/MissionSession";
+import type { DomDiagnostics } from "../diagnostics/DomDiagnostics";
 
 export interface HudDiagnostics {
   fps: number;
@@ -9,6 +11,13 @@ export interface HudDiagnostics {
   render: RenderDiagnostics;
   physics: PhysicsDiagnostics;
   expedition: ExpeditionGateEvaluation;
+  mission: MissionObjectiveProgress | null;
+  worldContract: {
+    readonly label: string;
+    readonly recoveredBeforeVisit: number;
+    readonly objectiveCount: number;
+  } | null;
+  dom: DomDiagnostics;
 }
 
 export interface HudCallbacks {
@@ -39,7 +48,7 @@ export class Hud {
     this.root.className = "ui-layer";
     this.root.innerHTML = `
       <header class="brand-chip" aria-label="Game title">
-        <span class="brand-kicker">PHASE B / HAB-03</span>
+        <span class="brand-kicker">PHASE F / WORLD MEMORY</span>
         <strong>LOWPASS</strong><span class="brand-subtitle">SALVAGE ATLAS</span>
       </header>
       <section class="objective-chip" aria-label="Current objective">
@@ -52,7 +61,7 @@ export class Hud {
       </section>
       <div class="reticle" aria-hidden="true"></div>
       <aside class="controls-hint">
-        <span>WASD</span> 移動　<span>SHIFT</span> 走る　<span>MOUSE</span> 視点　<span>F1</span> 診断
+        <span>WASD</span> 移動　<span>SHIFT</span> 走る　<span>E</span> 操作　<span>MOUSE</span> 視点　<span>F1</span> 診断
       </aside>
     `;
 
@@ -107,12 +116,33 @@ export class Hud {
     const interactionPrompt = state.runtime.mode === "playing" ? state.interaction.prompt : null;
     this.prompt.textContent = interactionPrompt ?? "";
     this.prompt.classList.toggle("is-visible", interactionPrompt !== null);
-    this.status.textContent = state.expedition.confirmedManifest
-      ? `MANIFEST · ${state.expedition.confirmedManifest.totalCapacityUnits}/28U`
-      : `DRAFT · ${diagnostics.expedition.capacity.usedUnits}/28U`;
-    this.objective.textContent = state.expedition.confirmedManifest
-      ? "確定マニフェストを確認する"
-      : "出撃コンソールで遠征編成を確定する";
+    if (state.world.mode === "mission-loading") {
+      this.status.textContent = "MISSION · LOADING";
+      this.objective.textContent = "固定探索マップへ降下する";
+    } else if (state.world.mode === "mission" && diagnostics.mission && state.expedition.confirmedManifest) {
+      const squad = state.mission.squad;
+      this.status.textContent = squad
+        ? `CTRL ${squad.control.controlledAgentId.toUpperCase()} · LEAD ${squad.control.fieldLeadAgentId.toUpperCase()}`
+        : `TEAM ${state.expedition.confirmedManifest.selectedAgentIds.length} · GEAR ${state.expedition.confirmedManifest.items.length}`;
+      const contractRecovered = diagnostics.worldContract
+        ? Math.min(
+            diagnostics.worldContract.objectiveCount,
+            diagnostics.worldContract.recoveredBeforeVisit + diagnostics.mission.securedResources,
+          )
+        : diagnostics.mission.securedResources;
+      this.objective.textContent = squad?.rallyObjective.active
+        ? `${squad.rallyObjective.label} · ${Math.round(squad.rallyObjective.progress * 100)}%`
+        : diagnostics.worldContract
+          ? `${diagnostics.worldContract.label} ${contractRecovered}/${diagnostics.worldContract.objectiveCount} · 冷却コイル ${diagnostics.mission.coolingCoilLoaded ? "積載済" : "未積載"}`
+          : `全契約完了 · 任意サルベージ ${diagnostics.mission.securedResources}点`;
+    } else {
+      this.status.textContent = state.expedition.confirmedManifest
+        ? `MANIFEST · ${state.expedition.confirmedManifest.totalCapacityUnits}/28U · RUN ${state.world.completedExpeditions}`
+        : `DRAFT · ${diagnostics.expedition.capacity.usedUnits}/28U`;
+      this.objective.textContent = state.expedition.confirmedManifest
+        ? "確定マニフェストから固定遠征を開始する"
+        : "出撃コンソールで遠征編成を確定する";
+    }
 
     if (state.interaction.noticeRevision !== this.noticeRevision && state.interaction.notice) {
       this.noticeRevision = state.interaction.noticeRevision;
@@ -129,14 +159,32 @@ export class Hud {
       const { player, runtime } = state;
       const { render, physics } = diagnostics;
       this.debug.textContent = [
-        "PHASE B DIAGNOSTICS  [F1]",
+        "PHASE F DIAGNOSTICS  [F1]",
+        `WORLD ${state.world.mode.toUpperCase()}  RUNS ${state.world.completedExpeditions}`,
         `FPS ${diagnostics.fps.toFixed(0).padStart(3)}  FIXED 60Hz  TICK ${runtime.tick}`,
         `POS ${format(player.position.x)}  ${format(player.position.y)}  ${format(player.position.z)}`,
         `SPEED ${player.movementSpeed.toFixed(2)}m/s  GROUND ${player.grounded ? "YES" : "NO"}`,
-        `RAPIER COL ${physics.colliderCount}  CONTACT ${physics.collisionCount}`,
+        `RAPIER BODY ${physics.rigidBodyCount}  COL ${physics.colliderCount}  CONTACT ${physics.collisionCount}`,
         `WEBGL ${render.drawCalls} calls  ${render.triangles} tris  ${render.renderWidth}×${render.renderHeight}`,
+        `SCENE OBJECTS ${render.sceneObjects}`,
+        `GPU MEM GEO ${render.geometries}  TEX ${render.textures}  PROG ${render.programs}`,
         `DROPPED CATCH-UP ${diagnostics.droppedSimulationFrames}`,
         `GATE DRAFT ${diagnostics.expedition.accepted ? "VALID" : "BLOCKED"}  ${diagnostics.expedition.capacity.usedUnits}/28U`,
+        diagnostics.mission
+          ? diagnostics.worldContract
+            ? `SALVAGE ${diagnostics.worldContract.label} ${diagnostics.mission.securedResources}/${diagnostics.mission.requiredResources}  CART ${diagnostics.mission.cartAtExtraction ? "EXTRACT" : "FIELD"}`
+            : `SALVAGE OPTIONAL ${diagnostics.mission.securedResources} ITEMS  CART ${diagnostics.mission.cartAtExtraction ? "EXTRACT" : "FIELD"}`
+          : "SALVAGE INACTIVE",
+        state.mission.squad
+          ? `COMMS ${Object.values(state.mission.squad.agents).map((agent) => `${agent.id}:${agent.communicationBand}`).join(" ")}`
+          : "COMMS INACTIVE",
+        state.mission.threat
+          ? `THREAT ${state.mission.threat.drone.mode.toUpperCase()}  TARGET ${state.mission.threat.drone.targetAgentId ?? "NONE"}  PRES ${state.mission.threat.drone.presence?.band.toUpperCase() ?? "NONE"}`
+          : "THREAT INACTIVE",
+        state.mission.porter
+          ? `PORTER ${state.mission.porter.mode.toUpperCase()}  CARRY ${state.mission.porter.carriedItemId ?? "NONE"}`
+          : "PORTER INACTIVE",
+        `DOM ${diagnostics.dom.totalNodes}  HUD ${diagnostics.dom.persistentHudNodes}  MODAL ${diagnostics.dom.modalNodes}  FX ${diagnostics.dom.transientFeedbackNodes}  HISTORY ${diagnostics.dom.resultHistoryNodes}`,
       ].join("\n");
     }
   }
