@@ -1,16 +1,20 @@
 # LOWPASS: SALVAGE ATLAS — 再開引き継ぎ
 
-更新日: 2026-07-21
+更新日: 2026-07-22
 
 ## 現在地
 
 - 正本ブランチ: `feat/phase-f-world-persistence`
 - 実装基準コミット: `1e98860597ac940ff8d47505a5b00736d852c43a`
+- リモート同期基準: `d25a9c04c277d5d4728904a11429f45413599a83`
 - 到達点: フェーズF「訪問間世界永続化」の実装・自動検証・3訪問ブラウザ検証まで完了
-- 次のゲート: 人間による3訪問の感覚評価。その後にフェーズGの目的を1つだけ選ぶ
+- 再開検証: 2026-07-22に依存整合、型検査、24ファイル122テスト、build、HTTP smokeを再実施してPASS
+- 次のゲート: 監修確認後、人間による3訪問の感覚評価。その後にフェーズGの目的を1つだけ選ぶ
 - `main` はフェーズB基準点 `c5ae3b9` のまま。Phase C〜Fを暗黙に統合・強制更新しない
 
 この文書を含む最新の引き継ぎコミットはブランチ先端です。再開時は `git rev-parse HEAD` と `git status -sb` で、`origin/feat/phase-f-world-persistence` と一致することを確認してください。
+
+監修役AIは [`docs/supervising-ai-report.md`](docs/supervising-ai-report.md) を読み、今回確認済みの自動検証、2026-07-21の既存ブラウザ証跡、人間所有の感覚評価、条件付き長期ロードマップを分離して扱ってください。
 
 ## リモート反映
 
@@ -66,6 +70,22 @@ git status -sb
 
 既知の非ブロッキング項目は、Viteの500 kB初期チャンク警告とRapier互換パッケージ由来の初期化非推奨warningです。警告を消すためだけの閾値変更や物理基盤変更は行いません。
 
+## 2026-07-22 再開検証
+
+- `git fetch --prune --tags origin`: PASS
+- `git pull --ff-only origin feat/phase-f-world-persistence`: PASS、already up to date
+- `git rev-list --left-right --count HEAD...origin/feat/phase-f-world-persistence`: `0 0`
+- `git rev-list --left-right --count main...origin/main`: `0 0`
+- Node `v24.13.0` / npm `11.6.2`
+- 対象checkoutに紐づくNode / npm process: 0
+- `npm ls --depth=0`: PASS
+- `npm run typecheck`: PASS
+- `npm test`: PASS（24ファイル、122テスト）
+- `npm run build`: PASS（初期チャンク2,900.15 kB / gzip 1,017.94 kB、既知warningのみ）
+- 開発URL `http://127.0.0.1:5173/?qa=1&audio=muted`: HTTP 200、正しいtitleとmodule entrypointを確認後にserver停止
+
+この再開検証は3訪問の操作、音、リソース計測を再実施していません。それらは直前節とREADMEの2026-07-21証跡を参照します。
+
 ## 意図的に触れていない境界
 
 - `main` のfast-forward、既存branch/tagの強制更新、履歴改変
@@ -80,6 +100,7 @@ git status -sb
 | --- | --- | --- | --- | --- | --- |
 | 人間による感覚評価 | 復元要約、契約テンポ、脅威圧、音量、視認性、搬送速度を最終判断できる | デスクトップ実機で `partial → reload → complete → 第2契約` をミュートなしで完走 | 実装済み・評価待ち | ゲームデザイン / UX | 調整値と文言だけをデータ定義・UIへ反映する |
 | フェーズGの目的選定 | 次スライスの境界を固定し、複数機構の同時拡張を防ぐ | 人間評価結果と `docs/idea-ledger.md` を比較し、目的を1つに絞る | 未決定 | オーナー / ゲームデザイン | 受入条件を先に書き、専用branchをPhase F先端から作る |
+| 監修ロードマップ確認 | 先行目標を承認済み仕様と混同せず、次ゲートを明確にする | `docs/supervising-ai-report.md` の条件・停止条件・権限分界を確認 | 提案済み・承認待ち | 監修役AI / オーナー | 人間評価を先に行い、Phase G候補を1つだけ承認する |
 | 保存migration | 将来のschema更新でもv1セーブを安全に継続利用できる | 明示version migration、v1 fixture、破損値のfail-closed維持 | v2要求まで保留 | 保存基盤 | schemaVersion 2が必要になった時点でテストから着手する |
 | 初期バンドル分割 | 初回ダウンロードを減らせる | 実機起動計測、vendor cache戦略、現行dynamic import境界の維持 | 非ブロッキング | 性能作業 | 実測後にThree.js / Rapier分割の費用対効果を判断する |
 | Rapier warning解消 | 開発コンソールの既知warningを除去できる | 依存版と初期化APIの互換性検証 | 非ブロッキング | 依存更新 | Rapier更新時に再評価する |
@@ -88,9 +109,10 @@ git status -sb
 
 1. `PROJECT_HANDOFF.md`
 2. `docs/project-context.md`
-3. `README.md` のフェーズF設計・検証・残課題
-4. `docs/decision-log.md`
-5. `docs/idea-ledger.md`
-6. 実装着手時は `src/game/world/`、`src/game/mission/ExpeditionReservation.ts`、`src/main.ts`
+3. `docs/supervising-ai-report.md`
+4. `README.md` のフェーズF設計・検証・残課題
+5. `docs/decision-log.md`
+6. `docs/idea-ledger.md`
+7. 実装着手時は `src/game/world/`、`src/game/mission/ExpeditionReservation.ts`、`src/main.ts`
 
 未解決の設計質問は「Phase Gで、プレイヤー体験を最も大きく前進させる単一目的は何か」です。人間評価前に複数敵協調、生成世界、途中再開をまとめて実装しないでください。

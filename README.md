@@ -4,12 +4,13 @@
 
 ## 再開ポイント
 
-別端末・別セッションでは最初に [`PROJECT_HANDOFF.md`](PROJECT_HANDOFF.md) を読み、現行ブランチ、検証基準、最初のコマンド、未決定の人間判断を確認してください。プロジェクトの現在地は [`docs/project-context.md`](docs/project-context.md)、確定判断は [`docs/decision-log.md`](docs/decision-log.md)、未採用の方向性は [`docs/idea-ledger.md`](docs/idea-ledger.md) に分離しています。このREADMEは実装仕様とフェーズ別の検証証跡を保持します。
+別端末・別セッションでは最初に [`PROJECT_HANDOFF.md`](PROJECT_HANDOFF.md) を読み、現行ブランチ、検証基準、最初のコマンド、未決定の人間判断を確認してください。プロジェクトの現在地は [`docs/project-context.md`](docs/project-context.md)、確定判断は [`docs/decision-log.md`](docs/decision-log.md)、未採用の方向性は [`docs/idea-ledger.md`](docs/idea-ledger.md)、監修判断用の時点報告と条件付き長期ロードマップは [`docs/supervising-ai-report.md`](docs/supervising-ai-report.md) に分離しています。このREADMEは実装仕様とフェーズ別の検証証跡を保持します。
 
 ## 実行
 
 ```powershell
-npm install
+npm ci
+npm ls --depth=0
 npm run dev
 ```
 

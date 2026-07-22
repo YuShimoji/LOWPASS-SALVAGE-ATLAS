@@ -1,6 +1,6 @@
 # Project Context
 
-更新日: 2026-07-21
+更新日: 2026-07-22
 
 ## North star
 
@@ -15,7 +15,8 @@
 | 完了スライス | Phase F: 訪問間世界永続化 |
 | 作業ブランチ | `feat/phase-f-world-persistence` |
 | 実装基準 | `1e98860597ac940ff8d47505a5b00736d852c43a` |
-| 次のゲート | 人間の感覚評価 → Phase G単一目的の選定 |
+| リモート同期基準 | `d25a9c04c277d5d4728904a11429f45413599a83`（2026-07-22時点でoriginと0 / 0） |
+| 次のゲート | 監修確認 → 人間の感覚評価 → Phase G単一目的の選定 |
 | 受入の正本 | `README.md` のフェーズ別検証結果と `PROJECT_HANDOFF.md` |
 
 ## 現行アーキテクチャ
@@ -53,12 +54,14 @@
 
 ## 現在の品質基準
 
-Phase F先端で、型検査、24ファイル122テスト、production build、トップレベル依存整合、diff checkを通すこと。ブラウザでは3訪問、進行中リロード、契約累積、Porter関係、開放経路、証拠一回通知、relay残置・回収、世界限定リセットを確認すること。詳細な手順と実測値は `README.md` にあり、更新時は要約だけでなく同じ証跡を更新します。
+Phase F先端で、型検査、24ファイル122テスト、production build、トップレベル依存整合、diff checkを通すこと。2026-07-22の再開検証ではこれらと開発URLのHTTP 200を再確認した。ブラウザ3訪問、進行中リロード、契約累積、Porter関係、開放経路、証拠一回通知、relay残置・回収、世界限定リセットの正本証跡は2026-07-21の `README.md` にあり、今回のHTTP smokeと混同しない。監修判断用の分離は `docs/supervising-ai-report.md` を参照する。
 
 ## Re-entry snapshot
 
-- コードとREADMEはPhase F完了地点でクリーン
+- `git fetch --prune --tags origin` と現branchの`--ff-only` pullを実施し、同期基準 `d25a9c0` でahead / behindは0 / 0だった
+- Node `v24.13.0` / npm `11.6.2` で依存、型検査、122テスト、build、HTTP smokeを再確認した
 - Phase Gは未選定。人間評価が所有するため自動的に決めない
+- 推奨候補は契約・証拠・再訪判断の因果深化だが、承認済み仕様ではない
 - `main` はPhase B基準の統合ゲートであり、Phase C〜Fの履歴はfeature branchに直列で保持
 - `.serena/`、`node_modules/`、`dist/`、IndexedDB、資格情報はローカル専用。削除・追跡・共有しない
 - 最短コマンドと残作業の責任分界はルートの `PROJECT_HANDOFF.md` を参照
