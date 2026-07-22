@@ -1,6 +1,6 @@
 # Project Context
 
-更新日: 2026-07-22
+更新日: 2026-07-23
 
 ## North star
 
@@ -15,7 +15,8 @@
 | 完了スライス | Phase F: 訪問間世界永続化 |
 | 作業ブランチ | `feat/phase-f-world-persistence` |
 | 実装基準 | `1e98860597ac940ff8d47505a5b00736d852c43a` |
-| リモート同期基準 | `d25a9c04c277d5d4728904a11429f45413599a83`（2026-07-22時点でoriginと0 / 0） |
+| リモート同期基準 | `d25a9c04c277d5d4728904a11429f45413599a83`（2026-07-23取得時点のorigin先端） |
+| ローカル監修文書基準 | `1f1319a9dd3e324ae81b62d73972b26137b7014c` と本更新。実装変更ではなく、未push |
 | 次のゲート | 監修確認 → 人間の感覚評価 → Phase G単一目的の選定 |
 | 受入の正本 | `README.md` のフェーズ別検証結果と `PROJECT_HANDOFF.md` |
 
@@ -54,11 +55,12 @@
 
 ## 現在の品質基準
 
-Phase F先端で、型検査、24ファイル122テスト、production build、トップレベル依存整合、diff checkを通すこと。2026-07-22の再開検証ではこれらと開発URLのHTTP 200を再確認した。ブラウザ3訪問、進行中リロード、契約累積、Porter関係、開放経路、証拠一回通知、relay残置・回収、世界限定リセットの正本証跡は2026-07-21の `README.md` にあり、今回のHTTP smokeと混同しない。監修判断用の分離は `docs/supervising-ai-report.md` を参照する。
+Phase F先端で、型検査、24ファイル122テスト、production build、トップレベル依存整合、diff checkを通すこと。2026-07-23の再開検証ではこれらと開発URLのHTTP 200を再確認した。ブラウザ3訪問、進行中リロード、契約累積、Porter関係、開放経路、証拠一回通知、relay残置・回収、世界限定リセットの正本証跡は2026-07-21の `README.md` にあり、今回のHTTP smokeと混同しない。監修判断用の分離は `docs/supervising-ai-report.md` を参照する。
 
 ## Re-entry snapshot
 
-- `git fetch --prune --tags origin` と現branchの`--ff-only` pullを実施し、同期基準 `d25a9c0` でahead / behindは0 / 0だった
+- `git fetch --prune --tags origin` と現branchの`--ff-only` pullを実施し、origin側の未取込は0件。既存のローカル監修commit `1f1319a` を保全した
+- この更新をcommitした直後はlocal ahead 2 / behind 0の想定。2件ともdocs-onlyで、remote portabilityはオーナー判断待ち
 - Node `v24.13.0` / npm `11.6.2` で依存、型検査、122テスト、build、HTTP smokeを再確認した
 - Phase Gは未選定。人間評価が所有するため自動的に決めない
 - 推奨候補は契約・証拠・再訪判断の因果深化だが、承認済み仕様ではない

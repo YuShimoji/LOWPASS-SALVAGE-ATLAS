@@ -1,10 +1,10 @@
 # 監修役AI向け現状報告
 
-更新日時: 2026-07-22 21:57 JST
+更新日時: 2026-07-23 06:51 JST
 
 ## 監修結論
 
-`feat/phase-f-world-persistence` は、リモート同期、依存整合、型検査、全自動テスト、production build、開発サーバーHTTP smokeの範囲で開発再開可能です。Phase F「訪問間世界永続化」の実装基準は `1e98860597ac940ff8d47505a5b00736d852c43a`、今回リモートから同期した文書込みの基準は `d25a9c04c277d5d4728904a11429f45413599a83` です。
+`feat/phase-f-world-persistence` は、リモート取得、依存整合、型検査、全自動テスト、production build、開発サーバーHTTP smokeの範囲で開発再開可能です。Phase F「訪問間世界永続化」の実装基準は `1e98860597ac940ff8d47505a5b00736d852c43a`、originの最新基準は `d25a9c04c277d5d4728904a11429f45413599a83` です。origin側の未取込変更は0件で、ローカルには監修文書commit `1f1319a9dd3e324ae81b62d73972b26137b7014c` と本更新だけが先行します。
 
 ただし、これは `main` への統合、公開リリース、Phase G着手の承認ではありません。次の必須ゲートは、ミュートなしの3訪問を人間が評価し、その観察結果を受けてPhase Gの目的を1つだけ選ぶことです。
 
@@ -19,24 +19,26 @@
 - 別端末・別AI向け再開手順: `PROJECT_HANDOFF.md`
 - 本文書: 監修判断用の時点報告と条件付きロードマップ。確定仕様ではない
 
-`README.md` に残る2026-07-21のブラウザ証跡はPhase F実装時の受入証跡です。今回の2026-07-22再開検証は自動ゲートとHTTP smokeまでであり、3訪問の手動ブラウザ操作や音の主観評価を再実施したものではありません。
+`README.md` に残る2026-07-21のブラウザ証跡はPhase F実装時の受入証跡です。今回の2026-07-23再開検証は自動ゲートとHTTP smokeまでであり、3訪問の手動ブラウザ操作や音の主観評価を再実施したものではありません。
 
 ## Git・リモート状態
 
-| 項目 | 2026-07-22確認値 | 判定 |
+| 項目 | 2026-07-23確認値 | 判定 |
 | --- | --- | --- |
 | origin | `https://github.com/YuShimoji/LOWPASS-SALVAGE-ATLAS.git` | 取得可能 |
 | 作業ブランチ | `feat/phase-f-world-persistence` | 正本再開ブランチ |
-| 同期基準 | `d25a9c04c277d5d4728904a11429f45413599a83` | `origin/feat/phase-f-world-persistence` と同期 |
-| 同期直後のfeature branch parity | ahead 0 / behind 0 | PASS |
+| origin feature先端 | `d25a9c04c277d5d4728904a11429f45413599a83` | fetch / pull後も不変 |
+| 文書更新前のlocal先端 | `1f1319a9dd3e324ae81b62d73972b26137b7014c` | docs-only handoff |
+| 同期・文書更新前のfeature parity | local ahead 1 / behind 0 | remote未取込なし、既存local commit保全 |
+| 本更新commit直後の想定feature parity | local ahead 2 / behind 0 | 2件ともdocs-only、未push |
 | `main` parity | ahead 0 / behind 0 | PASS |
 | `origin/main` | `c5ae3b9a168eb81c41886aab93699980be4c90df` | Phase B統合基準のまま |
 | draft PR | [#1](https://github.com/YuShimoji/LOWPASS-SALVAGE-ATLAS/pull/1), OPEN / DRAFT / MERGEABLE | 人間レビュー待ち |
 | PR checks | status check 0件 | CI証跡なし。ローカル検証で代替した状態 |
 
-実行した同期操作は `git fetch --prune --tags origin` と `git pull --ff-only origin feat/phase-f-world-persistence` です。結果は `Already up to date` で、rebase、force-push、履歴書換え、`main` の暗黙統合は行っていません。上表の0 / 0は監修文書を作る直前の同期値であり、この文書のローカルcommitはoriginへpushしません。
+実行した同期操作は `git fetch --prune --tags origin` と `git pull --ff-only origin feat/phase-f-world-persistence` です。結果は `Already up to date` で、rebase、force-push、履歴書換え、`main` の暗黙統合は行っていません。aheadはremoteから取り込むべき変更ではなく、監修役AIへ渡すためのローカル文書です。pushは依頼範囲に含めず、オーナー判断へ残します。
 
-Phase C〜Fは `main` より8コミット先の直列履歴です。ローカル専用の `.serena/`、`node_modules/`、`dist/` は無視状態のまま保持し、削除・追跡・共有していません。
+origin上のPhase C〜Fは `main` より8コミット先の直列履歴です。ローカルbranchは本更新commit後に、そこからdocs-onlyで2コミット先行する想定です。ローカル専用の `.serena/`、`node_modules/`、`dist/` は無視状態のまま保持し、削除・追跡・共有していません。
 
 ## 今回の再開検証
 
@@ -48,10 +50,11 @@ Phase C〜Fは `main` より8コミット先の直列履歴です。ローカル
 | `npm run typecheck` | PASS | TypeScript `tsc --noEmit` |
 | `npm test` | PASS | 24ファイル / 122テスト |
 | `npm run build` | PASS | Vite 8.1.5、63 modules transformed |
-| `git diff --check` | PASS | 同期基準のソース差分に空白エラーなし |
+| `git diff --check` | PASS | 更新後のdocs差分にも空白エラーなし |
 | 開発URL | PASS | `http://127.0.0.1:5173/?qa=1&audio=muted` がHTTP 200 |
 | HTML entry | PASS | title `LOWPASS: SALVAGE ATLAS`、module entrypointあり |
 | サーバー停止 | PASS | smoke後に停止、port 5173 listenerなし |
+| draft PR #1 live state | PASS | OPEN / DRAFT / MERGEABLE、status check 0件 |
 
 production buildはPhase F既知値と同じ初期チャンク2,900.15 kB（gzip 1,017.94 kB）を生成しました。500 kB超のVite warningは継続していますが、build失敗ではありません。警告を隠すための閾値変更や、警告だけを理由にしたThree.js / Rapier分割は行っていません。
 
@@ -61,10 +64,22 @@ production buildはPhase F既知値と同じ初期チャンク2,900.15 kB（gzip
 | --- | --- |
 | must-fix before restart-ready | なし。同期、依存、自動ゲート、HTTP entrypoint、停止状態を確認済み |
 | acceptable debt | Vite大容量warning、Rapier既知warning、PR CI未設定、今回の3訪問ブラウザ再実施なし |
-| docs debt | 既知なし。READMEの再開手順をlockfile基準の`npm ci`へ統一し、監修報告への導線を追加 |
+| docs debt | 既知なし。本更新でlocal / origin parityを修正し、diff / local link / Git状態を再監査済み |
 | next-slice seeds | 契約・証拠の因果深化、条件付きの複数敵協調、途中再開、第2作者定義世界、計測後のbundle分割 |
 
 人間の感覚評価とPhase G選定は、開発環境のrestart-readyを否定する不具合ではありません。ただし次スライス着手を止める製品判断ゲートです。
+
+## 完成度の目安
+
+これは工数予測ではなく、現時点の証跡と残ゲートから見た監修用の目安です。
+
+| 対象 | 目安 | 根拠 |
+| --- | --- | --- |
+| Phase F垂直スライス | `██████████ 100%` | 実装、自動ゲート、3訪問ブラウザ証跡、再開smokeまで成立 |
+| 次スライス着手準備 | `██████░░░░ 60%` | 候補、境界、受入像はあるが、人間感覚評価とPhase G承認が未完了 |
+| 製品化ロードマップ | `████░░░░░░ 約40%` | 中核ループと継続世界は成立。第2世界、中断耐性、save進化、性能・accessibility、rights、配布受入が未完了 |
+
+したがって「開発環境は再開可能」ですが、「次の製品スライスが承認済み」でも「リリース可能」でもありません。
 
 ## 現在できていること
 
@@ -83,7 +98,7 @@ production buildはPhase F既知値と同じ初期チャンク2,900.15 kB（gzip
 ### 今回確認済み
 
 - リモート取得と現ブランチのfast-forward安全性
-- branch / mainのtracking parity
+- remote側の未取込が0件であること、main parity 0 / 0、ローカルdocs-only先行状態
 - 依存整合、型検査、122テスト、production build
 - 開発サーバー起動とQA URLのHTTP entrypoint
 - draft PR #1がOPEN / DRAFT / MERGEABLEであること
@@ -177,6 +192,8 @@ production buildはPhase F既知値と同じ初期チャンク2,900.15 kB（gzip
 | Phase L | 制約付き再訪変化 | 到達性検証、安定semantic ID、safe anchorを持つseeded variationを導入 | 2つ以上の作者定義世界で抽象が実証済み | world generation / QA |
 | Beta hardening | 実機品質 | 起動時間、bundle、フレーム、入力、音、キーボード操作、save recoveryに数値予算 | 主要ゲームループ凍結 | performance / accessibility / QA |
 | Release candidate | 配布候補 | rights、制作アセット、回帰、save compatibility、PR review、rollback手順を人間承認 | Beta受入 | オーナー / release |
+| Launch gate | 配布判断 | 配布先、versioning、署名・権利、既知問題、rollback、save移行可否をオーナーが承認 | Release candidate受入 | オーナーのみ |
+| Post-launch stewardship | 継続運用 | crash/save破損対応、互換性fixture、release notes、rollback基準を版ごとに維持 | 公開が明示承認された場合のみ | owner / maintenance |
 
 ### 長期ロードマップの停止条件
 
@@ -193,6 +210,7 @@ production buildはPhase F既知値と同じ初期チャンク2,900.15 kB（gzip
 | Phase F人間評価 | 自動検証できない感覚品質を確定する | ミュートなし3訪問、観察メモ、blocking/tuning判定 | 待ち | 人間ゲームデザイン / UX | QA URLから通しプレイし、6観点を記録する |
 | Phase G選定 | 次スライスを一目的に固定する | 人間観察、idea ledger比較、受入条件、非対象 | 未承認 | オーナー / 監修役AI | 推奨案または条件付き代替を1つ承認する |
 | Phase G仕様 | 実装の境界と完了判定を先に固定する | プレイヤー判断1文、不変条件、5件以内の受入、テスト計画 | 未着手 | ゲームデザイン + 実装AI | Phase F先端から専用branchを作る前に仕様を書く |
+| ローカル監修commitのremote portability | 別端末でも同じ監修文書から再開できる | 2件のdocs-only commit確認、push権限、push後parity | local ahead 2 / behind 0想定・未push | オーナー | 承認時だけfeature branchへpushする |
 | draft PR #1 | Phase C〜Fをmainへ統合可能にする | 人間レビュー、必要ならCI、merge方針 | OPEN / DRAFT / MERGEABLE | オーナー / reviewer | Phase F感覚受入後にReady化可否を判断する |
 | CI証跡 | PR上で再現可能なゲートを得る | typecheck/test/build workflow | 未設定・非ブロッキング | repo owner / CI | merge方針決定時に必要性を判断する |
 | bundle計測 | 性能作業の根拠を得る | 初回、warm cache、再訪の実機計測 | warningのみ・保留 | performance | 体感問題が出た端末で3値を採る |
@@ -203,7 +221,7 @@ production buildはPhase F既知値と同じ初期チャンク2,900.15 kB（gzip
 ## 次のAIが最初に行うこと
 
 1. `PROJECT_HANDOFF.md`、`docs/project-context.md`、本文書を読む。
-2. `git status -sb` と `git rev-list --left-right --count HEAD...origin/feat/phase-f-world-persistence` を確認する。
+2. `git status -sb` と `git rev-list --left-right --count HEAD...origin/feat/phase-f-world-persistence` を確認し、docs-onlyのlocal aheadを保全する。
 3. 人間評価メモが追加されているか確認する。なければPhase G実装を開始しない。
 4. 評価メモがある場合だけ `docs/idea-ledger.md` と比較し、Phase Gを1つに絞る。
 5. 受入条件と非対象を先に文書化し、Phase F先端から新branchを作る。
