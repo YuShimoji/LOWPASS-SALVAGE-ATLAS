@@ -1,7 +1,7 @@
 import { createInitialWorldState, settleWorldVisit } from "./WorldState";
 import { decodeWorldState } from "./worldStateCodec";
 import type {
-  PersistedWorldStateV1,
+  PersistedWorldState,
   WorldDefinition,
   WorldSettlementResult,
   WorldVisitSettlement,
@@ -12,20 +12,20 @@ const DATABASE_VERSION = 1;
 const STORE_NAME = "world-state-v1";
 
 export type WorldStateLoadResult =
-  | { readonly status: "loaded" | "created"; readonly state: PersistedWorldStateV1; readonly diagnostic: null }
-  | { readonly status: "corrupt"; readonly state: PersistedWorldStateV1; readonly diagnostic: string };
+  | { readonly status: "loaded" | "created"; readonly state: PersistedWorldState; readonly diagnostic: null }
+  | { readonly status: "corrupt"; readonly state: PersistedWorldState; readonly diagnostic: string };
 
 export interface WorldStateRepository {
   loadOrCreate(definition: WorldDefinition, worldInstanceId: string): Promise<WorldStateLoadResult>;
   commit(settlement: WorldVisitSettlement, definition: WorldDefinition): Promise<WorldSettlementResult>;
-  reset(definition: WorldDefinition, worldInstanceId: string): Promise<PersistedWorldStateV1>;
+  reset(definition: WorldDefinition, worldInstanceId: string): Promise<PersistedWorldState>;
 }
 
 export class InMemoryWorldStateRepository implements WorldStateRepository {
-  private states = new Map<string, PersistedWorldStateV1>();
+  private states = new Map<string, PersistedWorldState>();
   private failNextWrite = false;
 
-  constructor(initialState?: PersistedWorldStateV1) {
+  constructor(initialState?: PersistedWorldState) {
     if (initialState) this.states.set(initialState.worldInstanceId, initialState);
   }
 
@@ -54,7 +54,7 @@ export class InMemoryWorldStateRepository implements WorldStateRepository {
     return result;
   }
 
-  async reset(definition: WorldDefinition, worldInstanceId: string): Promise<PersistedWorldStateV1> {
+  async reset(definition: WorldDefinition, worldInstanceId: string): Promise<PersistedWorldState> {
     const state = createInitialWorldState(definition, worldInstanceId);
     this.states.set(worldInstanceId, state);
     return state;
@@ -87,6 +87,9 @@ export class IndexedDbWorldStateRepository implements WorldStateRepository {
           state: createInitialWorldState(definition, worldInstanceId),
           diagnostic: "INVALID_WORLD_STATE: world identity mismatch",
         };
+      }
+      if (isLegacyStoredState(raw)) {
+        await transactionComplete(database.transaction(STORE_NAME, "readwrite"), (store) => store.put(decoded.state, worldInstanceId));
       }
       return { status: "loaded", state: decoded.state, diagnostic: null };
     } finally {
@@ -125,7 +128,7 @@ export class IndexedDbWorldStateRepository implements WorldStateRepository {
     }
   }
 
-  async reset(definition: WorldDefinition, worldInstanceId: string): Promise<PersistedWorldStateV1> {
+  async reset(definition: WorldDefinition, worldInstanceId: string): Promise<PersistedWorldState> {
     const state = createInitialWorldState(definition, worldInstanceId);
     const database = await this.open();
     try {
@@ -151,6 +154,11 @@ export class IndexedDbWorldStateRepository implements WorldStateRepository {
 function decodeStoredValue(raw: unknown) {
   const serialized = typeof raw === "string" ? raw : JSON.stringify(raw);
   return decodeWorldState(serialized ?? "null");
+}
+
+function isLegacyStoredState(raw: unknown): boolean {
+  return typeof raw === "object" && raw !== null && !Array.isArray(raw)
+    && "schemaVersion" in raw && raw.schemaVersion === 1;
 }
 
 function requestResult<T>(request: IDBRequest<T>): Promise<T> {

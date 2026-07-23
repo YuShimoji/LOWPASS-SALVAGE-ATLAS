@@ -34,7 +34,13 @@ function settlement(
 describe("WorldState delta and settlement", () => {
   it("creates a stable initial world with one active and one locked contract", () => {
     const state = initial();
-    expect(state.schemaVersion).toBe(1);
+    expect(state.schemaVersion).toBe(2);
+    expect(state.securityState).toEqual({
+      posture: "routine",
+      confirmedContactVisitCount: 0,
+      lastConfirmedContactVisitId: null,
+      observedTacticTags: [],
+    });
     expect(state.revision).toBe(0);
     expect(state.contractProgress.map((entry) => entry.state)).toEqual(["active", "locked"]);
     expect(getVisitSalvageSourceIds(state, world)).toEqual([
@@ -89,6 +95,72 @@ describe("WorldState delta and settlement", () => {
     expect(twice.machineRelations[0]?.assistedVisitCount).toBe(1);
     expect(Object.isFrozen(twice)).toBe(true);
   });
+
+  it("promotes a confirmed contact to watchful once and merges observed tactics", () => {
+    const first = settleWorldVisit(initial(), settlement({ events: [{
+      type: "security-contact-confirmed",
+      visitId: "visit-security-01",
+      observedTacticTags: ["flare-observed", "field-relay-observed"],
+    }] }, "security-settlement-01"), world);
+    expect(first.status).toBe("applied");
+    expect(first.state.securityState).toEqual({
+      posture: "watchful",
+      confirmedContactVisitCount: 1,
+      lastConfirmedContactVisitId: "visit-security-01",
+      observedTacticTags: ["field-relay-observed", "flare-observed"],
+    });
+    if (first.status !== "applied") return;
+    const duplicate = settleWorldVisit(first.state, settlement({ events: [{
+      type: "security-contact-confirmed",
+      visitId: "visit-security-01",
+      observedTacticTags: ["porter-support-observed"],
+    }] }, "security-settlement-01", 1), world);
+    expect(duplicate.status).toBe("duplicate");
+    expect(duplicate.state.securityState.confirmedContactVisitCount).toBe(1);
+  });
+
+  it("caps persistent escalation at watchful across later confirmed visits", () => {
+    const first = settleWorldVisit(initial(), settlement({ events: [{
+      type: "security-contact-confirmed",
+      visitId: "visit-security-01",
+      observedTacticTags: [],
+    }] }, "security-settlement-01"), world);
+    if (first.status !== "applied") throw new Error("first security settlement failed");
+    const second = settleWorldVisit(first.state, settlement({ events: [{
+      type: "security-contact-confirmed",
+      visitId: "visit-security-02",
+      observedTacticTags: ["opened-traversal-observed"],
+    }] }, "security-settlement-02", 1, "aborted"), world);
+    expect(second.status).toBe("applied");
+    expect(second.state.securityState).toMatchObject({ posture: "watchful", confirmedContactVisitCount: 2 });
+  });
+
+  it("does not update security state until a visit settlement is applied", () => {
+    const state = initial();
+    const uncommittedDelta: WorldDelta = { events: [{
+      type: "security-contact-confirmed",
+      visitId: "crashed-visit",
+      observedTacticTags: ["flare-observed"],
+    }] };
+    expect(uncommittedDelta.events).toHaveLength(1);
+    expect(state.securityState).toMatchObject({ posture: "routine", confirmedContactVisitCount: 0 });
+  });
+
+  it.each(["complete", "partial", "aborted"] as const)(
+    "settles confirmed security contact for a %s return",
+    (outcome) => {
+      const result = settleWorldVisit(initial(), settlement({ events: [{
+        type: "security-contact-confirmed",
+        visitId: `visit-${outcome}`,
+        observedTacticTags: [],
+      }] }, `settlement-${outcome}`, 0, outcome), world);
+      expect(result.status).toBe("applied");
+      expect(result.state).toMatchObject({
+        lastOutcome: outcome,
+        securityState: { posture: "watchful", confirmedContactVisitCount: 1 },
+      });
+    },
+  );
 
   it("returns structured invalid-ID violations without partial application", () => {
     const base = initial();

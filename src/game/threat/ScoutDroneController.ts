@@ -45,9 +45,23 @@ export interface ThreatEcologyContext {
   readonly extractionPoint: Vec3;
   readonly stimuli: readonly MachineStimulus[];
   readonly relays: readonly ThreatRelayStimulus[];
+  readonly openedTraversals?: readonly {
+    readonly id: string;
+    readonly position: Vec3;
+  }[];
+  readonly attackPostureHeld?: boolean;
   readonly friendlyMachine: PorterAndroidState | null;
   readonly onInterdict?: (targetAgentId: CrewId) => void;
   readonly onRelaySabotage?: (relayItemId: string) => void;
+  readonly pressurePolicy?: {
+    readonly canBeginLockOn: (targetAgentId: CrewId, presence: PresenceAssessment, elapsedSeconds: number) => boolean;
+    readonly onLockOnStarted: (targetAgentId: CrewId) => void;
+    readonly onLockOnReleased: (targetAgentId: CrewId | null) => void;
+    readonly onInterdiction: (targetAgentId: CrewId, elapsedSeconds: number) => void;
+    readonly canBeginRelaySabotage: (relayItemId: string) => boolean;
+    readonly onRelaySabotageStarted: (relayItemId: string) => void;
+    readonly onRelaySabotageReleased: (relayItemId: string | null) => void;
+  };
 }
 
 export class ScoutDroneController {
@@ -120,6 +134,7 @@ export class ScoutDroneController {
       resolution: "active",
       firstRetreatAnalysisRevision: 0,
       interferenceRevision: 0,
+      securityCell: null,
     };
     for (let index = 1; index < Math.min(2, Math.max(1, debugDroneCount)); index += 1) {
       this.state.additionalDrones.push({
@@ -190,6 +205,8 @@ export class ScoutDroneController {
       return { accepted: false, code: "THREAT_OCCLUDED", reason: "ScoutDroneへの見通しが遮られています" };
     }
     this.transition("disabled", elapsedSeconds, `${agentId} field-terminal jam`);
+    this.ecologyContext?.pressurePolicy?.onLockOnReleased(this.state.drone.targetAgentId);
+    this.ecologyContext?.pressurePolicy?.onRelaySabotageReleased(this.state.drone.sabotageRelayId);
     this.state.drone.active = false;
     this.state.resolution = "disabled";
     this.observeLocally(agentId, elapsedSeconds, true);
@@ -247,6 +264,21 @@ export class ScoutDroneController {
     this.pathPoints = [];
     this.pathIndex = 0;
     this.plannedTarget = null;
+  }
+
+  investigateSharedPosition(position: Vec3, elapsedSeconds: number, factId: string): boolean {
+    if (!this.state.drone.active || this.isSafeZone(position)) return false;
+    this.state.drone.lastKnownTargetPosition = copyVec3(position);
+    this.state.drone.lastObservedAtSeconds = null;
+    this.state.drone.perception.lastStimulusId = factId;
+    this.state.drone.perception.lastStimulusPosition = copyVec3(position);
+    this.transition("investigate", elapsedSeconds, `shared contact ${factId}`);
+    return this.planTo(position);
+  }
+
+  enforceSecurityDisengage(elapsedSeconds: number, reason = "security cell outnumbered"): void {
+    if (!this.state.drone.active || this.state.drone.mode === "disabled" || this.state.drone.mode === "disengage") return;
+    this.beginDisengage(elapsedSeconds, reason);
   }
 
   dispose(): void {
@@ -389,6 +421,17 @@ export class ScoutDroneController {
       }
       return;
     }
+    if (this.ecologyContext?.attackPostureHeld) {
+      drone.lockOnProgress = 0;
+      if (drone.mode === "disengage") {
+        if (this.advancePath(dt, this.definition.pursuitSpeed)) {
+          this.transition("observe", elapsedSeconds, "outnumbered cell holding retreat point");
+        }
+      } else if (drone.mode !== "observe") {
+        this.beginDisengage(elapsedSeconds, "outnumbered cell attack posture held");
+      }
+      return;
+    }
     const visibleTargets = this.findVisibleTargets(squad, hasLineOfSight);
     const visibleCurrent = visibleTargets.find((target) => target.id === drone.targetAgentId) ?? null;
     if (visibleCurrent) this.acquireTarget(visibleCurrent, elapsedSeconds, "visual maintained");
@@ -399,12 +442,13 @@ export class ScoutDroneController {
         : null;
       const unsafe = !visibleCurrent
         || !assessment
-        || assessment.band === "outnumbered"
+        || assessment.band !== "predatory"
         || distanceSquared(drone.position, visibleCurrent.position) > this.definition.interdictRange ** 2
         || this.isSafeZone(visibleCurrent.position);
       if (unsafe) {
         if (assessment?.band === "outnumbered") this.beginDisengage(elapsedSeconds, "lock-on aborted by allied reinforcement");
         else this.transition("stalk", elapsedSeconds, "lock-on aborted by sight/range/safe-zone");
+        this.ecologyContext?.pressurePolicy?.onLockOnReleased(drone.targetAgentId);
         drone.lockOnProgress = 0;
         return;
       }
@@ -413,6 +457,7 @@ export class ScoutDroneController {
         this.transition("interdict", elapsedSeconds, `interdict ${visibleCurrent.id}`);
         drone.cooldowns.interdictUntilSeconds = elapsedSeconds + this.definition.interdictCooldownSeconds;
         this.state.interferenceRevision += 1;
+        this.ecologyContext?.pressurePolicy?.onInterdiction(visibleCurrent.id, elapsedSeconds);
         this.ecologyContext?.onInterdict?.(visibleCurrent.id);
       }
       return;
@@ -448,6 +493,7 @@ export class ScoutDroneController {
       const relay = this.ecologyContext?.relays.find((candidate) => candidate.id === drone.sabotageRelayId) ?? null;
       if (!relay || relay.disabled || this.isRelayDefended(relay.position, squad) || this.isSafeZone(relay.position)) {
         drone.sabotageRelayId = null;
+        this.ecologyContext?.pressurePolicy?.onRelaySabotageReleased(relay?.id ?? null);
         this.transition("return-to-route", elapsedSeconds, "relay sabotage aborted");
         this.planTo(this.definition.patrolPoints[drone.patrolIndex] ?? this.definition.spawn);
         return;
@@ -458,6 +504,7 @@ export class ScoutDroneController {
       }
       if (elapsedSeconds - drone.modeEnteredAtSeconds >= this.definition.relaySabotageSeconds) {
         this.ecologyContext?.onRelaySabotage?.(relay.id);
+        this.ecologyContext?.pressurePolicy?.onRelaySabotageReleased(relay.id);
         drone.sabotageRelayId = null;
         this.transition("return-to-route", elapsedSeconds, "relay disabled");
         this.planTo(this.definition.patrolPoints[drone.patrolIndex] ?? this.definition.spawn);
@@ -481,6 +528,10 @@ export class ScoutDroneController {
         return;
       }
       this.acquireTarget(target, elapsedSeconds, "isolated target scored by presence/comms/range");
+      if (assessment.band === "cautious") {
+        this.transition("observe", elapsedSeconds, "allied support holds cell at distance");
+        return;
+      }
       if (drone.mode !== "stalk") {
         this.transition("stalk", elapsedSeconds, `stalk ${target.id}`);
         this.planTo(target.position);
@@ -490,8 +541,10 @@ export class ScoutDroneController {
         !this.isSafeZone(target.position)
         && distanceSquared(drone.position, target.position) <= this.definition.interdictRange ** 2
         && (drone.cooldowns.interdictUntilSeconds ?? 0) <= elapsedSeconds
+        && (this.ecologyContext?.pressurePolicy?.canBeginLockOn(target.id, assessment, elapsedSeconds) ?? true)
       ) {
         this.transition("lock-on", elapsedSeconds, `lock-on ${target.id}`);
+        this.ecologyContext?.pressurePolicy?.onLockOnStarted(target.id);
         drone.lockOnProgress = 0;
         return;
       }
@@ -499,10 +552,11 @@ export class ScoutDroneController {
       return;
     }
 
-    const relay = this.findSabotageRelay(squad);
+    const relay = this.findSabotageRelay(squad, hasLineOfSight);
     if (relay) {
       drone.sabotageRelayId = relay.id;
       this.transition("sabotage-relay", elapsedSeconds, `sabotage ${relay.id}`);
+      this.ecologyContext?.pressurePolicy?.onRelaySabotageStarted(relay.id);
       this.planTo(relay.position);
       return;
     }
@@ -601,13 +655,20 @@ export class ScoutDroneController {
     entities.push({
       id: this.state.drone.id,
       side: "hostile",
-      kind: "hostile-drone",
+        kind: "hostile-drone",
       position: this.state.drone.position,
       operational: this.state.drone.active,
       perceptible: true,
     });
     for (const additional of this.state.additionalDrones) {
-      entities.push({ id: additional.id, side: "hostile", kind: "hostile-drone", position: additional.position, operational: additional.active, perceptible: true });
+      entities.push({
+        id: additional.id,
+        side: "hostile",
+        kind: additional.definitionId === "hostile-observation-drone" ? "hostile-observer" : "hostile-drone",
+        position: additional.position,
+        operational: additional.active,
+        perceptible: true,
+      });
     }
     const settings = {
       ...DEFAULT_PRESENCE_SETTINGS,
@@ -624,11 +685,13 @@ export class ScoutDroneController {
     return stable;
   }
 
-  private findSabotageRelay(squad: DistributedSquadState): ThreatRelayStimulus | null {
+  private findSabotageRelay(squad: DistributedSquadState, hasLineOfSight: ThreatLineOfSightQuery): ThreatRelayStimulus | null {
     return this.ecologyContext?.relays
       .filter((relay) => relay.active && !relay.disabled)
       .filter((relay) => distanceSquared(relay.position, this.state.drone.position) <= this.definition.relaySabotageRange ** 2)
+      .filter((relay) => this.isRecognizable(relay.position, hasLineOfSight))
       .filter((relay) => !this.isSafeZone(relay.position) && !this.isRelayDefended(relay.position, squad))
+      .filter((relay) => this.ecologyContext?.pressurePolicy?.canBeginRelaySabotage(relay.id) ?? true)
       .sort((left, right) => left.id.localeCompare(right.id))[0] ?? null;
   }
 
@@ -665,6 +728,9 @@ export class ScoutDroneController {
   private beginDisengage(elapsedSeconds: number, reason: string): void {
     const targetId = this.state.drone.targetAgentId;
     if (targetId) this.state.drone.cooldowns[`reacquire:${targetId}`] = elapsedSeconds + this.definition.sameTargetCooldownSeconds;
+    this.ecologyContext?.pressurePolicy?.onLockOnReleased(targetId);
+    this.ecologyContext?.pressurePolicy?.onRelaySabotageReleased(this.state.drone.sabotageRelayId);
+    this.state.drone.sabotageRelayId = null;
     this.state.drone.lockOnProgress = 0;
     this.transition("disengage", elapsedSeconds, reason);
     this.planTo(this.definition.spawn);

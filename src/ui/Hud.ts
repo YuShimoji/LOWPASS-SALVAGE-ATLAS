@@ -48,7 +48,7 @@ export class Hud {
     this.root.className = "ui-layer";
     this.root.innerHTML = `
       <header class="brand-chip" aria-label="Game title">
-        <span class="brand-kicker">PHASE F / WORLD MEMORY</span>
+        <span class="brand-kicker">PHASE G / SECURITY CELL</span>
         <strong>LOWPASS</strong><span class="brand-subtitle">SALVAGE ATLAS</span>
       </header>
       <section class="objective-chip" aria-label="Current objective">
@@ -159,7 +159,7 @@ export class Hud {
       const { player, runtime } = state;
       const { render, physics } = diagnostics;
       this.debug.textContent = [
-        "PHASE F DIAGNOSTICS  [F1]",
+        "PHASE G DIAGNOSTICS  [F1]",
         `WORLD ${state.world.mode.toUpperCase()}  RUNS ${state.world.completedExpeditions}`,
         `FPS ${diagnostics.fps.toFixed(0).padStart(3)}  FIXED 60Hz  TICK ${runtime.tick}`,
         `POS ${format(player.position.x)}  ${format(player.position.y)}  ${format(player.position.z)}`,
@@ -181,6 +181,12 @@ export class Hud {
         state.mission.threat
           ? `THREAT ${state.mission.threat.drone.mode.toUpperCase()}  TARGET ${state.mission.threat.drone.targetAgentId ?? "NONE"}  PRES ${state.mission.threat.drone.presence?.band.toUpperCase() ?? "NONE"}`
           : "THREAT INACTIVE",
+        state.mission.threat?.securityCell
+          ? `CELL ${state.mission.threat.securityCell.posture.toUpperCase()}  LINK ${(state.mission.threat.securityCell.link?.quality ?? 0).toFixed(2)}  LOCAL ${Object.values(state.mission.threat.securityCell.knowledgeByMachine).map((knowledge) => `${knowledge.machineId.endsWith("needle-01") ? "N" : "W"}:${Object.keys(knowledge.localFacts).length}`).join(" ")}  SHARED ${Object.keys(state.mission.threat.securityCell.blackboard.sharedFacts).length}`
+          : "CELL INACTIVE",
+        state.mission.threat?.securityCell
+          ? `TASKS ${Object.values(state.mission.threat.securityCell.blackboard.currentAssignments).map((assignment) => `${assignment.machineId.endsWith("needle-01") ? "N" : "W"}:${assignment.task}`).join(" ") || "NONE"}  RSV ${Object.keys(state.mission.threat.securityCell.blackboard.taskReservations).length}  TOK L${Object.keys(state.mission.threat.securityCell.blackboard.pressureTokens.lockOnByAgentId).length}/I${state.mission.threat.securityCell.blackboard.pressureTokens.activeInterdictionMachineId ? 1 : 0}/S${Object.keys(state.mission.threat.securityCell.blackboard.pressureTokens.relaySabotageByRelayId).length}`
+          : "TASKS INACTIVE",
         state.mission.porter
           ? `PORTER ${state.mission.porter.mode.toUpperCase()}  CARRY ${state.mission.porter.carriedItemId ?? "NONE"}`
           : "PORTER INACTIVE",

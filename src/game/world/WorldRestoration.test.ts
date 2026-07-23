@@ -10,7 +10,7 @@ import { MissionSessionController } from "../mission/MissionSession";
 import { WaypointNavigationService } from "../navigation/WaypointNavigationService";
 import { DistributedSquadController } from "../squad/DistributedSquadController";
 import { CREW_DEFINITIONS } from "../squad/squadTypes";
-import { ScoutDroneController } from "../threat/ScoutDroneController";
+import { SecurityCellController, createFloodedMarketSecurityCellDefinition } from "../security/SecurityCellController";
 import { PhysicsWorld } from "../../physics/PhysicsWorld";
 import { Ps1MaterialFactory } from "../../render/materials/Ps1MaterialFactory";
 import { createFloodedMarket } from "../../render/objects/createFloodedMarket";
@@ -63,10 +63,13 @@ describe("world restoration projections", () => {
       expect(squad.navigation.isEdgeEnabled(traversal.navigationEdgeId)).toBe(true);
       expect(physics.isWorldColliderEnabled(traversal.colliderId)).toBe(false);
     }
-    const threat = new ScoutDroneController(
+    const threat = new SecurityCellController(
       projection.definition.threatEncounter,
       manifest.selectedAgentIds,
       squad.navigation,
+      0,
+      "watchful",
+      createFloodedMarketSecurityCellDefinition(projection.definition.signalZones),
     );
     const porter = new PorterAndroidController(
       projection.definition.porterAndroid,
@@ -92,6 +95,8 @@ describe("world restoration projections", () => {
     view.update(session.state, squad.state, threat.state, porter.state, 0);
     expect(view.root.getObjectByName("market-cooling-shortcut-gate")?.visible).toBe(false);
     expect(view.root.getObjectByName("market-loading-chain-gate")?.visible).toBe(false);
+    expect(threat.getActiveDroneCount()).toBe(2);
+    expect(view.root.getObjectByName("phase-g-hostile-observation-drone-machine:security:watcher-01")).toBeDefined();
     view.dispose();
     materials.dispose();
     porter.dispose();

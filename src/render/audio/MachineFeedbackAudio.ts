@@ -46,6 +46,17 @@ export class MachineFeedbackAudio {
     if (this.enabled) this.sweep(180, 310, 0.2, 0.04);
   }
 
+  playHostileShareTransmit(): void {
+    if (!this.enabled) return;
+    this.tone(920, 0.045, 0.025);
+    globalThis.setTimeout(() => this.tone(1240, 0.035, 0.018), 70);
+  }
+
+  playHostileShareReceive(): void {
+    if (!this.enabled) return;
+    globalThis.setTimeout(() => this.sweep(520, 690, 0.09, 0.022), 145);
+  }
+
   dispose(): void {
     void this.context?.close();
     this.context = null;

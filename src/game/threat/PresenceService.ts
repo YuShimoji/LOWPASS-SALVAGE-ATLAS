@@ -5,7 +5,7 @@ export type PresenceBand = "predatory" | "cautious" | "outnumbered";
 export interface PresenceEntity {
   readonly id: string;
   readonly side: "allied" | "hostile";
-  readonly kind: "crew" | "friendly-machine" | "hostile-drone";
+  readonly kind: "crew" | "friendly-machine" | "hostile-drone" | "hostile-observer";
   readonly position: Vec3;
   readonly operational: boolean;
   readonly perceptible: boolean;
@@ -26,6 +26,7 @@ export interface PresenceSettings {
   readonly crewWeight: number;
   readonly friendlyMachineWeight: number;
   readonly hostileDroneWeight: number;
+  readonly hostileObserverWeight: number;
   readonly outnumberedMargin: number;
   readonly hysteresisSeconds: number;
   readonly sameTargetCooldownSeconds: number;
@@ -36,6 +37,7 @@ export const DEFAULT_PRESENCE_SETTINGS: PresenceSettings = Object.freeze({
   crewWeight: 1,
   friendlyMachineWeight: 0.75,
   hostileDroneWeight: 1,
+  hostileObserverWeight: 0.5,
   outnumberedMargin: 0.75,
   hysteresisSeconds: 0.8,
   sameTargetCooldownSeconds: 4,
@@ -63,7 +65,9 @@ export function assessPresence(
       ? settings.crewWeight
       : entity.kind === "friendly-machine"
         ? settings.friendlyMachineWeight
-        : settings.hostileDroneWeight;
+        : entity.kind === "hostile-observer"
+          ? settings.hostileObserverWeight
+          : settings.hostileDroneWeight;
     if (entity.side === "allied") alliedPresence += weight;
     else hostilePresence += weight;
     contributingEntityIds.push(entity.id);

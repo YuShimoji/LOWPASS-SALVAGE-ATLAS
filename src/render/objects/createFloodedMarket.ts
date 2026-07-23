@@ -153,12 +153,21 @@ export function createFloodedMarket(
   const scoutDrone = createScoutDrone(materials);
   scoutDrone.root.name = "phase-e-hostile-scout-drone";
   root.add(scoutDrone.root);
-  const additionalDroneViews = threat.additionalDrones.map((drone) => {
-    const view = createScoutDrone(materials);
-    view.root.name = `phase-e-hostile-scout-drone-${drone.id}`;
+  const additionalDroneViews = new Map<string, DroneView>();
+  const ensureAdditionalDroneView = (drone: ThreatEncounterState["additionalDrones"][number]): DroneView => {
+    const existing = additionalDroneViews.get(drone.id);
+    if (existing) return existing;
+    const view = drone.definitionId === "hostile-observation-drone"
+      ? createObservationDrone(materials)
+      : createScoutDrone(materials);
+    view.root.name = drone.definitionId === "hostile-observation-drone"
+      ? `phase-g-hostile-observation-drone-${drone.id}`
+      : `phase-e-hostile-scout-drone-${drone.id}`;
     root.add(view.root);
+    additionalDroneViews.set(drone.id, view);
     return view;
-  });
+  };
+  for (const drone of threat.additionalDrones) ensureAdditionalDroneView(drone);
   const porterView = createPorterAndroid(materials);
   porterView.root.name = "phase-e-friendly-porter-android";
   root.add(porterView.root);
@@ -264,14 +273,23 @@ export function createFloodedMarket(
       lastKnownMarker.position.set(controlledContact.position.x, 0.12, controlledContact.position.z);
       lastKnownMarker.rotation.z = elapsedSeconds * 0.35;
     }
-    activeThreat.additionalDrones.forEach((additional, index) => {
-      const view = additionalDroneViews[index];
-      if (!view) return;
+    const activeAdditionalIds = new Set(activeThreat.additionalDrones.map((droneState) => droneState.id));
+    for (const view of additionalDroneViews.values()) view.root.visible = false;
+    activeThreat.additionalDrones.forEach((additional) => {
+      const view = ensureAdditionalDroneView(additional);
       view.root.visible = additional.visible;
       view.root.position.set(additional.position.x, additional.position.y, additional.position.z);
       view.root.rotation.y = additional.facingYaw;
       view.rotor.rotation.y = elapsedSeconds * 7.2;
+      view.scanBeam.visible = false;
+      if (view.wideScan) {
+        view.wideScan.visible = additional.active && additional.mode !== "disabled";
+        view.wideScan.rotation.y = Math.sin(elapsedSeconds * 0.85) * 0.46;
+      }
     });
+    for (const [id, view] of additionalDroneViews) {
+      if (!activeAdditionalIds.has(id)) view.root.visible = false;
+    }
     porterView.root.position.set(activePorter.position.x, activePorter.position.y - 0.93, activePorter.position.z);
     porterView.root.rotation.y = activePorter.facing;
     porterView.statusLight.visible = activePorter.authenticated;
@@ -290,12 +308,15 @@ export function createFloodedMarket(
   };
 }
 
-function createScoutDrone(materials: Ps1MaterialFactory): {
+interface DroneView {
   readonly root: Group;
   readonly rotor: Group;
   readonly contactHalo: Mesh;
   readonly scanBeam: Mesh;
-} {
+  readonly wideScan: Mesh | null;
+}
+
+function createScoutDrone(materials: Ps1MaterialFactory): DroneView {
   const root = new Group();
   const hull = new Mesh(new BoxGeometry(0.74, 0.28, 0.5), materials.create({ color: "#3d4641", metalness: 0.48 }));
   hull.castShadow = true;
@@ -323,7 +344,48 @@ function createScoutDrone(materials: Ps1MaterialFactory): {
   );
   scanBeam.visible = false;
   root.add(hull, optic, rotor, contactHalo, scanBeam);
-  return { root, rotor, contactHalo, scanBeam };
+  return { root, rotor, contactHalo, scanBeam, wideScan: null };
+}
+
+function createObservationDrone(materials: Ps1MaterialFactory): DroneView {
+  const root = new Group();
+  const hull = new Mesh(new BoxGeometry(1.22, 0.2, 0.42), materials.create({ color: "#4b5652", metalness: 0.42 }));
+  const keel = new Mesh(new BoxGeometry(0.28, 0.34, 0.5), materials.create({ color: "#26302e", metalness: 0.36 }));
+  keel.position.y = -0.16;
+  const optic = new Mesh(new BoxGeometry(0.72, 0.11, 0.08), materials.createEmissive("#e0a35c", 0.86));
+  optic.position.set(0, -0.08, -0.26);
+  const rotor = new Group();
+  for (const x of [-0.78, 0.78]) {
+    const arm = new Mesh(new BoxGeometry(0.48, 0.04, 0.08), materials.create({ color: "#252d2b" }));
+    arm.position.x = x;
+    const ring = new Mesh(new TorusGeometry(0.27, 0.025, 5, 12), materials.create({ color: "#697670", metalness: 0.48 }));
+    ring.rotation.x = Math.PI / 2;
+    ring.position.x = x;
+    rotor.add(arm, ring);
+  }
+  const contactHalo = new Mesh(
+    new TorusGeometry(0.74, 0.035, 5, 16),
+    materials.createEmissive("#e0a35c", 0.62),
+  );
+  contactHalo.rotation.x = Math.PI / 2;
+  contactHalo.position.y = 0.38;
+  contactHalo.visible = false;
+  const scanBeam = new Mesh(new BoxGeometry(0.01, 0.01, 0.01), materials.createEmissive("#e0a35c", 0.2));
+  scanBeam.visible = false;
+  const wideScan = new Mesh(
+    new BoxGeometry(3.4, 0.018, 4.4),
+    materials.create({
+      color: "#d9b56f",
+      emissive: "#9b7843",
+      emissiveIntensity: 0.35,
+      transparent: true,
+      opacity: 0.1,
+      depthWrite: false,
+    }),
+  );
+  wideScan.position.set(0, -0.72, -2.1);
+  root.add(hull, keel, optic, rotor, contactHalo, scanBeam, wideScan);
+  return { root, rotor, contactHalo, scanBeam, wideScan };
 }
 
 function createPorterAndroid(materials: Ps1MaterialFactory): {

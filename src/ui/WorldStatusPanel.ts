@@ -1,4 +1,4 @@
-import type { PersistedWorldStateV1, WorldDefinition } from "../game/world/worldTypes";
+import type { PersistedWorldState, WorldDefinition } from "../game/world/worldTypes";
 import { getActiveContract } from "../game/world/WorldState";
 
 export class WorldStatusPanel {
@@ -19,7 +19,7 @@ export class WorldStatusPanel {
     mount.append(this.root);
   }
 
-  update(state: PersistedWorldStateV1, definition: WorldDefinition, visible: boolean): void {
+  update(state: PersistedWorldState, definition: WorldDefinition, visible: boolean): void {
     this.root.classList.toggle("is-visible", visible);
     const visit = this.root.querySelector<HTMLElement>("[data-world-visit]");
     if (visit) visit.textContent = `VISIT ${state.visitCount}`;
@@ -44,6 +44,7 @@ export class WorldStatusPanel {
         <div><dt>EVIDENCE</dt><dd>${evidence.length}</dd></div>
         <div><dt>SHIP DOCUMENTS</dt><dd>${escapeHtml(documents || "NONE")}</dd></div>
         <div><dt>LAST OUTCOME</dt><dd>${state.lastOutcome?.toUpperCase() ?? "NONE"}</dd></div>
+        <div><dt>SECURITY POSTURE</dt><dd>${state.securityState.posture.toUpperCase()} · CONTACTS ${state.securityState.confirmedContactVisitCount}</dd></div>
       </dl>
     `;
   }

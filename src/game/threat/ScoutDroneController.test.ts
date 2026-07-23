@@ -183,10 +183,10 @@ describe("ScoutDrone deterministic encounter", () => {
       friendlyMachine: null,
       onRelaySabotage: (id) => disabled.push(id),
     };
-    updateThreat(squad, threat, 0.8, () => false, 0.25, ecology);
-    updateThreat(squad, threat, 1.05, () => false, 0.25, ecology);
+    updateThreat(squad, threat, 0.8, () => true, 0.25, ecology);
+    updateThreat(squad, threat, 1.05, () => true, 0.25, ecology);
     expect(threat.state.drone.mode).toBe("sabotage-relay");
-    updateThreat(squad, threat, 3.6, () => false, 0.25, ecology);
+    updateThreat(squad, threat, 3.6, () => true, 0.25, ecology);
     expect(disabled).toEqual(["relay-01"]);
 
     const safe = createControllers();

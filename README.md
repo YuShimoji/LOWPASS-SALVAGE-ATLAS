@@ -1,6 +1,6 @@
 # LOWPASS: SALVAGE ATLAS
 
-デスクトップブラウザ向け3Dゲームの垂直スライスです。TypeScript、Vite、Three.js、Rapier、DOM UIで構成されています。フェーズAの三人称アクション基盤、フェーズBの遠征編成、フェーズCの固定探索・回収ループ、フェーズDの分散分隊、フェーズEの非致死的な機械生態系に加え、フェーズFでは帰還精算を境界とする訪問間世界永続化を接続しています。
+デスクトップブラウザ向け3Dゲームの垂直スライスです。TypeScript、Vite、Three.js、Rapier、DOM UIで構成されています。フェーズAの三人称アクション基盤、フェーズBの遠征編成、フェーズCの固定探索・回収ループ、フェーズDの分散分隊、フェーズEの非致死的な機械生態系、フェーズFの訪問間世界永続化に加え、フェーズGでは永続警戒姿勢を持つ2機上限の敵対Security Cellを接続しています。
 
 ## 再開ポイント
 
@@ -35,7 +35,7 @@ npm run build
 
 探索では `E` で資源回収、カートの牽引・解放、工具短縮路、リレー再起動、搬送アンドロイド認証、抽出を操作します。右下の `SQUAD` パネルから `follow`、`hold`、`move-to`、`search-zone`、`rally`、操作対象切替、携帯リレー、フレアを操作できます。接触情報は操作中隊員が直接観測または受信した範囲だけを同じ折り畳みパネルに表示します。敵のロックオンと通信妨害、友好アンドロイドの命令と搬送対象は低干渉な状態表示へ投影されます。
 
-`?qa=1` を付けた開発URLでは、ブラウザ反復試験用の28U編成プリセット、位置移動、孤立・援軍・離脱、リレー状態、Porter認証・搬送の診断操作が追加されます。`&drones=2` で敵対ドローン2体のデバッグ構成を選べます。`&audio=muted` を併用すると自動試験中はAudioContextを生成しません。通常の編成、インタラクション、ItemLocation、通信グラフ、抽出処理はQA表示でも迂回しません。
+`?qa=1` を付けた開発URLでは、ブラウザ反復試験用の28U編成プリセット、位置移動、孤立・援軍・離脱、リレー状態、Porter認証・搬送の診断操作が追加されます。`&security-posture=routine` または `&security-posture=watchful` で、その訪問だけ警戒姿勢を強制できます。この指定は永続WorldStateを変更しません。`&audio=muted` を併用すると自動試験中はAudioContextを生成しません。通常の編成、インタラクション、ItemLocation、通信グラフ、抽出処理はQA表示でも迂回しません。
 
 ## アーキテクチャ
 
@@ -95,7 +95,22 @@ Three.jsとRapierはゲームルールを所有しません。ゲート室の物
 - 抽出ビーコン半径8 mは干渉・リレー妨害を禁止する安全区域である。通常HUDはロック進行、妨害残り時間、Porter命令など必要最小限だけを示し、敵内部状態、存在量、標的評価はデバッグHUDだけへ表示する
 - `PorterAndroidController` は停止中の荷役補助機を、簡易フィールド端末を持つ操作可能な隊員の3秒認証で友好化する。`follow`、`hold`、`carry-to`、短距離voice通信、存在量0.75を提供し、冷却コイルを `world → machine-carried → extraction-pad` と搬送する。経路失敗時は再計算、再投影、再試行、安全配置、失敗報告、待機の順に回復する。認証後は低い反復音、経路失敗とゲート拒絶では別の下降音を状態投影として再生する
 - Porterのゲート特性は8U、volume 5、logic 5で、物体単体上限の双方から拒絶される。資源を抽出台へ置いた後は現地へ残り、`AlliedMachineOutcome` に `friendly-left-behind` と支援item idを不変結果として記録する。船内隊員・装備・貨物には追加せず、`ExpeditionManifest` も変更しない
-- 隊員別脅威知識、保留報告、SignalZone、携帯リレー、分隊命令、操作対象切替、カート、complete / partial精算は既存境界を再利用する。標準構成は敵1体で、`?drones=2` だけが2体の診断構成を追加する
+- 隊員別脅威知識、保留報告、SignalZone、携帯リレー、分隊命令、操作対象切替、カート、complete / partial精算は既存境界を再利用する。Phase E時点の標準構成は敵1体であり、Phase Gでは永続警戒姿勢に応じた固定上限へ置き換える
+
+### フェーズGのSecurity Cell境界
+
+- `PersistedWorldStateV2` はV1の全フィールドを保ったまま `securityState` を追加する。V1は明示migrationでV2へ変換し、IndexedDBの同じworld keyへ書き戻す。破損値と未来schemaは引き続きfail-closedでsafe modeへ送る
+- 永続値は `routine` / `watchful`、確認接触訪問数、最終接触visit ID、観測済み戦術タグだけである。機体位置、タスク、ロックオン、cooldown、個体知識、共有知識は訪問中runtimeに限定する
+- `routine` は監視針 `machine:security:needle-01` 1機、`watchful` は同機と観測機 `machine:security:watcher-01` の固定2機である。接触回数が増えても通常敵数を増やさない
+- 確認接触は訪問中の `WorldDelta` に蓄積し、`complete` / `partial` / `aborted` のsettlementでだけ `watchful` へ進める。同じsettlementの再送、クラッシュ、進行中reloadでは重複・先行保存しない。世界限定リセットは `routine` へ戻す
+- `HostileMachineKnowledge` は各機の `localFacts` と `pendingBroadcasts` を所有する。agent、flare、relay、friendly machineの事実はconfidence減衰、uncertainty拡大、TTL失効を持ち、古い共有位置だけからlock-onを開始しない
+- `HostileMachineLinkGraph` はプレイヤー通信と独立し、基本32 m、SignalZone・隔壁減衰、3 Hz再評価、品質別共有遅延を扱う。切断時はローカル保持し、再接続時はTTL内の事実だけを共有する。プレイヤーの携帯relayは敵リンクを中継しない
+- `SecurityBlackboard` は共有事実、割当、予約、圧力tokenだけを保持し、未共有情報を直接参照しない。`SecurityTaskAllocator` は能力、距離、到達性、confidence、存在量、安全域、継続時間、予約を2 Hzで評価し、同点は安定ID順で決める
+- 監視針はinterdict、relay sabotage、flare investigationを担当でき、観測機は広角・高所のobserve / overwatchに限定して直接干渉しない。同じ隊員へのinterdict、同じrelayへのsabotage、同一対象へのlock-onは各1機までである
+- `SecurityPressureController` は同時lock-on 1、同時interdiction 1、同時relay sabotage 1、干渉後grace 4秒を強制する。`cautious` は新規攻撃を保留し、`outnumbered` はセル全体の攻撃姿勢を解除して共通退避へ移す
+- 局所存在量は隊員1.0、friendly Porter 0.75、監視針1.0、観測機0.5である。watchful時は隊員1がpredatory、隊員1+Porterと隊員2がcautious、隊員2+Porterと隊員3がoutnumberedとなる。認識不能な隔壁越し実体は算入しない
+- 開放済み扉・切断済みchainのWorldStateを味方A*、敵A*、Rapier、描画へ同じ順序で投影する。観測機は高所overwatch nodeを使い、通常プレイで無言teleportしない
+- 観測機は監視針より高い高度、広いシルエット、幅広いamber scanを持ち、lock beamを使わない。初回共有だけ簡易端末へmesh解析を表示し、通常HUDにはblackboardや正確なタスクを常駐させない
 
 ## フェーズBで変更した主なファイル
 
@@ -174,6 +189,23 @@ Three.jsとRapierはゲームルールを所有しません。ゲート室の物
 - `src/render/objects/createFloodedMarket.ts` / `src/physics/PhysicsWorld.ts` / `src/game/squad/DistributedSquadController.ts`: traversal、コライダー、ナビエッジ、active / disabled relayを同じ復元投影へ同期
 - `src/main.ts`: WorldStateロード、訪問開始時の順序付き復元、帰還時だけのcommit、リロード中断破棄、世界限定リセットの調停
 - `src/game/world/*.test.ts` と既存回帰テスト: schema、delta、精算、復元、Porter、残置装備、契約、reservationの自動検証
+
+## フェーズGで変更した主なファイル
+
+- `src/game/world/worldTypes.ts` / `WorldState.ts`: V2、`PersistedSecurityState`、接触delta、冪等settlement、watchful上限、reset初期値
+- `src/game/world/worldStateCodec.ts` / `WorldStateRepository.ts`: V1の全フィールドを維持するV2 migration、V2 JSON検証、同一IndexedDB keyへの移行書戻し、未来schemaのfail-closed
+- `src/game/world/WorldVisit.ts` / `WorldStatusPanel.ts`: 訪問中の確認接触・戦術タグからのdelta生成と、船内での警戒姿勢・接触回数表示
+- `src/game/security/HostileMachineKnowledge.ts`: 個体事実、pending broadcast、confidence / uncertainty / TTL
+- `src/game/security/HostileMachineLinkGraph.ts`: 約3 Hzの独立敵リンク、SignalZone・遮蔽減衰、品質別共有遅延、再接続flush
+- `src/game/security/SecurityBlackboard.ts`: 共有事実の安定重複排除、task assignment / reservation / pressure tokenの一元管理と失効解放
+- `src/game/security/SecurityTaskAllocator.ts`: 能力・距離・到達性・存在量・安全域・予約に基づく2 Hzの決定論的役割分担
+- `src/game/security/SecurityPressureController.ts`: 同時lock / interference / sabotage上限、4秒grace、cautious hold、outnumbered disengage
+- `src/game/security/SecurityCellController.ts`: routine/watchful構成、固定周波数の知覚・通信・共有・割当・減衰、needle / watcherの統合調停と診断readback
+- `src/game/threat/PresenceService.ts` / `ScoutDroneController.ts`: 観測機0.5存在量、セル圧力方針、再視認条件、援軍時のlock解除、共通退避、開放経路利用
+- `src/game/mission/fixed/floodedMarket.ts`: Security Cellの安定IDとwatcher用overwatch route
+- `src/render/objects/createFloodedMarket.ts` / `src/render/audio/MachineFeedbackAudio.ts`: 観測機の別シルエット・高高度・広角scanと、共有送受信chirp
+- `src/main.ts` / `src/ui/Hud.ts`: Security Cellのdynamic import、WorldState・navigation・Porter・relay・flare接続、初回mesh通知、QA override、デバッグ診断
+- `src/game/security/*.test.ts` とworld / threat回帰テスト: migration、知識、link、割当、予約、圧力、存在量、navigation、settlement、reset、長時間安定性
 
 ## フェーズB基準点の検証結果 — 2026-07-20
 
@@ -333,17 +365,57 @@ Viteの500 kB警告は継続しています。警告閾値は変更していま�
 
 初期チャンクは2,900.15 kB（gzip 1,017.94 kB）で、Phase Eの2,876.58 kB（gzip 1,011.02 kB）から23.57 kB（gzip 6.92 kB）増加した。Viteの500 kB警告は継続し、閾値は変更していない。Rapier開発実行時の `using deprecated parameters for the initialization function; pass a single object instead` も依存側の既知警告として継続しており、今回の固定60 Hz物理、復元コライダー、3訪問には影響しなかった。
 
+## フェーズG Security Cellの検証結果 — 2026-07-23
+
+- Phase F基準 `1e98860597ac940ff8d47505a5b00736d852c43a` で24ファイル122テスト、型検査、build、依存整合、diff検査を再確認してから、lightweight tag `phase-f-world-persistence` を同コミットへ作成した。既存ローカル監修文書を含むcleanな先端 `4e3cdc6` から `feat/phase-g-security-cell` を作り、履歴・既存tag・branchは強制更新していない
+- `npm run typecheck`: PASS
+- `npm test`: PASS（26ファイル、151テスト）。V1→V2移行、V1全フィールド維持、V2 round-trip、safe mode、接触settlement、重複・未精算・reset、個体知識、遅延共有、切断・再接続、減衰・失効、決定論的割当、予約解除、圧力予算、5通りの存在量、開閉経路、Porter・relay・契約・証拠回帰を含む
+- `npm run build`: PASS、`npm ls --depth=0`: PASS、`git diff --check`: PASS
+- production buildはSecurity Cellを独立dynamic chunkとして生成し、船内初期ロードへ観測機・敵セル調整を混入させていない。Viteの500 kB warningは継続し、閾値は変更していない
+
+### 実ブラウザ検証
+
+- `routine`で監視針1機、最初の直接接触を含む`aborted`帰還でV2 `watchful`・接触訪問数1・revision 1となり、reload後も維持された。次の訪問から監視針＋観測機の固定2機となり、3回目の接触後も2機上限を維持した
+- world reset後の別の3訪問で、filter 1点の`partial`、残りfilter 2点と第1契約完了の`complete`、資源0点の`aborted`を現branchの実ブラウザで順に実行した。visit / revisionは1→2→3、lastOutcomeは各結果へ更新され、確認接触1回からwatchfulへ進んだ後も接触のない帰還で重複増加しなかった
+- 実ブラウザへ契約進捗、Porter friendly / 支援回数、開放経路、残置relay、証拠、visitCount、revisionを含むV1 fixtureを安全に投入した。reload後にV2へ移行し全フィールドを維持、同じIndexedDB world keyへV2を書き戻した。世界限定reset後はV2 `routine`、visit 0、revision 0へ戻った
+- watchfulで敵リンク品質0.782と遅延共有を確認した。リンク遮断中は共有revisionが増えず、復旧後だけTTL内の事実を共有した。視線喪失後1.6秒の実ブラウザreadbackで共有agent factのconfidenceは0.964→0.820、uncertaintyは0.168→0.840へ変化した。古い共有位置だけのlock-on禁止は実装と自動テストで固定した
+- 観測機は監視針と異なる幅広いシルエット、高い巡回高度、広いamber scanを表示し、細いlock beamを使わなかった。監視針のrelay sabotageと観測機のoverwatchが並行し、relay予約が一機だけに付与された
+- 隊員1でpredatory、隊員1+Porterと隊員2でcautious、隊員2+Porterと隊員3でoutnumberedを実測した。援軍到着で進行中lockとpressure tokenが解除され、outnumberedでは全攻撃を解除して退避した
+- isolated状態では一機だけがlock tokenを取得した。干渉後4秒のgrace中はlockを再開せず、grace終了後に直接視認を再取得した場合だけ再開した。抽出安全域、cautious、新鮮な直接視認条件も自動テストで固定した
+- flareとactive relayは直接認識時だけSecurityFactとなった。relay場面ではneedle=`sabotage-relay`、watcher=`maintain-overwatch`、flareの単独調査分岐は自動テストで確認した
+- 開放済みtraversalを敵navigationへ反映し、閉鎖経路を通さないことを自動・ブラウザ診断で照合した。ブラウザconsole error 0、page error / 未処理例外0。warningは既知のRapier初期化非推奨1種類だけだった
+- 自動ブラウザは `audio=muted` で実施したため、送信chirp・共有応答音・既存lock / interference音の音量、識別性、疲労感は人間未評価である。観測機の最終的な見分けやすさ、圧力テンポ、退避の自然さも人間判断へ残す
+
+### 3訪問後のリソース・DOM計測
+
+| 項目 | 第3訪問帰還・通常reload後 |
+| --- | ---: |
+| Rapier rigid bodies / colliders / contacts | 1 / 12 / 1 |
+| Scene objects | 60 |
+| WebGL draw calls / triangles | 60 / 1,416 |
+| renderer.info.memory geometries | 43 |
+| renderer.info.memory textures | 3 |
+| renderer.info.programs | 4 |
+| DOM totalNodes | 119 |
+| DOM persistentHudNodes | 67 |
+| DOM modalNodes | 0 |
+| DOM transientFeedbackNodes | 0 |
+| DOM resultHistoryNodes | 0 |
+
+各帰還直後のQA診断ではScene 60、geometry / texture / program 43 / 3 / 4が一定で、通常reload後は上表へ復帰した。イベント、notice、settlementの重複や、Rapier・Scene・GPU memory・DOMカテゴリの単調増加は観測されなかった。
+
+最終buildの初期チャンクは2,904.36 kB（gzip 1,019.06 kB）、SecurityCellController遅延チャンクは44.38 kB（gzip 11.89 kB）である。MachineFeedbackAudio 1.75 kB、MissionSession 7.88 kB、Porter 9.18 kB、固定マップ9.80 kB、探索ビュー9.81 kBも独立境界を維持した。Viteの500 kB warningは継続し、警告閾値は変更していない。Rapierの `using deprecated parameters for the initialization function; pass a single object instead` は依存側既知warningとして残し、動作証跡なしに物理基盤を変更していない。
+
 ## 残課題
 
 | 目的 | 影響 | 要件 | 状態 | 担当 | 次の一手 |
 | --- | --- | --- | --- | --- | --- |
-| フェーズGの探索深化 | 固定世界と2契約は永続化したが、複数敵協調、プロシージャル生成、ミッション途中再開はない | schemaVersion 1、WorldDelta、ItemLocation、settlement revision境界を維持し、新規ゲーム機構を1スライスずつ選ぶ | フェーズF完了・次スライス未定 | ゲームデザイン / シミュレーション | 人間評価後にフェーズGの目的を1つに絞って仕様化する |
-| 保存migration実装 | schemaVersion 1以外は安全に拒絶するため、将来schemaをまだ読み込めない | versionごとの明示migrationとfixtureを追加し、破損値を推測変換しない | migration境界のみ実装・非ブロッキング | 保存基盤 | schemaVersion 2が必要になった時点でv1 fixtureからの移行テストを先に追加する |
-| 初期バンドル分割 | 初回ダウンロードが大きい | Three.js/Rapierのvendor分割、実機起動計測、キャッシュ戦略 | 非ブロッキング | 将来の性能作業 | 現在のdynamic import境界を維持して実測後に分割方針を決める |
-| Rapier非推奨警告の解消 | 開発コンソールに警告が残る | 依存版と初期化APIの互換性確認 | 非ブロッキング | 依存更新作業 | Rapier更新時に移行を再評価する |
-| 人間による感覚評価 | 自動検証では復元要約の密度、契約テンポ、脅威圧、音量、視認性、搬送速度の最終判断はできない | 3訪問のデスクトップ実機プレイと、警告・再評価・退避音をミュートなしで評価する | 実装済み・人間評価待ち | ゲームデザイン / UX | partial→reload→complete→第2契約を通し、調整値と文言だけをデータ定義・UIへ反映する |
+| Phase G人間受入 | 自動化では観測機の識別性、chirp、圧力テンポ、退避の自然さを最終判断できない | デスクトップ実機、ミュートなし、routine→watchful→集団退避、blocking / tuning / acceptedメモ | 実装・自動・ブラウザ機械検証済み、人間評価待ち | ゲームデザイン / UX | 調整値と文言だけを限定変更し、構造変更が必要ならPhase Hへ送る |
+| Phase H目的選定 | 次の開発を実測上の最大課題へ集中できる | Phase G感覚評価、受入条件、非対象、停止条件を1つの目的へ固定 | 条件付き提案・未承認 | オーナー / 監修役AI | `docs/supervising-ai-report.md` のGate G-Aを判定してから1案だけ承認する |
+| 初期バンドル分割 | 初回ダウンロードが大きい | Three.js/Rapierのvendor分割、実機起動・cache・再訪計測 | warningのみ・非ブロッキング | performance | 体感問題が出た端末で3値を測り、分割効果が見込める場合だけ着手する |
+| Rapier非推奨warning | 開発consoleに既知warningが残る | 依存版と初期化APIの互換性、物理回帰 | 非ブロッキング | 依存更新 | Rapier更新スライスで解消可否を判断する |
 
-オンライン同期、HP、死亡、銃撃戦、敵による偽通信・音声模倣、Porterのカート操作、複数敵協調、プロシージャル世界、ミッション途中再開は実装していません。フェーズFは不変マニフェスト、ItemLocation、NavigationService、CommunicationGraph、分隊知識を維持したまま、固定世界の帰還精算と再訪復元までです。
+オンライン同期、HP、死亡、銃撃戦、敵による偽通信・音声模倣、Porterのカート操作、プロシージャル世界、ミッション途中再開は実装していません。フェーズGの協調敵は安定IDを持つ固定2機セルが上限で、訪問間に保存するのは警戒姿勢と接触要約だけです。
 
 ## アセット方針
 

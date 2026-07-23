@@ -1,17 +1,22 @@
 # Idea Ledger
 
-ここは未採用の方向性を失わないための台帳です。記載は実装承認ではなく、Phase Gの単一目的を選ぶ比較材料です。
+ここは未採用方向、選定理由、負の例を失わないための台帳です。記載は実装承認ではありません。
 
-## Active seeds
+## 2026-07-23 direction shift
+
+オーナーの明示指示により、Phase Gは「固定上限の協調敵対Security Cell」に選定・実装されました。以前の第一候補「契約と証拠の深化」は棄却ではなく将来候補へ戻します。複数敵協調という語も無制限敵生成ではなく、needle 1 + watcher 1、routine/watchful、限定知識、予約、圧力上限という薄いスライスへ具体化しました。
+
+## Phase H以降のactive seeds
 
 | 候補 | 期待する価値 | 着手条件 | 主な危険 | 状態 |
 | --- | --- | --- | --- | --- |
-| 複数敵協調 | 通信・孤立・援軍判断をより深くする | 単体敵の人間評価で脅威圧と情報量が適正 | AI、知覚、存在量、妨害を同時に複雑化しやすい | 候補・未選定 |
-| ミッション途中再開 | 長い訪問の中断耐性を上げる | 帰還settlementと別の一時snapshot契約、復元可能なinteraction設計 | 一時状態と確定world stateの混同、二重精算 | 候補・未選定 |
-| プロシージャル世界 | 再訪の変化と拡張性を上げる | 安定ID、到達性、safe anchor、作者意図の代替設計 | 決定論・検証可能性・保存互換性を同時に失う | 候補・未選定 |
-| 契約と証拠の深化 | 継続世界の意味と選択を強める | 現行2契約のテンポと要約密度を人間評価 | コンテンツ量だけが増え、機構の深さが増えない | 候補・未選定 |
-| 初期バンドル分割 | 初回起動を軽くする | 実機で起動・キャッシュ・再訪のボトルネックを計測 | 警告だけを追い、体感改善のない複雑化を招く | 性能候補・非ブロッキング |
-| schema v2 migration | 将来の保存形式変更を安全にする | 実際にv2で必要なデータが確定 | 要件なしのmigration基盤を先行設計する | トリガー待ち |
+| Phase G tuning closeout | watcher、chirp、圧力、退避の感覚品質を閉じる | ミュートなし人間観察とblocking/tuning分類 | 構造変更をtuning名目で混ぜる | 最優先ゲート・未評価 |
+| 契約と証拠の因果深化 | 継続世界の選択と再訪理由を強める | Phase G受入後、現行契約テンポと要約密度を評価 | content量だけ増え、判断が増えない | Phase H第一候補・未承認 |
+| Security Cell authoring definition | 別の作者定義世界でも役割セルを再利用する | 第2世界が承認され、hard-code重複が実在する | 早すぎる抽象化、敵数の暗黙増加 | 条件付き候補 |
+| 第2の作者定義世界 | 固定世界反復の幅を広げ、WorldDefinitionを実証する | 現世界の継続動機が人間受入済み | contentと基盤変更の同時肥大化 | 条件付き候補 |
+| ミッション途中再開 | 長い訪問の中断耐性を上げる | 訪問時間の実測、一時snapshotとsettlementの別契約 | 一時AI状態と確定world stateの混同、二重精算 | 条件付き候補 |
+| 初期bundle分割 | cold startを軽くする | cold / warm / revisitの実機計測 | warningだけを追う複雑化 | 性能候補・非ブロッキング |
+| schema V3 | 将来の保存形式変更を安全にする | 実データ要件とV2 fixtureが確定 | 要件なしmigrationの先行設計 | trigger待ち |
 
 ## Deferred directions
 
@@ -19,32 +24,27 @@
 - HP、死亡、銃撃戦
 - 敵による偽通信・音声模倣
 - Porterによるカート操作
+- 通常敵数のwatchful 2機超への増加
 - 大規模な手続き生成や無制限の世界拡張
 
-これらは現在のPhase F受入条件に含めません。採用する場合は既存の `ItemLocation`、communication、knowledge、settlement境界への影響を先に仕様化します。
+採用する場合は `ItemLocation`、world settlement、個体/共有knowledge、pressure budget、navigation、disposeのどこを変更するか先に仕様化します。
 
 ## Negative examples
 
-- Viteのchunk warningを消すだけの閾値引き上げ
+- Vite chunk warningを消すだけの閾値引き上げ
 - Rapier warningを消すためだけの未検証な物理基盤交換
-- runtime UUIDやRapier handleをセーブへ書く
-- 破損セーブや未来schemaの欠落値を推測補完する
-- 帰還前のdeltaを確定world stateとして保存する
-- 同一ItemInstanceを船内在庫と世界残置へ同時に置く
-- Phase Gで複数敵、生成世界、途中再開を一度に実装する
-- 人間評価前に調整値を自動的に最終決定する
+- runtime UUID、Rapier handle、配列index、runtime taskやSetをsaveへ書く
+- 破損saveや未来schemaの欠落値を推測補完する
+- 帰還前のsecurity deltaを確定world stateとして保存する
+- 敵がplayer stateや共有前のwatcher factを直接読む
+- 古い共有位置だけからlock / interferenceを開始する
+- watcherへinterdictを割り当てる、または全機を同じagent / relayへ予約する
+- cautiousで新規攻撃を始める、outnumberedでもtokenを保持する
+- Phase Hで契約、新世界、途中再開、敵追加を同時実装する
+- 自動テスト結果から音量、シルエット、game feelをacceptedと推論する
 
-## Selection question
+## Phase H selection question
 
-Phase Gでは「どの候補が、既存の通信・物流・継続世界を壊さず、プレイヤーが次の訪問を考える理由を最も強くするか」を1つだけ選びます。選定時は目的、プレイヤーへの効果、必要な不変条件、受入試験、非対象を先に固定します。
+「Phase Gの人間評価で観測された最大の支障を、既存の保存・通信・物流・限定知識を壊さず、1つのプレイヤー判断として最も前進させる変更は何か」を選びます。目的1文、受入条件、非対象、停止条件を先に固定し、push / PR / release承認とは分離します。
 
-## 2026-07-22 prioritization proposal
-
-これは選定結果ではなく、人間評価後の比較順です。
-
-1. 重大な別問題がなければ「契約と証拠の深化」を第一候補とする。相互排他または順序依存の判断を1つ追加し、次訪問への因果を船内要約で読めることを狙う。
-2. 脅威圧不足が支配的なら「複数敵協調」を第一候補へ繰り上げる。敵数の無制限化ではなく、通信・孤立判断を増やす最小構成に限定する。
-3. 中断負担が支配的なら「ミッション途中再開」を選ぶ。帰還settlementと別の一時snapshot契約を先に仕様化する。
-4. 固定世界の反復疲労が支配的なら、プロシージャル生成の前に第2の作者定義世界を作り、`WorldDefinition` 抽象と安定IDを実証する。
-
-詳細な条件、受入像、長期順序は `supervising-ai-report.md` を参照します。
+現時点の優先順は、(1) Phase G tuning closeout、(2) 契約と証拠の因果深化、(3) 第2作者定義世界、(4) 訪問時間が問題なら途中再開、(5) 実測で問題ならbundle分割です。監修用の条件付き長期順序は `supervising-ai-report.md` を参照します。

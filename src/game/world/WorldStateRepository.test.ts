@@ -54,5 +54,11 @@ describe("WorldStateRepository", () => {
     const reset = await repository.reset(FLOODED_MARKET_WORLD, FLOODED_MARKET_WORLD_INSTANCE_ID);
     expect(reset.revision).toBe(0);
     expect(reset.visitCount).toBe(0);
+    expect(reset.securityState).toEqual({
+      posture: "routine",
+      confirmedContactVisitCount: 0,
+      lastConfirmedContactVisitId: null,
+      observedTacticTags: [],
+    });
   });
 });

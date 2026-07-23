@@ -30,10 +30,57 @@ describe("world state codec", () => {
   });
 
   it("rejects an unsupported future schema at the migration boundary", () => {
-    expect(migratePersistedWorldState({ schemaVersion: 2 })).toMatchObject({
+    expect(migratePersistedWorldState({ schemaVersion: 3 })).toMatchObject({
       ok: false,
       code: "UNSUPPORTED_SCHEMA_VERSION",
     });
+  });
+
+  it("migrates a complete v1 payload without losing phase-f progress", () => {
+    const current = createInitialWorldState(FLOODED_MARKET_WORLD, FLOODED_MARKET_WORLD_INSTANCE_ID);
+    const { securityState: _securityState, ...legacyWithoutSecurity } = current;
+    const legacy = {
+      ...legacyWithoutSecurity,
+      schemaVersion: 1 as const,
+      revision: 7,
+      visitCount: 3,
+      traversalStates: current.traversalStates.map((entry, index) => index === 0 ? { ...entry, state: "opened" as const } : entry),
+      machineRelations: current.machineRelations.map((entry, index) => index === 0 ? {
+        ...entry,
+        relation: "friendly" as const,
+        assistedVisitCount: 2,
+        assistedVisitIds: ["visit-1", "visit-2"],
+      } : entry),
+      leftBehindEquipment: [{
+        itemInstanceId: "relay-legacy",
+        definitionId: "portable-relay" as const,
+        position: { x: 1, y: 0.93, z: -1 },
+        rotationY: 0,
+        operationalState: "active" as const,
+      }],
+      evidenceStates: current.evidenceStates.map((entry, index) => index === 0 ? {
+        ...entry,
+        discovered: true,
+        firstDiscoveredVisitId: "visit-1",
+      } : entry),
+      appliedSettlementIds: ["settlement-legacy"],
+    };
+
+    const migrated = migratePersistedWorldState(legacy);
+
+    expect(migrated.ok).toBe(true);
+    if (!migrated.ok) return;
+    expect(migrated.state).toMatchObject({
+      schemaVersion: 2,
+      revision: 7,
+      visitCount: 3,
+      appliedSettlementIds: ["settlement-legacy"],
+      securityState: { posture: "routine", confirmedContactVisitCount: 0 },
+    });
+    expect(migrated.state.traversalStates[0]?.state).toBe("opened");
+    expect(migrated.state.machineRelations[0]?.relation).toBe("friendly");
+    expect(migrated.state.leftBehindEquipment[0]?.itemInstanceId).toBe("relay-legacy");
+    expect(migrated.state.evidenceStates[0]?.discovered).toBe(true);
   });
 
   it("rejects a structurally invalid v1 payload", () => {

@@ -9,7 +9,8 @@ import type { DistributedSquadState } from "../squad/squadTypes";
 import { getActiveContract, getVisitSalvageSourceIds } from "./WorldState";
 import type {
   PersistedLeftBehindEquipment,
-  PersistedWorldStateV1,
+  PersistedWorldState,
+  SecurityObservationTag,
   WorldDefinition,
   WorldDelta,
   WorldDeltaEvent,
@@ -37,7 +38,7 @@ export interface RestoredEquipmentPlacement extends PersistedLeftBehindEquipment
 }
 
 export function createWorldVisitProjection(
-  persisted: PersistedWorldStateV1,
+  persisted: PersistedWorldState,
   world: WorldDefinition,
   mission: FixedMissionDefinition,
   navigation: Pick<WaypointNavigationService, "projectToNavigablePoint">,
@@ -95,18 +96,30 @@ export function createWorldVisitProjection(
 
 export interface VisitDeltaInput {
   readonly visitId: string;
-  readonly baseState: PersistedWorldStateV1;
+  readonly baseState: PersistedWorldState;
   readonly world: WorldDefinition;
   readonly result: FixedMissionResult;
   readonly manifest: ExpeditionManifest;
   readonly itemLocations: Readonly<ItemLocationLedger>;
   readonly squad: DistributedSquadState;
   readonly porter: PorterAndroidState;
+  readonly securityObservation?: {
+    readonly confirmedContact: boolean;
+    readonly observedTacticTags: readonly SecurityObservationTag[];
+  };
 }
 
 export function buildWorldVisitSettlement(input: VisitDeltaInput): WorldVisitSettlement {
   const events: WorldDeltaEvent[] = [];
   const active = getActiveContract(input.baseState, input.world);
+
+  if (input.securityObservation?.confirmedContact) {
+    events.push({
+      type: "security-contact-confirmed",
+      visitId: input.visitId,
+      observedTacticTags: [...new Set(input.securityObservation.observedTacticTags)].sort(),
+    });
+  }
 
   for (const recoveredId of input.result.recoveredResourceIds) {
     const sourceId = sourceIdFromMissionItemId(recoveredId);

@@ -1,4 +1,9 @@
-import type { PersistedWorldStateV1 } from "./worldTypes";
+import type {
+  PersistedWorldState,
+  PersistedWorldStateV1,
+  PersistedWorldStateV2,
+  SecurityObservationTag,
+} from "./worldTypes";
 import { freezeWorldState } from "./worldTypes";
 
 export type WorldStateCodecErrorCode =
@@ -8,10 +13,10 @@ export type WorldStateCodecErrorCode =
   | "INVALID_WORLD_STATE";
 
 export type WorldStateDecodeResult =
-  | { readonly ok: true; readonly state: PersistedWorldStateV1 }
+  | { readonly ok: true; readonly state: PersistedWorldState }
   | { readonly ok: false; readonly code: WorldStateCodecErrorCode; readonly reason: string };
 
-export function encodeWorldState(state: PersistedWorldStateV1): string {
+export function encodeWorldState(state: PersistedWorldState): string {
   return JSON.stringify(state);
 }
 
@@ -29,24 +34,61 @@ export function migratePersistedWorldState(value: unknown): WorldStateDecodeResu
   if (!isRecord(value) || !("schemaVersion" in value)) {
     return { ok: false, code: "MISSING_SCHEMA_VERSION", reason: "世界状態にschemaVersionがありません" };
   }
-  if (value.schemaVersion !== 1) {
+  if (value.schemaVersion === 1) {
+    if (!isPersistedWorldStateV1(value)) {
+      return { ok: false, code: "INVALID_WORLD_STATE", reason: "世界状態V1の必須フィールドまたは値が不正です" };
+    }
+    const { schemaVersion: _legacyVersion, ...legacy } = structuredClone(value);
+    return {
+      ok: true,
+      state: freezeWorldState({
+        ...legacy,
+        schemaVersion: 2,
+        securityState: {
+          posture: "routine",
+          confirmedContactVisitCount: 0,
+          lastConfirmedContactVisitId: null,
+          observedTacticTags: [],
+        },
+      } satisfies PersistedWorldStateV2),
+    };
+  }
+  if (value.schemaVersion === 2) {
+    if (!isPersistedWorldStateV2(value)) {
+      return { ok: false, code: "INVALID_WORLD_STATE", reason: "世界状態V2の必須フィールドまたは値が不正です" };
+    }
+    return { ok: true, state: freezeWorldState(value) };
+  }
+  {
     return {
       ok: false,
       code: "UNSUPPORTED_SCHEMA_VERSION",
       reason: `未対応の世界状態schemaVersionです: ${String(value.schemaVersion)}`,
     };
   }
-  if (!isPersistedWorldStateV1(value)) {
-    return { ok: false, code: "INVALID_WORLD_STATE", reason: "世界状態の必須フィールドまたは値が不正です" };
-  }
-  return { ok: true, state: freezeWorldState(value) };
 }
 
 function isPersistedWorldStateV1(
   value: Record<string, unknown>,
 ): value is Record<string, unknown> & PersistedWorldStateV1 {
-  return value.schemaVersion === 1
-    && typeof value.worldInstanceId === "string"
+  return value.schemaVersion === 1 && isCommonWorldState(value);
+}
+
+function isPersistedWorldStateV2(
+  value: Record<string, unknown>,
+): value is Record<string, unknown> & PersistedWorldStateV2 {
+  return value.schemaVersion === 2
+    && isCommonWorldState(value)
+    && isRecord(value.securityState)
+    && (value.securityState.posture === "routine" || value.securityState.posture === "watchful")
+    && isNonNegativeInteger(value.securityState.confirmedContactVisitCount)
+    && isNullableString(value.securityState.lastConfirmedContactVisitId)
+    && Array.isArray(value.securityState.observedTacticTags)
+    && value.securityState.observedTacticTags.every(isSecurityObservationTag);
+}
+
+function isCommonWorldState(value: Record<string, unknown>): boolean {
+  return typeof value.worldInstanceId === "string"
     && typeof value.worldDefinitionId === "string"
     && isNonNegativeInteger(value.revision)
     && isNonNegativeInteger(value.visitCount)
@@ -93,6 +135,13 @@ function isPersistedWorldStateV1(
       || value.lastOutcome === "complete"
       || value.lastOutcome === "partial"
       || value.lastOutcome === "aborted");
+}
+
+function isSecurityObservationTag(value: unknown): value is SecurityObservationTag {
+  return value === "flare-observed"
+    || value === "field-relay-observed"
+    || value === "porter-support-observed"
+    || value === "opened-traversal-observed";
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

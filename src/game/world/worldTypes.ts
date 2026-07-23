@@ -7,6 +7,19 @@ export type ContractState = "locked" | "available" | "active" | "complete";
 export type TraversalState = "closed" | "opened";
 export type MachineRelation = "unknown" | "friendly";
 export type EquipmentOperationalState = "active" | "disabled";
+export type SecurityPosture = "routine" | "watchful";
+export type SecurityObservationTag =
+  | "flare-observed"
+  | "field-relay-observed"
+  | "porter-support-observed"
+  | "opened-traversal-observed";
+
+export interface PersistedSecurityState {
+  readonly posture: SecurityPosture;
+  readonly confirmedContactVisitCount: number;
+  readonly lastConfirmedContactVisitId: string | null;
+  readonly observedTacticTags: readonly SecurityObservationTag[];
+}
 
 export interface WorldAnchorDefinition {
   readonly id: WorldEntityId;
@@ -114,6 +127,13 @@ export interface PersistedWorldStateV1 {
   readonly lastOutcome: "complete" | "partial" | "aborted" | null;
 }
 
+export interface PersistedWorldStateV2 extends Omit<PersistedWorldStateV1, "schemaVersion"> {
+  readonly schemaVersion: 2;
+  readonly securityState: PersistedSecurityState;
+}
+
+export type PersistedWorldState = PersistedWorldStateV2;
+
 export type WorldDeltaEvent =
   | {
       readonly type: "porter-befriended";
@@ -139,6 +159,11 @@ export type WorldDeltaEvent =
       readonly contractId: string;
       readonly objectiveId: WorldEntityId;
       readonly visitId: string;
+    }
+  | {
+      readonly type: "security-contact-confirmed";
+      readonly visitId: string;
+      readonly observedTacticTags: readonly SecurityObservationTag[];
     };
 
 export interface WorldDelta {
@@ -174,32 +199,33 @@ export interface WorldSettlementEffects {
   readonly recoveredCargoIds: readonly WorldEntityId[];
   readonly recoveredEquipmentIds: readonly string[];
   readonly completedContractIds: readonly string[];
+  readonly securityPostureChanged: boolean;
 }
 
 export type WorldSettlementResult =
   | {
       readonly status: "applied";
-      readonly state: PersistedWorldStateV1;
+      readonly state: PersistedWorldState;
       readonly effects: WorldSettlementEffects;
     }
   | {
       readonly status: "duplicate";
-      readonly state: PersistedWorldStateV1;
+      readonly state: PersistedWorldState;
       readonly effects: WorldSettlementEffects;
     }
   | {
       readonly status: "revision-conflict";
-      readonly state: PersistedWorldStateV1;
+      readonly state: PersistedWorldState;
       readonly actualRevision: number;
       readonly expectedRevision: number;
     }
   | {
       readonly status: "invalid";
-      readonly state: PersistedWorldStateV1;
+      readonly state: PersistedWorldState;
       readonly violations: readonly WorldStateViolation[];
     };
 
-export function freezeWorldState(state: PersistedWorldStateV1): PersistedWorldStateV1 {
+export function freezeWorldState<T extends PersistedWorldStateV1 | PersistedWorldStateV2>(state: T): T {
   return deepFreeze(structuredClone(state));
 }
 

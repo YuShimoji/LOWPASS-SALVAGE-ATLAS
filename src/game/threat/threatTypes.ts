@@ -3,6 +3,7 @@ import type { Vec3 } from "../core/types";
 import type { CrewId } from "../squad/squadTypes";
 import type { HostileDroneMode, MachineAgentState } from "../machines/machineTypes";
 import type { PresenceAssessment } from "./PresenceService";
+import type { SecurityCellRuntimeState } from "../security/securityTypes";
 
 export type ScoutDroneMode = HostileDroneMode;
 
@@ -99,6 +100,7 @@ export interface ThreatEncounterState {
   resolution: "active" | "disengaged" | "disabled";
   firstRetreatAnalysisRevision: number;
   interferenceRevision: number;
+  securityCell: SecurityCellRuntimeState | null;
 }
 
 export interface ThreatCommunicationStatus {

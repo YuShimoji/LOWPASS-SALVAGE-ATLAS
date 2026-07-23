@@ -156,7 +156,7 @@ export const FLOODED_MARKET_MISSION = Object.freeze({
     { id: "loading-chain", label: "搬入口の封鎖チェーン", requiredDefinitionIds: ["bolt-cutter"], interactionPosition: { x: 2.2, y: 0.93, z: -2.45 }, colliderId: "loading-chain-gate", navigationEdgeId: "loading-chain-shortcut" },
   ],
   threatEncounter: {
-    id: "scout-drone-market-01",
+    id: "machine:security:needle-01",
     label: "HOSTILE SCOUT DRONE",
     spawn: { x: 3.45, y: 1.55, z: -4.65 },
     patrolPoints: [

@@ -27,7 +27,8 @@ import { createInsertionPlan, type MissionLaunchOptions } from "./game/insertion
 import { WaypointNavigationService } from "./game/navigation/WaypointNavigationService";
 import { DistributedSquadController } from "./game/squad/DistributedSquadController";
 import { CREW_DEFINITIONS, type CrewId, type SquadOrderType } from "./game/squad/squadTypes";
-import type { ScoutDroneController, ThreatEcologyContext } from "./game/threat/ScoutDroneController";
+import type { ThreatEcologyContext } from "./game/threat/ScoutDroneController";
+import type { SecurityCellController } from "./game/security/SecurityCellController";
 import type { PorterAndroidController } from "./game/machines/PorterAndroidController";
 import type { MachineFeedbackAudio } from "./render/audio/MachineFeedbackAudio";
 import { FixedStepRunner } from "./game/simulation/FixedStepRunner";
@@ -52,7 +53,7 @@ import {
 } from "./game/world/floodedMarketWorld";
 import { IndexedDbWorldStateRepository } from "./game/world/WorldStateRepository";
 import { buildWorldVisitSettlement, createWorldVisitProjection } from "./game/world/WorldVisit";
-import type { PersistedWorldStateV1 } from "./game/world/worldTypes";
+import type { PersistedWorldState } from "./game/world/worldTypes";
 import { getActiveContract } from "./game/world/WorldState";
 
 declare global {
@@ -74,6 +75,11 @@ declare global {
           pendingReportCount: number;
           firstRetreatAnalysisRevision: number;
           interferenceRevision: number;
+          securityPosture: string;
+          securityCellId: string | null;
+          hostileLinkQuality: number;
+          sharedFactCount: number;
+          reservationCount: number;
         };
         porter: {
           mode: string | null;
@@ -100,13 +106,16 @@ declare global {
       recoverRelayForQa(): string;
       deployFlareForQa(): string;
       setDronePositionForQa(x: number, z: number, facingYaw?: number): void;
+      setWatcherPositionForQa(x: number, z: number, facingYaw?: number): void;
+      setSecurityPostureForQa(posture: "routine" | "watchful"): void;
+      suppressHostileLinkForQa(suppressed: boolean): void;
       disableThreatForQa(): string;
       authenticatePorterForQa(): string;
       porterCommandForQa(command: "follow" | "hold" | "carry-to"): string;
       disableRelayForQa(itemInstanceId?: string): string;
       restartRelayForQa(itemInstanceId?: string): string;
-      threatReadback(): ReturnType<ScoutDroneController["getDebugReadback"]> | null;
-      worldState(): PersistedWorldStateV1;
+      threatReadback(): ReturnType<SecurityCellController["getDebugReadback"]> | null;
+      worldState(): PersistedWorldState;
       resetWorldStateForQa(): Promise<void>;
     };
   }
@@ -146,7 +155,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   let resultPanel: MissionResultPanel | null = null;
   let missionController: MissionSessionController | null = null;
   let squadController: DistributedSquadController | null = null;
-  let threatController: ScoutDroneController | null = null;
+  let threatController: SecurityCellController | null = null;
   let porterController: PorterAndroidController | null = null;
   let machineAudio: MachineFeedbackAudio | null = null;
   let activeReservation: ExpeditionReservation | null = null;
@@ -158,7 +167,8 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   let cachedEcologyContext: ThreatEcologyContext | null = null;
   let porterWasAuthenticated = false;
   let handledFirstRetreatAnalysisRevision = 0;
-  let activeWorldVisitBase: PersistedWorldStateV1 | null = null;
+  let handledSharedContactRevision = 0;
+  let activeWorldVisitBase: PersistedWorldState | null = null;
 
   const releaseWorldInput = (): void => {
     input?.clearMovement();
@@ -558,14 +568,17 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       const [
         { FLOODED_MARKET_MISSION },
         { createFloodedMarket },
-        { ScoutDroneController: DynamicScoutDroneController },
+        {
+          SecurityCellController: DynamicSecurityCellController,
+          createFloodedMarketSecurityCellDefinition,
+        },
         { PorterAndroidController: DynamicPorterAndroidController },
         { MachineFeedbackAudio: DynamicMachineFeedbackAudio },
         { MissionSessionController: DynamicMissionSessionController },
       ] = await Promise.all([
         import("./game/mission/fixed/floodedMarket"),
         import("./render/objects/createFloodedMarket"),
-        import("./game/threat/ScoutDroneController"),
+        import("./game/security/SecurityCellController"),
         import("./game/machines/PorterAndroidController"),
         import("./render/audio/MachineFeedbackAudio"),
         import("./game/mission/MissionSession"),
@@ -605,12 +618,17 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         insertionPlan,
         nextMissionController.state.itemLocations,
       );
-      const nextThreatController = new DynamicScoutDroneController(
+      const forcedPosture = query.get("security-posture");
+      const securityPosture = forcedPosture === "routine" || forcedPosture === "watchful"
+        ? forcedPosture
+        : persistedWorldState.securityState.posture;
+      const nextThreatController = new DynamicSecurityCellController(
         visitDefinition.threatEncounter,
         manifest.selectedAgentIds,
         nextSquadController.navigation,
         state.runtime.elapsedSeconds,
-        query.get("drones") === "2" ? 2 : 1,
+        securityPosture,
+        createFloodedMarketSecurityCellDefinition(visitDefinition.signalZones),
       );
       for (const traversalId of worldVisit.restoredTraversalIds) {
         const traversal = FLOODED_MARKET_WORLD.traversal.find((entry) => entry.id === traversalId);
@@ -700,6 +718,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       cachedEcologyContext = null;
       porterWasAuthenticated = nextPorterController.state.authenticated;
       handledFirstRetreatAnalysisRevision = 0;
+      handledSharedContactRevision = 0;
       state.world.mode = "mission";
       simulation.teleportPlayer(controlledSpawn);
       refreshMissionInteractions();
@@ -730,6 +749,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       !activeReservation ||
       !activeWorldVisitBase ||
       !squadController ||
+      !threatController ||
       !porterController ||
       !state.mission.lastResult ||
       appDisposed
@@ -753,6 +773,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         itemLocations: missionController.state.itemLocations,
         squad: squadController.state,
         porter: porterController.state,
+        securityObservation: threatController.getSecurityObservation(),
       });
       const worldCommit = await worldRepository.commit(worldSettlement, FLOODED_MARKET_WORLD);
       if (worldCommit.status === "revision-conflict") {
@@ -943,6 +964,11 @@ async function bootstrap(root: HTMLElement): Promise<void> {
                     disabled: activeSquad.isRelayDisabled(itemId),
                   }];
                 }),
+                openedTraversals: FLOODED_MARKET_WORLD.traversal.flatMap((traversal) => {
+                  if (!activeSquad.state.shortcutOpenById[traversal.shortcutId]) return [];
+                  const shortcut = activeSession.definition.toolShortcuts.find((entry) => entry.id === traversal.shortcutId);
+                  return shortcut ? [{ id: traversal.id, position: { ...shortcut.interactionPosition } }] : [];
+                }),
                 friendlyMachine: porterController?.state ?? null,
                 onInterdict: (targetAgentId) => {
                   const target = activeSquad.state.agents[targetAgentId];
@@ -981,6 +1007,15 @@ async function bootstrap(root: HTMLElement): Promise<void> {
                   `FIELD TERMINAL // LOCAL PRESENCE ${presence.alliedPresence.toFixed(2)} > ${presence.hostilePresence.toFixed(2)} // DRONE RETREAT`,
                 );
               }
+            }
+            const sharedRevision = threatController.state.securityCell?.sharedContactRevision ?? 0;
+            if (sharedRevision > handledSharedContactRevision) {
+              if (handledSharedContactRevision === 0) {
+                simulation.setNotice("HOSTILE MESH DETECTED // CONTACT SHARED · 2 SECURITY NODES · TASKS DIVERGED");
+                machineAudio?.playHostileShareTransmit();
+                machineAudio?.playHostileShareReceive();
+              }
+              handledSharedContactRevision = sharedRevision;
             }
             machineAudio?.update(
               threatController.state.drone.mode,
@@ -1064,6 +1099,11 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         pendingReportCount: threatController?.getPendingReportCount() ?? 0,
         firstRetreatAnalysisRevision: threatController?.state.firstRetreatAnalysisRevision ?? 0,
         interferenceRevision: threatController?.state.interferenceRevision ?? 0,
+        securityPosture: threatController?.state.securityCell?.posture ?? persistedWorldState.securityState.posture,
+        securityCellId: threatController?.state.securityCell?.id ?? null,
+        hostileLinkQuality: threatController?.state.securityCell?.link?.quality ?? 0,
+        sharedFactCount: Object.keys(threatController?.state.securityCell?.blackboard.sharedFacts ?? {}).length,
+        reservationCount: Object.keys(threatController?.state.securityCell?.blackboard.taskReservations ?? {}).length,
       },
       porter: {
         mode: porterController?.state.mode ?? null,
@@ -1113,6 +1153,15 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     setDronePositionForQa: (x, z, facingYaw) => {
       threatController?.setDronePositionForQa({ x, y: threatController.definition.cruiseAltitude, z }, facingYaw);
       refreshMissionInteractions();
+    },
+    setWatcherPositionForQa: (x, z, facingYaw) => {
+      threatController?.setWatcherPositionForQa({ x, y: 2.65, z }, facingYaw);
+    },
+    setSecurityPostureForQa: (posture) => {
+      threatController?.forcePostureForQa(posture);
+    },
+    suppressHostileLinkForQa: (suppressed) => {
+      threatController?.setHostileLinkSuppressedForQa(suppressed);
     },
     disableThreatForQa: runThreatDisable,
     authenticatePorterForQa: runPorterAuthentication,
@@ -1169,7 +1218,7 @@ function createQaNavigation(
 ): HTMLElement {
   const panel = document.createElement("aside");
   panel.className = "qa-navigation";
-  panel.setAttribute("aria-label", "Phase F QA navigation");
+  panel.setAttribute("aria-label", "Phase G QA navigation");
   for (const [target, label] of [
     ["phase-d-loadout", "QA Phase D 28U"],
     ["console", "QA 出撃コンソール"],

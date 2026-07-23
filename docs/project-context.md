@@ -4,33 +4,35 @@
 
 ## North star
 
-`LOWPASS: SALVAGE ATLAS` は、低忠実度3D表現の中で、隊員・装備・通信・非致死的機械生態系・継続世界を一貫した状態モデルとして扱うデスクトップブラウザ向け探索ゲームです。プレイヤーの判断が帰還精算を通じて次の訪問へ残り、表示・物理・ナビゲーションが同じシミュレーション状態を投影することを重視します。
+`LOWPASS: SALVAGE ATLAS` は、低忠実度3D表現の中で、隊員・装備・通信・非致死的機械生態系・継続世界を一貫した状態モデルとして扱うデスクトップブラウザ探索ゲームです。プレイヤーの判断と敵の判断を、各主体が実際に観測・共有できた情報から説明可能にし、帰還精算を通じて次の訪問へ残します。
 
 ## Cockpit
 
 | 項目 | 現在値 |
 | --- | --- |
-| 軸 | 状態所有とプレイヤー判断の整合性 |
-| レーン | 固定世界を反復訪問できる垂直スライス |
-| 完了スライス | Phase F: 訪問間世界永続化 |
-| 作業ブランチ | `feat/phase-f-world-persistence` |
-| 実装基準 | `1e98860597ac940ff8d47505a5b00736d852c43a` |
-| リモート同期基準 | `d25a9c04c277d5d4728904a11429f45413599a83`（2026-07-23取得時点のorigin先端） |
-| ローカル監修文書基準 | `1f1319a9dd3e324ae81b62d73972b26137b7014c` と本更新。実装変更ではなく、未push |
-| 次のゲート | 監修確認 → 人間の感覚評価 → Phase G単一目的の選定 |
-| 受入の正本 | `README.md` のフェーズ別検証結果と `PROJECT_HANDOFF.md` |
+| 軸 | 状態所有、限定知識、プレイヤー判断の整合性 |
+| レーン | 固定世界を反復訪問する非致死的探索垂直スライス |
+| 完了スライス | Phase G: 協調する敵対機械Security Cell |
+| 作業ブランチ | `feat/phase-g-security-cell` |
+| Phase F保全 | tag `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a` |
+| Phase G分岐元 | `4e3cdc66d357e8054d45e0a42c4f41f166087b20` |
+| Phase G実装 | この文書を含むbranch HEAD、件名 `feat: coordinate hostile machine security cells` |
+| 次のゲート | Phase Gミュートなし人間受入 → Phase H単一目的の承認 |
+| 受入の正本 | `README.md` のPhase G検証結果、`PROJECT_HANDOFF.md`、`docs/supervising-ai-report.md` |
 
 ## 現行アーキテクチャ
 
-- TypeScript / Vite / Three.js / Rapier / DOM UI。ゲームルールは `src/game/` が所有し、Three.jsとRapierを真実源にしない
-- 固定60 Hzシミュレーション。敵判断と通信評価は低い固定周波数に分離し、描画フレーム依存を避ける
-- 不変な `ExpeditionManifest` と可変な `MissionSession` を分離する
-- `ItemLocation` を装備・資源・カート・機械搬送を含む所在の唯一の表現とする
-- `WorldDefinition` は作者定義の不変世界、`PersistedWorldStateV1` は安定IDだけを保存する訪問間スナップショットとする
-- `WorldDelta` は純粋に適用し、settlementは `expectedRevision` とsettlement IDで競合・重複を防ぐ
-- IndexedDBのread / revision判定 / writeは単一readwrite transactionで行う
-- 表示、Rapier collider、navigation edge、通信グラフは保存状態から順序付きで復元する
-- ミッション・探索ビュー・機械処理はdynamic importし、帰還時にRapier world、Three object、geometry、material、DOM購読を破棄する
+- TypeScript / Vite / Three.js / Rapier / DOM UI。ゲームルールは `src/game/` が所有し、Three.js、Rapier、DOMを真実源にしない
+- 固定60 Hzシミュレーション。Security Cellは知覚・存在量5 Hz、敵通信・共有3 Hz、task割当2 Hz、事実減衰2.5 Hzへ分離する
+- 不変な `ExpeditionManifest`、訪問中の `MissionSession`、訪問間の `PersistedWorldStateV2`、敵セルruntimeを分離する
+- `ItemLocation` を装備・資源・カート・Porter搬送・残置装備の唯一の所在表現にする
+- `WorldDefinition` は作者定義世界、V2 snapshotはV1全フィールドと永続security summaryだけを安定IDで保存する
+- V1→V2は明示migrationする。破損・未来schemaはfail-closed、正常migrationだけ同じIndexedDB world keyへ書き戻す
+- `WorldDelta` は純粋適用し、settlementは `expectedRevision` とsettlement IDで競合・重複を防ぐ。確認接触も帰還時だけ永続化する
+- `HostileMachineKnowledge` はlocal/pending、敵専用linkは共有到達性、blackboardはshared fact / assignment / reservation / pressure tokenを所有する
+- needleは再視認後のinterdict / sabotage、watcherはobserve / overwatchに限定する。共有していない情報や古い共有位置だけで攻撃しない
+- 表示、Rapier collider、味方A*、敵A*、通信は同じ保存・シミュレーション状態から順序付きで投影する
+- ミッション、探索view、Security Cell、機械audioはdynamic importし、帰還時にRapier world、Three object、geometry、material、DOM購読を破棄する
 
 ## フェーズ履歴
 
@@ -40,30 +42,29 @@
 | C | `7d775d5` / `phase-c-fixed-expedition` | 固定探索、資源、カート、complete / partial精算 |
 | D | `6a6cb6c` / `phase-d-squad-comms` | 分散スポーン、手書きA*、通信、分隊命令、知識 |
 | E | `6473c65` / `phase-e-machine-ecology` | 敵対Scout Drone、干渉、relay妨害、友好Porter |
-| F | `1e98860` | revision付き帰還精算、再訪復元、契約、証拠、残置装備 |
+| F | `1e98860` / `phase-f-world-persistence` | revision付き帰還精算、再訪復元、契約、証拠、残置装備 |
+| G | 現branch HEAD | V2 migration、routine/watchful、固定2機cell、個体/共有知識、敵link、task/pressure制御 |
 
-`048299b` と `bf4eeb7` はPhase E途中の保全コミットです。履歴をsquash、rebase、force-pushして消さないでください。
+`048299b` と `bf4eeb7` はPhase E途中の保全コミットです。履歴をsquash、rebase、force-pushして消さないでください。Phase Gもローカル専用であり、pushやmain統合は別の明示判断です。
 
 ## 保存・中断契約
 
-- 保存するのは帰還操作で確定したworld settlementだけ。訪問中の一時状態は保存しない
-- リロード、クラッシュ、強制終了、ロード途中終了では未精算deltaを捨て、基底revisionを維持する
-- codecはunknown入力、破損、未来schemaを正常値として上書きせず、safe modeと診断へ送る
-- schema更新はversionごとの明示migrationで行い、欠落値を推測補完しない
+- 保存するのは帰還操作で確定したworld settlementだけ。訪問中の機体位置、task、knowledge、lock、cooldown、未精算deltaは保存しない
+- `complete` / `partial` / `aborted` は警戒deltaを精算できる。reload、クラッシュ、強制終了では基底revisionとpostureを維持する
+- V2 security summaryはposture、確認接触訪問数、最終接触visit ID、観測戦術tagだけで、通常進行の上限はwatchful / 2機である
+- 同じsettlementの再送はduplicate successで、visitCount、revision、接触回数、effectsを増やさない
 - 残置装備は同じItemInstance IDを維持し、船内在庫との二重化を許さない
-- 不正な保存位置はnavigationへ投影し、失敗時のみ作者定義安全アンカーへ修復して診断を残す
+- 世界限定resetはV2初期routineへ戻すが、描画、音、操作設定を変更しない
 
 ## 現在の品質基準
 
-Phase F先端で、型検査、24ファイル122テスト、production build、トップレベル依存整合、diff checkを通すこと。2026-07-23の再開検証ではこれらと開発URLのHTTP 200を再確認した。ブラウザ3訪問、進行中リロード、契約累積、Porter関係、開放経路、証拠一回通知、relay残置・回収、世界限定リセットの正本証跡は2026-07-21の `README.md` にあり、今回のHTTP smokeと混同しない。監修判断用の分離は `docs/supervising-ai-report.md` を参照する。
+Phase G HEADで型検査、26ファイル151テスト、production build、トップレベル依存整合、diff checkを通すこと。実ブラウザではV1→V2、routine→watchful、reload、2機上限、link断・復旧、役割分担、存在量5ケース、lock解除、grace、reset、3訪問後のresource/DOM復帰を確認する。感覚品質は自動PASSと混同せず、人間のミュートなし受入へ残す。
 
 ## Re-entry snapshot
 
-- `git fetch --prune --tags origin` と現branchの`--ff-only` pullを実施し、origin側の未取込は0件。既存のローカル監修commit `1f1319a` を保全した
-- この更新をcommitした直後はlocal ahead 2 / behind 0の想定。2件ともdocs-onlyで、remote portabilityはオーナー判断待ち
-- Node `v24.13.0` / npm `11.6.2` で依存、型検査、122テスト、build、HTTP smokeを再確認した
-- Phase Gは未選定。人間評価が所有するため自動的に決めない
-- 推奨候補は契約・証拠・再訪判断の因果深化だが、承認済み仕様ではない
-- `main` はPhase B基準の統合ゲートであり、Phase C〜Fの履歴はfeature branchに直列で保持
-- `.serena/`、`node_modules/`、`dist/`、IndexedDB、資格情報はローカル専用。削除・追跡・共有しない
-- 最短コマンドと残作業の責任分界はルートの `PROJECT_HANDOFF.md` を参照
+- Phase F exact commitをlive再検証後、lightweight tagを作成し、既存のローカル監修文書を保全した先端からPhase G branchを作成した
+- Node `v24.13.0` / npm `11.6.2`、26ファイル151テスト、build、V1→V2 browser migration、3訪問resource計測を確認した
+- 実ブラウザ後はworld reset済みのV2 routineを基準とし、保存fixtureやQA artifactをrepositoryへ残さない
+- Vite大容量warningとRapier初期化warningは既知・非ブロッキング。警告隠しは行わない
+- push、PR、deploy、releaseは未実施。remote portabilityと統合はオーナー所有
+- 最短コマンド、残作業のpurpose/effect/requirements/state/owner/nextはルート `PROJECT_HANDOFF.md` を参照する

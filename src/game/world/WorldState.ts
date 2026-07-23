@@ -1,7 +1,7 @@
 import type { ItemDefinitionId } from "../items/itemDefinitions";
 import type {
   ContractProgress,
-  PersistedWorldStateV1,
+  PersistedWorldState,
   WorldDefinition,
   WorldDelta,
   WorldSettlementEffects,
@@ -18,16 +18,16 @@ type Mutable<T> = T extends readonly (infer Entry)[]
     : T;
 
 export interface WorldDeltaApplyResult {
-  readonly state: PersistedWorldStateV1;
+  readonly state: PersistedWorldState;
   readonly violations: readonly WorldStateViolation[];
 }
 
 export function createInitialWorldState(
   definition: WorldDefinition,
   worldInstanceId: string,
-): PersistedWorldStateV1 {
+): PersistedWorldState {
   return freezeWorldState({
-    schemaVersion: 1,
+    schemaVersion: 2,
     worldInstanceId,
     worldDefinitionId: definition.id,
     revision: 0,
@@ -59,18 +59,36 @@ export function createInitialWorldState(
     })),
     appliedSettlementIds: [],
     lastOutcome: null,
+    securityState: {
+      posture: "routine",
+      confirmedContactVisitCount: 0,
+      lastConfirmedContactVisitId: null,
+      observedTacticTags: [],
+    },
   });
 }
 
 export function applyWorldDelta(
-  current: PersistedWorldStateV1,
+  current: PersistedWorldState,
   delta: WorldDelta,
   definition: WorldDefinition,
 ): WorldDeltaApplyResult {
-  const next = structuredClone(current) as Mutable<PersistedWorldStateV1>;
+  const next = structuredClone(current) as Mutable<PersistedWorldState>;
   const violations: WorldStateViolation[] = [];
 
   for (const event of delta.events) {
+    if (event.type === "security-contact-confirmed") {
+      if (next.securityState.lastConfirmedContactVisitId !== event.visitId) {
+        next.securityState.posture = "watchful";
+        next.securityState.confirmedContactVisitCount += 1;
+        next.securityState.lastConfirmedContactVisitId = event.visitId;
+      }
+      next.securityState.observedTacticTags = [...new Set([
+        ...next.securityState.observedTacticTags,
+        ...event.observedTacticTags,
+      ])].sort();
+      continue;
+    }
     if (event.type === "traversal-opened") {
       const definitionEntry = definition.traversal.find((entry) => entry.id === event.traversalId);
       const stateEntry = next.traversalStates.find((entry) => entry.entityId === event.traversalId);
@@ -172,7 +190,7 @@ export function applyWorldDelta(
 }
 
 export function settleWorldVisit(
-  current: PersistedWorldStateV1,
+  current: PersistedWorldState,
   settlement: WorldVisitSettlement,
   definition: WorldDefinition,
 ): WorldSettlementResult {
@@ -188,13 +206,14 @@ export function settleWorldVisit(
     };
   }
 
+  const beforePosture = current.securityState.posture;
   const beforeCargo = new Set(current.uniqueItemStates.filter((entry) => entry.recovered).map((entry) => entry.entityId));
   const beforeEquipment = new Set(current.leftBehindEquipment.map((entry) => entry.itemInstanceId));
   const beforeComplete = new Set(current.contractProgress.filter((entry) => entry.state === "complete").map((entry) => entry.contractId));
   const applied = applyWorldDelta(current, settlement.delta, definition);
   if (applied.violations.length > 0) return { status: "invalid", state: current, violations: applied.violations };
 
-  const committed = structuredClone(applied.state) as Mutable<PersistedWorldStateV1>;
+  const committed = structuredClone(applied.state) as Mutable<PersistedWorldState>;
   committed.revision += 1;
   committed.visitCount += 1;
   committed.appliedSettlementIds = [...committed.appliedSettlementIds, settlement.id];
@@ -209,12 +228,13 @@ export function settleWorldVisit(
     completedContractIds: Object.freeze(state.contractProgress
       .filter((entry) => entry.state === "complete" && !beforeComplete.has(entry.contractId))
       .map((entry) => entry.contractId)),
+    securityPostureChanged: beforePosture !== state.securityState.posture,
   });
   return { status: "applied", state, effects };
 }
 
 export function getActiveContract(
-  state: PersistedWorldStateV1,
+  state: PersistedWorldState,
   definition: WorldDefinition,
 ): { readonly definition: WorldDefinition["contracts"][number]; readonly progress: ContractProgress } | null {
   const progress = state.contractProgress.find((entry) => entry.state === "active")
@@ -224,7 +244,7 @@ export function getActiveContract(
   return contract ? { definition: contract, progress } : null;
 }
 
-export function getVisitSalvageSourceIds(state: PersistedWorldStateV1, definition: WorldDefinition): readonly string[] {
+export function getVisitSalvageSourceIds(state: PersistedWorldState, definition: WorldDefinition): readonly string[] {
   const active = getActiveContract(state, definition);
   return definition.uniqueItems
     .filter((item) => {
@@ -248,7 +268,7 @@ function unlockContracts(progress: Mutable<ContractProgress>[], definition: Worl
 }
 
 function emptyEffects(): WorldSettlementEffects {
-  return Object.freeze({ recoveredCargoIds: [], recoveredEquipmentIds: [], completedContractIds: [] });
+  return Object.freeze({ recoveredCargoIds: [], recoveredEquipmentIds: [], completedContractIds: [], securityPostureChanged: false });
 }
 
 function violation(code: WorldStateViolation["code"], entityId: string, reason: string): WorldStateViolation {
