@@ -1,6 +1,6 @@
 # Project Context
 
-更新日: 2026-07-23
+更新日: 2026-07-24
 
 ## North star
 
@@ -16,7 +16,8 @@
 | 作業ブランチ | `feat/phase-g-security-cell` |
 | Phase F保全 | tag `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a` |
 | Phase G分岐元 | `4e3cdc66d357e8054d45e0a42c4f41f166087b20` |
-| Phase G実装 | この文書を含むbranch HEAD、件名 `feat: coordinate hostile machine security cells` |
+| Phase G実装 | `6df8ba0621baf8976fc56373863cf57565cc12ba`、件名 `feat: coordinate hostile machine security cells` |
+| remote状態 | Phase G branchとPhase F tagはlocal-only。remote未取込0、本引継ぎcommit込みでlocal 4commit先行 |
 | 次のゲート | Phase Gミュートなし人間受入 → Phase H単一目的の承認 |
 | 受入の正本 | `README.md` のPhase G検証結果、`PROJECT_HANDOFF.md`、`docs/supervising-ai-report.md` |
 
@@ -43,7 +44,7 @@
 | D | `6a6cb6c` / `phase-d-squad-comms` | 分散スポーン、手書きA*、通信、分隊命令、知識 |
 | E | `6473c65` / `phase-e-machine-ecology` | 敵対Scout Drone、干渉、relay妨害、友好Porter |
 | F | `1e98860` / `phase-f-world-persistence` | revision付き帰還精算、再訪復元、契約、証拠、残置装備 |
-| G | 現branch HEAD | V2 migration、routine/watchful、固定2機cell、個体/共有知識、敵link、task/pressure制御 |
+| G | `6df8ba0` | V2 migration、routine/watchful、固定2機cell、個体/共有知識、敵link、task/pressure制御 |
 
 `048299b` と `bf4eeb7` はPhase E途中の保全コミットです。履歴をsquash、rebase、force-pushして消さないでください。Phase Gもローカル専用であり、pushやmain統合は別の明示判断です。
 
@@ -58,13 +59,17 @@
 
 ## 現在の品質基準
 
-Phase G HEADで型検査、26ファイル151テスト、production build、トップレベル依存整合、diff checkを通すこと。実ブラウザではV1→V2、routine→watchful、reload、2機上限、link断・復旧、役割分担、存在量5ケース、lock解除、grace、reset、3訪問後のresource/DOM復帰を確認する。感覚品質は自動PASSと混同せず、人間のミュートなし受入へ残す。
+Phase G implementation `6df8ba0` で型検査、26ファイル151テスト、production build、トップレベル依存整合、diff checkを通すこと。2026-07-24にこれらと開発URLのHTTP 200を再確認した。実ブラウザのV1→V2、routine→watchful、reload、2機上限、link断・復旧、役割分担、存在量5ケース、lock解除、grace、reset、3訪問後resource/DOM復帰は2026-07-23のREADME証跡を正本とする。感覚品質は自動PASSと混同せず、人間のミュートなし受入へ残す。
 
 ## Re-entry snapshot
 
-- Phase F exact commitをlive再検証後、lightweight tagを作成し、既存のローカル監修文書を保全した先端からPhase G branchを作成した
-- Node `v24.13.0` / npm `11.6.2`、26ファイル151テスト、build、V1→V2 browser migration、3訪問resource計測を確認した
+- 2026-07-24に `git fetch --prune --tags origin` を実施し、remote側の未取込commitが0であることを確認した
+- remote `main` はlocalと0 / 0、remote Phase Fは `d25a9c0`、現branchは本引継ぎcommit込みで4commit先行する
+- remoteにPhase G branchとPhase F tagはない。remote portabilityはowner判断待ち
+- Node `v24.13.0` / npm `11.6.2` で依存、型検査、151 tests、build、diff、HTTP smokeを再確認した
+- V1→V2 browser migrationと3visit resource計測は同じ `6df8ba0` の2026-07-23証跡を参照する
 - 実ブラウザ後はworld reset済みのV2 routineを基準とし、保存fixtureやQA artifactをrepositoryへ残さない
 - Vite大容量warningとRapier初期化warningは既知・非ブロッキング。警告隠しは行わない
-- push、PR、deploy、releaseは未実施。remote portabilityと統合はオーナー所有
+- draft PR #1はOPEN / DRAFT / mergeable、Phase C〜Fのみでchecksは0件
+- push、PR更新、merge、deploy、releaseは未実施。remote portabilityと統合はオーナー所有
 - 最短コマンド、残作業のpurpose/effect/requirements/state/owner/nextはルート `PROJECT_HANDOFF.md` を参照する

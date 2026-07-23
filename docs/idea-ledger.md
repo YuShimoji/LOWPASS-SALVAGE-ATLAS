@@ -48,3 +48,16 @@
 「Phase Gの人間評価で観測された最大の支障を、既存の保存・通信・物流・限定知識を壊さず、1つのプレイヤー判断として最も前進させる変更は何か」を選びます。目的1文、受入条件、非対象、停止条件を先に固定し、push / PR / release承認とは分離します。
 
 現時点の優先順は、(1) Phase G tuning closeout、(2) 契約と証拠の因果深化、(3) 第2作者定義世界、(4) 訪問時間が問題なら途中再開、(5) 実測で問題ならbundle分割です。監修用の条件付き長期順序は `supervising-ai-report.md` を参照します。
+
+## 2026-07-24 branch framing
+
+remote同期と開発gate再検証では新しいtechnical blockerは見つかりませんでした。したがって次の分岐は作業都合ではなく、Gate G-Aの観察結果で決めます。
+
+| 分岐 | Objective | Gain | Risk | Best fit |
+| --- | --- | --- | --- | --- |
+| 契約・証拠の因果深化 | 1visitの選択を次visitの目的・経路・支援へ接続 | 継続世界が計画理由になる | content追加だけで判断が増えない | Phase Gがacceptedで、再訪動機が最大gap |
+| 第2作者定義world | WorldDefinitionとSecurity Cell再利用を実証 | content幅と抽象の妥当性が上がる | contentと基盤変更が同時に膨らむ | 固定world反復が主要な退屈要因 |
+| ミッション途中再開 | 長いvisitを安全に中断・再開 | accessibilityと生活適合が上がる | temporary snapshotとsettlement混同 | 中断負担が人間評価の主要問題 |
+| 実機hardening | load、frame、input、audioの端末差を閉じる | production readinessが上がる | gameplay前進が止まる | cold startやframeがblocking |
+
+第一候補は契約・証拠の因果深化です。ただしPhase Gの人間評価がblockingなら、どの分岐にも進まずPhase G closeoutを優先します。
