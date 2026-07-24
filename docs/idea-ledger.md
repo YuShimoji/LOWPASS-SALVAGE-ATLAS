@@ -65,3 +65,9 @@ remote同期と開発gate再検証では新しいtechnical blockerは見つか�
 ## 2026-07-24 remote portability
 
 オーナーの明示依頼により、`feat/phase-g-security-cell` branchと`phase-f-world-persistence` tagをoriginへpushしました。別端末から同じ実装・保全基準を取得できる状態になりました。これは履歴の共有gateを閉じただけであり、Phase Gのミュートなし人間受入、PR更新、main統合、deploy、releaseの承認を意味しません。
+
+## 2026-07-25 restart audit
+
+remote fetch / ff-only pull、依存、型、151 tests、production build、HTTP smokeを再実施し、新しいtechnical blockerは見つかりませんでした。`feat/phase-g-security-cell` はupstreamと0 / 0です。したがって候補順位は作業都合では変更せず、Gate G-Aの人間観察を次の分岐条件として維持します。
+
+長期案は `docs/supervising-ai-report.md` で、必須近距離、次距離、条件付き長距離、製品化・配布・運用距離に分けました。後段の記載は実装承認ではありません。各段階は直前gateの証拠、目的1つ、受入条件、非対象、停止条件が揃った場合だけ具体化します。

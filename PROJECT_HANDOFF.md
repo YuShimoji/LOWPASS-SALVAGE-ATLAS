@@ -1,21 +1,23 @@
 # LOWPASS: SALVAGE ATLAS — 再開引き継ぎ
 
-更新日: 2026-07-24
+更新日: 2026-07-25
 
 ## 現在地
 
 - 現行branch: `feat/phase-g-security-cell`
+- 現HEAD: `71ae93cd43d9b64614404448b97ebf4bf12fe40e`
 - Phase G実装commit: `6df8ba0621baf8976fc56373863cf57565cc12ba`
 - Phase F保全tag: `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a`
 - Phase G到達点: Security Cell、V2 migration、自動151 tests、実browser migration / 3visit / resource検証まで完了
-- 2026-07-24再開検証: remote fetch、GitHub metadata、依存、型、151 tests、build、diff、HTTP smokeを再確認してPASS
+- 2026-07-25再開検証: remote fetch / ff-only pull、GitHub metadata、依存、型、151 tests、build、diff、HTTP smoke、server停止 / port解放を再確認してPASS
 - remote未取込: 0（現branchとorigin/feat/phase-g-security-cellが0 / 0）
-- local先行: `origin/feat/phase-f-world-persistence` に対して5commit（Phase G分岐の位置関係、Phase F base branch自体は未変更）
+- local先行: 現branchは `origin/feat/phase-f-world-persistence` に対して6commit、ローカルPhase F branch自体は2commit（remote未取込ではなく、Phase F後の引継ぎdocsとPhase G履歴）
 - remote Phase G branch: `origin/feat/phase-g-security-cell` としてpush済み
 - remote Phase F tag: `phase-f-world-persistence` としてpush済み
 - 次の必須gate: Phase Gミュートなし人間受入
 - Phase G branch/tag push: 実施済み
 - PR更新、main統合、deploy、release: 未実施
+- worktree: 本引継ぎ更新のdocs 4件だけ変更・未commit。実装、manifest、lockfileの変更なし
 
 監修役AIは最初に [`docs/supervising-ai-report.md`](docs/supervising-ai-report.md) を読み、今回ライブ確認した事実、2026-07-23の既存browser証跡、人間所有の感覚評価、条件付きroadmapを分離してください。
 
@@ -24,11 +26,11 @@
 | ref | remote値 | localとの関係 |
 | --- | --- | --- |
 | `origin/main` | `c5ae3b9a168eb81c41886aab93699980be4c90df` | local `main` と0 / 0 |
-| `origin/feat/phase-f-world-persistence` | `d25a9c04c277d5d4728904a11429f45413599a83` | 現branchが5commit先行、base branchは未変更 |
-| `origin/feat/phase-g-security-cell` | 現branchと同一HEAD | parity 0 / 0 |
+| `origin/feat/phase-f-world-persistence` | `d25a9c04c277d5d4728904a11429f45413599a83` | 現branchが6commit先行、local Phase F branchが2commit先行 |
+| `origin/feat/phase-g-security-cell` | `71ae93cd43d9b64614404448b97ebf4bf12fe40e` | 現branchとparity 0 / 0 |
 | remote `phase-f-world-persistence` tag | `1e98860597ac940ff8d47505a5b00736d852c43a` | local tagと同一 |
 
-draft PR [#1](https://github.com/YuShimoji/LOWPASS-SALVAGE-ATLAS/pull/1) はOPEN / DRAFT / mergeableで、Phase C〜Fを `main` へ向けています。headは `d25a9c0`、checksは0件で、Phase Gは含みません。
+2026-07-25に再確認したdraft PR [#1](https://github.com/YuShimoji/LOWPASS-SALVAGE-ATLAS/pull/1) はOPEN / DRAFT / mergeableで、Phase C〜Fを `main` へ向けています。headは `d25a9c0`、checksは0件で、Phase Gは含みません。
 
 ## 最短再開
 
@@ -49,6 +51,7 @@ npm run dev
 期待値:
 
 - branch: `feat/phase-g-security-cell`
+- current HEAD: `71ae93cd43d9b64614404448b97ebf4bf12fe40e`
 - implementation ancestor: `6df8ba0621baf8976fc56373863cf57565cc12ba`
 - divergence: 現branchとremote Phase G branchは0 / 0
 - tests: 26 files / 151 tests
@@ -57,9 +60,14 @@ npm run dev
 
 QA URLは `http://127.0.0.1:5173/?qa=1&audio=muted` です。訪問限定構成は `&security-posture=routine` / `watchful` を使えます。音の人間評価では `audio=muted` を外します。npm操作は直列で実行します。
 
-## 2026-07-24 live verification
+## 2026-07-25 live verification
 
-- `git fetch --prune --tags origin`: PASS、remote変更なし
+- `git fetch --prune --tags origin`: PASS
+- `git pull --ff-only --prune origin feat/phase-g-security-cell`: PASS、`Already up to date`
+- 現branch vs remote Phase G: `0 / 0`
+- local `main` vs `origin/main`: `0 / 0`
+- local Phase F branch vs remote Phase F: `2 / 0`
+- 現branch vs remote Phase F: `6 / 0`
 - GitHub repository: public / default `main` / archived=false
 - Node `v24.13.0`
 - npm `11.6.2`
@@ -70,9 +78,9 @@ QA URLは `http://127.0.0.1:5173/?qa=1&audio=muted` です。訪問限定構成�
 - `git diff --check`: PASS
 - `http://127.0.0.1:5173/?qa=1&audio=muted`: HTTP 200
 - HTML title / module entry: PASS
-- smoke後server停止: PASS
+- smoke後server停止 / 5173番port解放: PASS
 
-今回browser gameplayは再実施していません。V1→V2、routine→watchful、敵cell分業、presence、grace、`partial → complete → aborted`、resource / DOM復帰は、同じPhase G implementation commitを使用したREADMEの2026-07-23証跡を正本とします。
+今回browser gameplayは再実施していません。V1→V2、routine→watchful、敵cell分業、presence、grace、`partial → complete → aborted`、resource / DOM復帰は、同じPhase G implementation commitを使用したREADMEの2026-07-23証跡を正本とします。`6df8ba0..HEAD` の3commitは引継ぎ文書だけで、ゲーム実装差分はありません。
 
 ## Phase Gの実装境界
 
@@ -93,6 +101,7 @@ QA URLは `http://127.0.0.1:5173/?qa=1&audio=muted` です。訪問限定構成�
 | --- | --- | --- | --- | --- | --- |
 | Phase G感覚評価 | watcher、chirp、圧力、退避を製品判断する | ミュートなしdesktop、5観点、accepted/tuning/blocking | 技術検証済み・人間待ち | human game design / UX | Gate G-Aを1回実施 |
 | Phase H選定 | 次sliceを最大gapへ集中する | G-A結果、目的1文、受入、非対象、停止条件 | 未承認 | owner / supervising AI | 4候補から1案だけ承認 |
+| 2026-07-25 handoff docs | 最新の同期・検証値を保持する | 4文書の整合とreview | 4ファイル変更・未commit | current operator / owner | review後、commit / pushは明示方針に従う |
 | Phase G remote portability | 別端末でPhase Gを取得可能にする | branch/tag確認、明示push権限、push後parity | 完了・parity 0 / 0 | owner | 別端末でfetch後に同じbranchをcheckout |
 | draft PR #1 | Phase C〜Fをreview可能にする | human review、CI方針、merge / rollback | OPEN / DRAFT / mergeable | owner / reviewer | G-A後に維持・更新・分離を判断 |
 | CI | local gateをPR上で再現する | typecheck/test/build workflow | 未設定 | repo owner | merge方針時に導入判断 |

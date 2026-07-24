@@ -1,36 +1,38 @@
 # 監修役AI向け現状報告
 
-更新日: 2026-07-24 JST
+更新日: 2026-07-25 JST
 
 ## 監修結論
 
-`LOWPASS: SALVAGE ATLAS` は、remoteにもpush済みの `feat/phase-g-security-cell` のPhase G実装commit `6df8ba0621baf8976fc56373863cf57565cc12ba` から開発再開可能です。2026-07-24にremoteを `git fetch --prune --tags origin` で再取得し、branch/tag push後のparity、依存整合、型検査、26ファイル151テスト、production build、diff check、開発URLのHTTP 200をライブ再確認しました。
+`LOWPASS: SALVAGE ATLAS` は、remoteにもpush済みの `feat/phase-g-security-cell` の現HEAD `71ae93cd43d9b64614404448b97ebf4bf12fe40e` から開発再開可能です。Phase G実装基準は祖先commit `6df8ba0621baf8976fc56373863cf57565cc12ba` です。2026-07-25に `git fetch --prune --tags origin` と `git pull --ff-only --prune origin feat/phase-g-security-cell` を実施し、pull結果が `Already up to date`、現branchとupstreamが0 / 0であることを確認しました。その後、依存整合、型検査、26ファイル151テスト、production build、diff check、開発URLのHTTP 200、smoke用server停止までライブ再確認しました。
 
-remoteにはPhase G branchとPhase F tagが存在します。push前のローカルPhase Gは `origin/feat/phase-f-world-persistence` を4commit分包含していました。push後、現branchと `origin/feat/phase-g-security-cell` はremote unique 0 / local unique 0で、今回もmerge、rebase、branch切替、履歴書換えは不要でした。
+remoteにはPhase G branchとPhase F tagが存在します。現branchと `origin/feat/phase-g-security-cell` はremote unique 0 / local unique 0です。現branchは `origin/feat/phase-f-world-persistence` より6commit先、ローカルの `feat/phase-f-world-persistence` branch自体はremote Phase Fより2commit先です。この差はPhase F後の引継ぎ文書、Phase G実装、Phase G引継ぎ文書であり、remote側の未取込commitではありません。今回もmerge、rebase、branch切替、履歴書換えは不要でした。
 
-技術的なrestart blockerはありません。ただし、Phase Gを製品としてacceptedとする前に、人間がミュートなしでwatcherの識別性、共有chirp、孤立時の圧力、援軍時のlock解除・退避を評価するGate G-Aが残っています。今回の明示依頼でbranch/tag pushは実施済みですが、PR更新、main統合、deploy、releaseは実施していません。
+技術的なrestart blockerはありません。ただし、Phase Gを製品としてacceptedとする前に、人間がミュートなしでwatcherの識別性、共有chirp、孤立時の圧力、援軍時のlock解除・退避を評価するGate G-Aが残っています。branch/tag pushは以前の明示依頼で実施済みですが、PR更新、main統合、deploy、releaseは実施していません。
 
-## 今回ライブ確認した事実
+## 2026-07-25にライブ確認した事実
 
 ### Git・remote
 
-| 項目 | 2026-07-24確認値 | 判定 |
+| 項目 | 2026-07-25確認値 | 判定 |
 | --- | --- | --- |
 | repository | `YuShimoji/LOWPASS-SALVAGE-ATLAS` | public / archived=false |
 | origin | `https://github.com/YuShimoji/LOWPASS-SALVAGE-ATLAS.git` | fetch成功 |
 | default branch | `main` | GitHubとlocalで一致 |
-| local branch | `feat/phase-g-security-cell` | clean |
+| local branch | `feat/phase-g-security-cell` | 同期・gate開始時clean。現在は本報告を含むdocs 4件だけ変更 |
+| current HEAD | `71ae93cd43d9b64614404448b97ebf4bf12fe40e` | remote Phase Gと同一 |
 | Phase G implementation | `6df8ba0621baf8976fc56373863cf57565cc12ba` | 現branchの実装基準 |
 | remote Phase G branch | `origin/feat/phase-g-security-cell` | localと0 / 0 |
 | remote Phase F branch | `d25a9c04c277d5d4728904a11429f45413599a83` | remote最新 |
-| local vs remote Phase F | remote unique 0 / local unique 4 | 本報告commit込み、remote未取込なし |
+| local Phase F branch | `4e3cdc66d357e8054d45e0a42c4f41f166087b20` | remote Phase Fより2 / 0 |
+| current Phase G vs remote Phase F | remote unique 0 / local unique 6 | Phase F後のdocs + Phase G、remote未取込なし |
 | local `main` vs `origin/main` | 0 / 0 | parity PASS |
 | remote Phase F tag | `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a` | local tagと同一 |
 | local Phase F tag | `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a` | 保全済み |
 | draft PR #1 | OPEN / DRAFT / mergeable | Phase C〜Fのみ、Phase G未反映 |
 | PR #1 checks | 0件 | CI証跡なし |
 
-GitHub上のremote branchは `main`、Phase C〜G、およびPhase E途中branchです。今回の明示依頼によりPhase G branchとPhase F tagのpushは完了しました。PR更新、main統合、deploy、release、rights、rollbackは別gateであり、このpushから推論しません。
+GitHub上のremote branchは `main`、Phase C〜G、およびPhase E途中branchです。`git pull --ff-only` は `Already up to date` で、取り込むべきremote差分はありませんでした。Phase G branchとPhase F tagは以前の明示依頼でpush済みです。PR更新、main統合、deploy、release、rights、rollbackは別gateであり、同期完了から推論しません。
 
 ### 開発環境
 
@@ -46,9 +48,9 @@ GitHub上のremote branchは `main`、Phase C〜G、およびPhase E途中branch
 | dev server | PASS | Vite ready / `127.0.0.1:5173` |
 | QA URL HTTP | PASS | status 200 |
 | HTML entry | PASS | title一致、module entryあり |
-| server stop | PASS | smoke後に停止 |
+| server stop | PASS | smoke後に停止、5173番port解放 |
 
-`node_modules` は再インストール不要と判断しました。`npm ls` と実gateがすべて正常で、package manifest / lockにremote差分もないためです。
+`node_modules` は再インストール不要と判断しました。`npm ls` と実gateがすべて正常で、package manifest / lockにremote差分もないためです。smoke前に5173番ポートが未使用であることを確認し、この作業で起動したViteだけを停止、停止後に同portが解放されたことも確認しました。
 
 ### production build
 
@@ -98,7 +100,7 @@ Security Cell、機械audio、mission logic、固定map、探索viewのdynamic i
 
 ## 既存のPhase Gブラウザ証跡
 
-以下はPhase G実装commitを作成した2026-07-23の正本証跡です。今回の2026-07-24再開検証では再実施せず、コードが同じ `6df8ba0` であることと全自動gateを再確認しました。
+以下はPhase G実装commitを作成した2026-07-23の正本証跡です。今回の2026-07-25再開検証ではbrowser gameplayを再実施せず、現HEADが同じ実装commit `6df8ba0` の子孫で、以後の差分が引継ぎ文書だけであることと全自動gateを再確認しました。
 
 - V1 fixtureからV2へ移行し、契約、Porter、opened traversal、relay、evidence、revisionを維持
 - routineでneedle 1機、確認接触後の帰還でwatchfulへ移行
@@ -130,7 +132,7 @@ Security Cell、機械audio、mission logic、固定map、探索viewのdynamic i
 | 区分 | 判定 |
 | --- | --- |
 | must-fix before development restart | なし |
-| 今回verified | remote fetch、branch/tag/PR metadata、依存、型、151 tests、build、diff、HTTP entry、server stop |
+| 今回verified | remote fetch / ff-only pull、branch/tag/PR metadata、依存、型、151 tests、build、diff、HTTP entry、server stop / port解放 |
 | 既存証跡を再利用 | V1→V2 browser migration、3visit、敵cell分業、presence、grace、resource復帰 |
 | acceptable debt | Vite大chunk warning、Rapier既知warning、PR CI未設定、production device性能未計測 |
 | human-owned | watcher識別、chirp、lock/interference音量、圧力tempo、退避の自然さ |
@@ -148,6 +150,8 @@ Security Cell、機械audio、mission logic、固定map、探索viewのdynamic i
 | remote portability | `██████████ 100%` | Phase G branchとPhase F tagをpush済み、現branchとのparity 0 / 0 |
 | major vertical loop | `███████░░░ 約70%` | 編成、探索、分隊、機械生態系、継続世界、敵協調が成立 |
 | release readiness | `████░░░░░░ 約40%` | device matrix、accessibility、rights、CI/review、配布・rollback未完了 |
+
+長期の百分率は予定消化率ではなく、現在の証拠から見たgate充足度です。Phase H以降は承認済み計画ではなく、前段の観察結果で再評価する条件付き提案です。
 
 ## 推奨する次の開発目標
 
@@ -178,20 +182,23 @@ blockingがあればPhase Hへ進まずPhase Gを修正します。tuningなら�
 
 ## 条件付き長期ロードマップ
 
-| 段階 | 目標 | 完了条件 | 依存・停止条件 | 主担当 |
-| --- | --- | --- | --- | --- |
-| Gate G-A | Phase G感覚受入 | 5観点をaccepted / tuning / blocking分類 | blockingならG修正 | game design / UX |
-| G-Tune | 限定調整 | 観察根拠のある値・音・表示だけ変更し全gate維持 | architecture変更は別slice | gameplay tuning |
-| Phase H | 再訪判断の因果 | 選択が次visitの目的・経路・支援を変え、summaryとsaveが一致 | 1目的だけ | design + world state |
-| Phase I | 第2作者定義world | stable ID、safe anchor、contract、Security Cell、disposeを再利用 | Hの再訪動機accepted | content + projection |
-| Phase J | 中断耐性 | temporary visit snapshotをsettlementと分離し、二重精算なくresume / discard | visit時間が実測問題 | save + lifecycle |
-| Phase K | save compatibility hardening | V2 fixture corpus、backup/export、破損診断、必要時のみV3 migration | 具体的V3 field必須 | persistence |
-| Phase L | 制約付きvariation | semantic ID、reachability、safe anchorを守るseeded variation | 2つ以上の作者worldで抽象実証 | generation + QA |
-| Beta hardening | 実機品質 | cold/warm/revisit、frame、keyboard、pointer lock、audio、save recoveryに数値budget | major loop凍結 | performance / accessibility / QA |
-| Content / asset pass | 製品表現 | rights確認済みasset、GLB/glTF budget、collision proxy、audio mix | rights不明なら導入しない | art / tech art / owner |
-| Release candidate | 配布候補 | CI、human review、save互換、known issues、rollback、rights承認 | push/PR/merge別承認 | owner / reviewer / QA |
-| Launch gate | 外部配布判断 | 配布先、version、privacy、support、rollbackを明示承認 | 技術PASSから自動承認しない | owner only |
-| Post-launch | 継続運用 | crash/save破損triage、fixture、release note、rollback基準 | 公開された場合だけ | owner / maintenance |
+確度は3段階に分けます。Gate G-Aと必要時のG-Tuneは現在の必須近距離、Phase Hは受入後に1目的だけ承認する次距離、Phase I以降は依存条件が成立した場合だけ具体化する長距離です。後段を先に実装して前段の人間gateを迂回しません。
+
+| 確度 | 段階 | 目標 | プレイヤー / 製品への効果 | 完了条件 | 依存・停止条件 | 主担当 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 必須近距離 | Gate G-A | Phase G感覚受入 | 敵協調を理不尽さではなく読める判断へする | 5観点をaccepted / tuning / blocking分類 | blockingならG修正 | game design / UX |
+| 必須近距離 | G-Tune | 観察根拠のある限定調整 | 識別、chirp、圧力、退避の感覚gapを閉じる | 値・音・表示だけ変更し全gate維持 | architecture変更は別slice | gameplay tuning |
+| 次距離 | Phase H | 再訪判断の因果 | 選択が次visitの目的・経路・支援を変える | summary、save、次visit提示が同じ因果を示す | 1目的だけ、G-A accepted | design + world state |
+| 条件付き長距離 | Phase I | 第2作者定義world | 固定世界反復に幅を与え、既存抽象を実証する | stable ID、safe anchor、contract、Security Cell、disposeを再利用 | Hの再訪動機accepted | content + projection |
+| 条件付き長距離 | Phase J | 中断耐性 | 長いvisitを生活時間に合わせて安全に再開できる | temporary visit snapshotをsettlementと分離し、二重精算なくresume / discard | visit時間が実測問題 | save + lifecycle |
+| 条件付き長距離 | Phase K | save compatibility hardening | 継続プレイ資産を更新・破損から守る | V2 fixture corpus、backup/export、破損診断、必要時のみV3 migration | 具体的V3 field必須 | persistence |
+| 条件付き長距離 | Phase L | 制約付きvariation | 再訪に差異を作りつつ説明可能性を維持する | semantic ID、reachability、safe anchorを守るseeded variation | 2つ以上の作者worldで抽象実証 | generation + QA |
+| 製品化距離 | Beta hardening | 実機品質 | 対象端末で安定して遊べる | cold/warm/revisit、frame、keyboard、pointer lock、audio、save recoveryに数値budget | major loop凍結 | performance / accessibility / QA |
+| 製品化距離 | Content / asset pass | 製品表現 | primitive表現を権利確認済みの一貫した体験へ上げる | provenance、license、GLB/glTF budget、collision proxy、audio mixを承認 | rights不明なら導入しない | art / tech art / owner |
+| 配布距離 | Release candidate | 配布候補 | review可能で巻き戻せる候補を作る | CI、human review、save互換、known issues、rollback、rights承認 | push/PR/merge別承認 | owner / reviewer / QA |
+| 配布距離 | Launch gate | 外部配布判断 | 対象と責任範囲を明確にして公開する | 配布先、version、privacy、support、rollbackを明示承認 | 技術PASSから自動承認しない | owner only |
+| 運用距離 | Post-launch stabilization | 初回運用の安定化 | crash / save破損を早期検出し、既存プレイヤー資産を守る | triage SLA、fixture、release note、rollback基準、hotfix手順 | 公開された場合だけ | owner / maintenance |
+| 運用距離 | Evidence-led expansion | 次のcontent / system拡張判断 | 実際の遊ばれ方に基づき次の価値を選ぶ | human observation、support傾向、performance値から目的を1つ選定 | telemetry導入はprivacy承認がある場合だけ | owner / design / research |
 
 ### 停止条件
 
@@ -209,6 +216,7 @@ blockingがあればPhase Hへ進まずPhase Gを修正します。tuningなら�
 | --- | --- | --- | --- | --- | --- |
 | Phase G感覚評価 | 視覚・音・tempoを製品判断できる | ミュートなしdesktop、5観点メモ | 待ち | human game design / UX | Gate G-Aを1回実施 |
 | Phase H選定 | 次sliceを最大の実測gapへ集中する | Gate G-A結果、目的1文、受入、非対象、停止条件 | 未承認 | owner / supervising AI | 4候補から1つだけ承認 |
+| 2026-07-25 handoff docs | 次のAIへ最新の同期・検証値を渡す | 本報告、project context、idea ledger、root handoffの整合 | 4ファイル変更・未commit | current operator / owner | 内容review後、commit / pushは明示方針に従う |
 | Phase G remote portability | 別端末で同じHEADから再開する | branch/tag内容確認、明示push権限、push後parity | 完了・parity 0 / 0 | owner | 別端末でfetch後に同じbranchをcheckout |
 | draft PR #1 | Phase C〜Fをreview可能にする | human review、CI方針、merge/rollback | OPEN / DRAFT / mergeable | owner / reviewer | G-A後にPR維持・更新・分離を判断 |
 | CI | local gateをPRで再現する | typecheck/test/build workflow | 未設定 | repo owner | merge方針決定時に導入判断 |
