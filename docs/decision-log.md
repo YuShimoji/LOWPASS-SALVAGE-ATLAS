@@ -2,6 +2,12 @@
 
 この文書は確定済みの設計判断だけを記録します。検討中の案は `idea-ledger.md`、実装・検証の詳細は `README.md` に置きます。
 
+## 2026-07-24 — Phase G branchとPhase F保全tagをremote portabilityのためpushする
+
+- 決定: オーナーの明示依頼「ローカルをリモートに反映」に基づき、`feat/phase-g-security-cell` と `phase-f-world-persistence` tagをoriginへpushする
+- 理由: 別端末からPhase Gの同じ履歴とPhase F保全基準を取得して再開できるようにするため
+- 帰結: 現branchと `origin/feat/phase-g-security-cell` は0 / 0、tagも同一参照。PR更新、main統合、deploy、release、public acceptanceはこのpushから推論せず別gateとして残す
+
 ## 2026-07-23 — Phase Gを固定上限のSecurity Cellとして実装する
 
 - 決定: オーナーの明示実装指示により、Phase Gを監視針1機と観測機1機からなる固定上限の敵対セルへ限定する

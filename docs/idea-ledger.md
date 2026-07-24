@@ -61,3 +61,7 @@ remote同期と開発gate再検証では新しいtechnical blockerは見つか�
 | 実機hardening | load、frame、input、audioの端末差を閉じる | production readinessが上がる | gameplay前進が止まる | cold startやframeがblocking |
 
 第一候補は契約・証拠の因果深化です。ただしPhase Gの人間評価がblockingなら、どの分岐にも進まずPhase G closeoutを優先します。
+
+## 2026-07-24 remote portability
+
+オーナーの明示依頼により、`feat/phase-g-security-cell` branchと`phase-f-world-persistence` tagをoriginへpushしました。別端末から同じ実装・保全基準を取得できる状態になりました。これは履歴の共有gateを閉じただけであり、Phase Gのミュートなし人間受入、PR更新、main統合、deploy、releaseの承認を意味しません。

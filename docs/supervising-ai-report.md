@@ -4,11 +4,11 @@
 
 ## 監修結論
 
-`LOWPASS: SALVAGE ATLAS` は、ローカルbranch `feat/phase-g-security-cell` のPhase G実装commit `6df8ba0621baf8976fc56373863cf57565cc12ba` で開発再開可能です。2026-07-24にremoteを `git fetch --prune --tags origin` で再取得し、remote側にローカル未取込commitがないこと、依存整合、型検査、26ファイル151テスト、production build、diff check、開発URLのHTTP 200をライブ再確認しました。
+`LOWPASS: SALVAGE ATLAS` は、remoteにもpush済みの `feat/phase-g-security-cell` のPhase G実装commit `6df8ba0621baf8976fc56373863cf57565cc12ba` から開発再開可能です。2026-07-24にremoteを `git fetch --prune --tags origin` で再取得し、branch/tag push後のparity、依存整合、型検査、26ファイル151テスト、production build、diff check、開発URLのHTTP 200をライブ再確認しました。
 
-remoteにはPhase G branchとPhase F tagがまだ存在しません。同期・文書更新前のローカルPhase Gは `origin/feat/phase-f-world-persistence` を3commit分包含し、remote unique 0 / local unique 3でした。本報告のlocal commit後はremote unique 0 / local unique 4です。今回取り込むべき変更はなく、merge、rebase、branch切替、履歴書換えは不要でした。
+remoteにはPhase G branchとPhase F tagが存在します。push前のローカルPhase Gは `origin/feat/phase-f-world-persistence` を4commit分包含していました。push後、現branchと `origin/feat/phase-g-security-cell` はremote unique 0 / local unique 0で、今回もmerge、rebase、branch切替、履歴書換えは不要でした。
 
-技術的なrestart blockerはありません。ただし、Phase Gを製品としてacceptedとする前に、人間がミュートなしでwatcherの識別性、共有chirp、孤立時の圧力、援軍時のlock解除・退避を評価するGate G-Aが残っています。push、PR更新、main統合、deploy、releaseは今回の依頼範囲に含めず、実施していません。
+技術的なrestart blockerはありません。ただし、Phase Gを製品としてacceptedとする前に、人間がミュートなしでwatcherの識別性、共有chirp、孤立時の圧力、援軍時のlock解除・退避を評価するGate G-Aが残っています。今回の明示依頼でbranch/tag pushは実施済みですが、PR更新、main統合、deploy、releaseは実施していません。
 
 ## 今回ライブ確認した事実
 
@@ -21,16 +21,16 @@ remoteにはPhase G branchとPhase F tagがまだ存在しません。同期・�
 | default branch | `main` | GitHubとlocalで一致 |
 | local branch | `feat/phase-g-security-cell` | clean |
 | Phase G implementation | `6df8ba0621baf8976fc56373863cf57565cc12ba` | 現branchの実装基準 |
-| remote Phase G branch | なし | local-only |
+| remote Phase G branch | `origin/feat/phase-g-security-cell` | localと0 / 0 |
 | remote Phase F branch | `d25a9c04c277d5d4728904a11429f45413599a83` | remote最新 |
 | local vs remote Phase F | remote unique 0 / local unique 4 | 本報告commit込み、remote未取込なし |
 | local `main` vs `origin/main` | 0 / 0 | parity PASS |
-| remote Phase F tag | なし | local-only |
+| remote Phase F tag | `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a` | local tagと同一 |
 | local Phase F tag | `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a` | 保全済み |
 | draft PR #1 | OPEN / DRAFT / mergeable | Phase C〜Fのみ、Phase G未反映 |
 | PR #1 checks | 0件 | CI証跡なし |
 
-GitHub上のremote branchは `main` とPhase C〜F、およびPhase E途中branchです。Phase Gをremoteへ公開する場合は、現branchとPhase F tagのpushを別途オーナーが明示承認する必要があります。技術検証成功からpush許可を推論しません。
+GitHub上のremote branchは `main`、Phase C〜G、およびPhase E途中branchです。今回の明示依頼によりPhase G branchとPhase F tagのpushは完了しました。PR更新、main統合、deploy、release、rights、rollbackは別gateであり、このpushから推論しません。
 
 ### 開発環境
 
@@ -134,7 +134,7 @@ Security Cell、機械audio、mission logic、固定map、探索viewのdynamic i
 | 既存証跡を再利用 | V1→V2 browser migration、3visit、敵cell分業、presence、grace、resource復帰 |
 | acceptable debt | Vite大chunk warning、Rapier既知warning、PR CI未設定、production device性能未計測 |
 | human-owned | watcher識別、chirp、lock/interference音量、圧力tempo、退避の自然さ |
-| owner-only | Phase G/tag push、PR方針、merge、deploy、release、rights、rollback |
+| owner-only | PR方針、merge、deploy、release、rights、rollback |
 
 ## 完成度の目安
 
@@ -145,7 +145,7 @@ Security Cell、機械audio、mission logic、固定map、探索viewのdynamic i
 | Phase G technical slice | `██████████ 100%` | 実装、151 tests、build、browser証跡、save migration、resource復帰 |
 | Phase G product acceptance | `████████░░ 80%` | 技術gate済み、ミュートなし人間評価待ち |
 | development restart readiness | `██████████ 100%` | remote未取込0、clean、依存・自動gate・HTTP PASS |
-| remote portability | `██████░░░░ 60%` | Phase G branchとPhase F tagがlocal-only |
+| remote portability | `██████████ 100%` | Phase G branchとPhase F tagをpush済み、現branchとのparity 0 / 0 |
 | major vertical loop | `███████░░░ 約70%` | 編成、探索、分隊、機械生態系、継続世界、敵協調が成立 |
 | release readiness | `████░░░░░░ 約40%` | device matrix、accessibility、rights、CI/review、配布・rollback未完了 |
 
@@ -209,7 +209,7 @@ blockingがあればPhase Hへ進まずPhase Gを修正します。tuningなら�
 | --- | --- | --- | --- | --- | --- |
 | Phase G感覚評価 | 視覚・音・tempoを製品判断できる | ミュートなしdesktop、5観点メモ | 待ち | human game design / UX | Gate G-Aを1回実施 |
 | Phase H選定 | 次sliceを最大の実測gapへ集中する | Gate G-A結果、目的1文、受入、非対象、停止条件 | 未承認 | owner / supervising AI | 4候補から1つだけ承認 |
-| Phase G remote portability | 別端末で同じHEADから再開する | branch/tag内容確認、明示push権限、push後parity | local-only | owner | 承認時だけbranchとtagをpush |
+| Phase G remote portability | 別端末で同じHEADから再開する | branch/tag内容確認、明示push権限、push後parity | 完了・parity 0 / 0 | owner | 別端末でfetch後に同じbranchをcheckout |
 | draft PR #1 | Phase C〜Fをreview可能にする | human review、CI方針、merge/rollback | OPEN / DRAFT / mergeable | owner / reviewer | G-A後にPR維持・更新・分離を判断 |
 | CI | local gateをPRで再現する | typecheck/test/build workflow | 未設定 | repo owner | merge方針決定時に導入判断 |
 | device performance | chunk warningの実影響を判断する | cold/warm/revisit、frame、memoryの実機値 | 未計測・非ブロッキング | performance | 問題端末で計測 |
@@ -224,7 +224,7 @@ blockingがあればPhase Hへ進まずPhase Gを修正します。tuningなら�
 3. `git fetch --prune --tags origin` 後、remote Phase G branchの有無とdivergenceを再確認する。
 4. Phase G人間評価メモを探す。なければ音量、scan幅、距離、delayを最終調整しない。
 5. メモがあればGate G-Aを判定し、blockingならGだけを修正、acceptedならPhase Hを1目的だけ仕様化する。
-6. push、PR、merge、deploy、releaseはそれぞれ明示権限を確認する。
+6. 追加push、PR、merge、deploy、releaseはそれぞれ明示権限を確認する。今回のbranch/tag pushは完了済み。
 
 ## 監修役AIへの判断依頼
 
