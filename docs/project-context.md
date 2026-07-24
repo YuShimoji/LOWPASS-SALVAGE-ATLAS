@@ -64,7 +64,7 @@ Phase G implementation `6df8ba0` で型検査、26ファイル151テスト、pro
 ## Re-entry snapshot
 
 - 2026-07-24に `git fetch --prune --tags origin` を実施し、remote側の未取込commitが0であることを確認した
-- remote `main` はlocalと0 / 0、remote Phase Fは `d25a9c0`、現branchは本引継ぎcommit込みで4commit先行する
+- remote `main` はlocalと0 / 0、remote Phase Fは `d25a9c0`、現branchは本引継ぎcommit込みで5commit先行する。Phase F base branch自体はPR境界維持のため未変更
 - remoteにPhase G branchとPhase F tagが存在し、現branchとのparityは0 / 0。別端末から取得可能
 - Node `v24.13.0` / npm `11.6.2` で依存、型検査、151 tests、build、diff、HTTP smokeを再確認した
 - V1→V2 browser migrationと3visit resource計測は同じ `6df8ba0` の2026-07-23証跡を参照する

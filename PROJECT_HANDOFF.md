@@ -10,7 +10,7 @@
 - Phase G到達点: Security Cell、V2 migration、自動151 tests、実browser migration / 3visit / resource検証まで完了
 - 2026-07-24再開検証: remote fetch、GitHub metadata、依存、型、151 tests、build、diff、HTTP smokeを再確認してPASS
 - remote未取込: 0（現branchとorigin/feat/phase-g-security-cellが0 / 0）
-- local先行: `origin/feat/phase-f-world-persistence` に対して4commit（Phase G分岐の位置関係）
+- local先行: `origin/feat/phase-f-world-persistence` に対して5commit（Phase G分岐の位置関係、Phase F base branch自体は未変更）
 - remote Phase G branch: `origin/feat/phase-g-security-cell` としてpush済み
 - remote Phase F tag: `phase-f-world-persistence` としてpush済み
 - 次の必須gate: Phase Gミュートなし人間受入
@@ -24,7 +24,7 @@
 | ref | remote値 | localとの関係 |
 | --- | --- | --- |
 | `origin/main` | `c5ae3b9a168eb81c41886aab93699980be4c90df` | local `main` と0 / 0 |
-| `origin/feat/phase-f-world-persistence` | `d25a9c04c277d5d4728904a11429f45413599a83` | 現branchが4commit先行 |
+| `origin/feat/phase-f-world-persistence` | `d25a9c04c277d5d4728904a11429f45413599a83` | 現branchが5commit先行、base branchは未変更 |
 | `origin/feat/phase-g-security-cell` | 現branchと同一HEAD | parity 0 / 0 |
 | remote `phase-f-world-persistence` tag | `1e98860597ac940ff8d47505a5b00736d852c43a` | local tagと同一 |
 
