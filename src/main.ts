@@ -64,6 +64,9 @@ declare global {
         world: string;
         physics: ReturnType<PhysicsWorld["getDiagnostics"]> | null;
         render: ReturnType<RenderSystem["getDiagnostics"]> | null;
+        input: ReturnType<InputController["getDiagnostics"]> | null;
+        camera: ReturnType<RenderSystem["cameraRig"]["getDiagnostics"]> | null;
+        cart: ReturnType<MissionSessionController["getCartDiagnostics"]> | null;
         dom: DomDiagnostics;
         communicationRevision: number;
         threat: {
@@ -440,7 +443,15 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   try {
     renderSystem = new RenderSystem(root, (message) => simulation.setNotice(message), audioEnabled);
     physics = await PhysicsWorld.create();
-    input = new InputController(renderSystem.canvas, (x, y) => renderSystem?.applyLookDelta(x, y));
+    input = new InputController(renderSystem.canvas, {
+      onLook: (x, y) => renderSystem?.applyLookDelta(x, y),
+      onWheelZoom: (deltaY) => renderSystem?.applyWheelZoom(deltaY),
+      isWorldInputAllowed: () =>
+        state.runtime.mode === "playing"
+        && state.ui.activeModal === "none"
+        && !transitionInFlight,
+      getModalState: () => state.ui.activeModal,
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     hud.showFatal(`初期化に失敗しました: ${message}`);
@@ -516,6 +527,28 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       }
       if (target === "porter-carry") {
         runPorterCommand("carry-to");
+        return;
+      }
+      if ((target === "cart-coil" || target === "cart-extract") && missionController && physics) {
+        const cartPosition = target === "cart-coil"
+          ? { x: 0, y: 0.48, z: -0.6 }
+          : missionController.definition.extractionPoint;
+        missionController.setCartPoseForQa(cartPosition, target === "cart-coil" ? Math.PI : 0);
+        physics.setKinematicObjectPosition(missionController.state.cartId, cartPosition);
+        const operatorPosition = missionController.getCartOperatorPosition();
+        activeInput.clearMovement();
+        physics.teleportCharacter(operatorPosition);
+        simulation.teleportPlayer(operatorPosition);
+        squadController?.setAgentPositionForQa(
+          squadController.state.control.controlledAgentId,
+          operatorPosition,
+        );
+        refreshMissionInteractions();
+        simulation.setNotice(
+          target === "cart-coil"
+            ? "QA // CART STAGED FOR COIL LOAD"
+            : "QA // LOADED CART STAGED FOR EXTRACTION",
+        );
         return;
       }
       let position = SHIP_INTERACTIONS.find((interaction) => interaction.id === "expedition-console")?.position;
@@ -645,7 +678,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
           id: nextMissionController.state.cartId,
           position: nextMissionController.getCartPosition(),
           halfExtents: { x: 0.58, y: 0.45, z: 0.42 },
-          sensor: true,
+          sensor: false,
         }],
       });
       if (appDisposed) {
@@ -870,6 +903,12 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         action,
         squadController?.state.control.controlledAgentId ?? "player",
       );
+      if (action.type === "mission-cart-toggle" && missionController.state.cartAttached && physics) {
+        releaseWorldInput();
+        const operatorPosition = missionController.getCartOperatorPosition();
+        physics.teleportCharacter(operatorPosition);
+        simulation.teleportPlayer(operatorPosition);
+      }
       simulation.setNotice(resolution.notice);
       refreshMissionInteractions();
       if (resolution.result) {
@@ -904,21 +943,59 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     const frameSeconds = Math.min((now - previousTime) / 1000, 0.25);
     previousTime = now;
 
-    const commands = activeInput.consumeFrameCommands();
+    const commands = activeInput.consumeFrameCommands(frameSeconds);
     if (commands.pausePressed && state.ui.activeModal !== "mission-result") {
       setModal(state.ui.activeModal === "none" ? "settings" : "none");
     }
     if (commands.debugPressed) hud.toggleDebug();
+    if (commands.zoomDirection !== 0) {
+      activeRenderSystem.applyZoomInput(commands.zoomDirection, frameSeconds);
+    }
+    if (commands.cancelPressed) {
+      if (missionController?.state.cartAttached) {
+        const resolution = missionController.releaseCart();
+        simulation.setNotice(resolution.notice);
+        refreshMissionInteractions();
+      } else if (state.ui.activeModal !== "none" && state.ui.activeModal !== "mission-result") {
+        setModal("none");
+      }
+    }
 
     let droppedSimulationTime = false;
     const currentPhysics = physics;
     if (state.runtime.mode === "playing" && currentPhysics) {
       const result = fixedStep.advance(frameSeconds, (dt) => {
         const movement = activeInput.sampleMovement(activeRenderSystem.cameraRig.getYaw());
-        const physicsSnapshot = currentPhysics.stepCharacter(movement, dt);
+        const previousPlayerPosition = { ...state.player.position };
+        let cartPairPhysics: ReturnType<PhysicsWorld["stepCharacter"]> | null = null;
+        const cartStep = missionController?.state.cartAttached
+          ? missionController.stepCartControl(dt, movement, (request) => {
+              const resolved = currentPhysics.stepKinematicCartPair(
+                missionController!.state.cartId,
+                request.currentPosition,
+                request.currentFacingYaw,
+                request.desiredPosition,
+                request.desiredFacingYaw,
+                request.operatorOffset,
+                dt,
+              );
+              cartPairPhysics = resolved.player;
+              return {
+                position: resolved.cartPosition,
+                facingYaw: resolved.cartFacingYaw,
+                collisionBlocked: resolved.collisionBlocked,
+              };
+            })
+          : null;
+        const physicsSnapshot = cartPairPhysics ?? currentPhysics.stepCharacter(movement, dt);
         simulation.fixedUpdate(dt, movement, physicsSnapshot);
+        if (cartStep) state.player.facingYaw = cartStep.facingYaw;
+        activeInput.recordActualDisplacement(
+          physicsSnapshot.position.x - previousPlayerPosition.x,
+          physicsSnapshot.position.z - previousPlayerPosition.z,
+        );
         if (missionController) {
-          missionController.fixedUpdate(dt, state.player.position, state.player.facingYaw);
+          missionController.fixedUpdate(dt);
           squadController?.fixedUpdate(dt, state.player.position, state.runtime.elapsedSeconds, state.player.facingYaw);
           if (squadController && porterController) {
             porterController.fixedUpdate(
@@ -1047,6 +1124,9 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         droppedSimulationFrames: frameStats.droppedSimulationFrames,
         render: activeRenderSystem.getDiagnostics(),
         physics: physics?.getDiagnostics() ?? { rigidBodyCount: 0, colliderCount: 0, collisionCount: 0 },
+        input: activeInput.getDiagnostics(),
+        camera: activeRenderSystem.cameraRig.getDiagnostics(),
+        cart: missionController?.getCartDiagnostics() ?? null,
         expedition: planner.getEvaluation(),
         mission: missionController?.getObjectiveProgress() ?? null,
         worldContract: (() => {
@@ -1088,6 +1168,9 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       world: state.world.mode,
       physics: physics?.getDiagnostics() ?? null,
       render: renderSystem?.getDiagnostics() ?? null,
+      input: input?.getDiagnostics() ?? null,
+      camera: renderSystem?.cameraRig.getDiagnostics() ?? null,
+      cart: missionController?.getCartDiagnostics() ?? null,
       dom: measureDomDiagnostics(),
       communicationRevision: squadController?.state.communicationRevision ?? 0,
       threat: {
@@ -1230,6 +1313,8 @@ function createQaNavigation(
     ["relay-core-02", "QA リレーコア02"],
     ["relay-core-03", "QA リレーコア03"],
     ["cart", "QA カート"],
+    ["cart-coil", "QA CART→COIL"],
+    ["cart-extract", "QA CART→EXTRACT"],
     ["sales", "QA 売場"],
     ["cooling", "QA 冷却室"],
     ["underground", "QA 地下"],

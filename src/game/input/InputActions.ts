@@ -5,7 +5,10 @@ export type InputAction =
   | "move-right"
   | "sprint"
   | "interact"
+  | "cancel"
   | "pause"
+  | "zoom-in"
+  | "zoom-out"
   | "toggle-debug";
 
 export const KEY_BINDINGS = {
@@ -14,7 +17,9 @@ export const KEY_BINDINGS = {
   KeyS: "move-backward",
   ArrowDown: "move-backward",
   KeyA: "move-left",
+  ArrowLeft: "move-left",
   KeyD: "move-right",
+  ArrowRight: "move-right",
   ShiftLeft: "sprint",
   ShiftRight: "sprint",
   KeyE: "interact",
@@ -23,6 +28,8 @@ export const KEY_BINDINGS = {
 } as const satisfies Record<string, InputAction>;
 
 export interface MovementIntent {
+  rawX: number;
+  rawY: number;
   worldX: number;
   worldZ: number;
   sprint: boolean;
@@ -32,4 +39,6 @@ export interface MovementIntent {
 export interface FrameCommands {
   pausePressed: boolean;
   debugPressed: boolean;
+  cancelPressed: boolean;
+  zoomDirection: number;
 }

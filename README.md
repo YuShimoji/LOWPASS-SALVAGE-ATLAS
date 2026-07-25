@@ -27,15 +27,29 @@ npm run build
 - `WASD` / 矢印キー: 移動
 - `Shift`: 走る
 - ゲーム画面をクリック後、マウス移動: 三人称カメラ
-- `E`: 出撃コンソールやゲート試験物体を操作
+- マウスwheel: カメラ距離を2.3〜6.5 mで調整
+- `E`: 出撃コンソール、資源、カート、抽出を操作
 - `Escape`: 開いている編成・設定画面を閉じる
 - `F1`: デバッグHUD
+- 標準Gamepad: 左stick / D-pad移動、右stick視点、A操作、B取消・カート解放、L3走行、Start一時停止、LB / RB zoom
 
 編成画面はドラッグ＆ドロップを必須にせず、標準のチェックボックス、ラジオボタン、ボタンで操作できます。Tabでフォーカスを移動し、EnterまたはSpaceで選択・割当できます。画面を開いている間は移動、カメラ、ポインターロック入力が停止し、設定画面とは排他的に表示されます。
 
 探索では `E` で資源回収、カートの牽引・解放、工具短縮路、リレー再起動、搬送アンドロイド認証、抽出を操作します。右下の `SQUAD` パネルから `follow`、`hold`、`move-to`、`search-zone`、`rally`、操作対象切替、携帯リレー、フレアを操作できます。接触情報は操作中隊員が直接観測または受信した範囲だけを同じ折り畳みパネルに表示します。敵のロックオンと通信妨害、友好アンドロイドの命令と搬送対象は低干渉な状態表示へ投影されます。
 
-`?qa=1` を付けた開発URLでは、ブラウザ反復試験用の28U編成プリセット、位置移動、孤立・援軍・離脱、リレー状態、Porter認証・搬送の診断操作が追加されます。`&security-posture=routine` または `&security-posture=watchful` で、その訪問だけ警戒姿勢を強制できます。この指定は永続WorldStateを変更しません。`&audio=muted` を併用すると自動試験中はAudioContextを生成しません。通常の編成、インタラクション、ItemLocation、通信グラフ、抽出処理はQA表示でも迂回しません。
+`?qa=1` を付けた開発URLでは、ブラウザ反復試験用の28U編成プリセット、位置移動、孤立・援軍・離脱、リレー状態、Porter認証・搬送の診断操作が追加されます。`QA CART→COIL` と `QA CART→EXTRACT` は、実入力で前後進・旋回・衝突・解放を確認した後に、積載・抽出ライフサイクルだけを短時間で再現するステージングです。移動試験の代替にはしません。`&security-posture=routine` または `&security-posture=watchful` で、その訪問だけ警戒姿勢を強制できます。この指定は永続WorldStateを変更しません。`&audio=muted` を併用すると自動試験中はAudioContextを生成しません。通常の編成、インタラクション、ItemLocation、通信グラフ、抽出処理はQA表示でも迂回しません。
+
+## Phase G playability recovery（2026-07-26）
+
+Gate G-Aは感覚評価中に操作基準の支障が見つかったため、`GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` として一時停止しました。`fix/phase-g-playability-recovery` では、物理キーと論理actionを分離し、毎sample時にheld codeからactionを解決します。これにより、WとArrowUpなど同一actionのaliasを同時保持して片方を離しても残るキーが継続します。ArrowLeft / ArrowRightも正式mappingへ追加しました。F1診断はheld code、logical action、raw/world movement、focus、modal、pointer lock、実変位、active device、Gamepad接続、カメラ距離、カート状態を表示します。
+
+Gamepadはブラウザ標準APIを使い、deadzone 0.18、正規化stick、接続解除clearを同じaction境界へ統合しました。今回のQA環境では物理Gamepadが0台だったため、実機確認済みとは扱わずmock統合テストを証拠にします。Gamepadによる完全なDOM menu navigationは対象外で、探索、カート、Pause、modal cancelまでがcontroller対応範囲です。
+
+ThirdPersonCameraは希望距離を2.3〜6.5 mで保持し、wheelとLB / RBを同じzoom経路へ接続します。遮蔽による一時接近は実効距離だけを変え、希望距離を上書きしません。カートはプレイヤー前方追従から、handle後方にoperatorを拘束する決定論的kinematic pairへ変更しました。前進、低速後退、旋回、加減速、Rapier衝突制限、E / B解放、干渉時解放を独立cart-control modeで処理し、`ItemLocation`、積載、抽出の真実源は維持します。
+
+自動gateはtop-level依存整合、型検査、28ファイル176テスト、production build、`git diff --check` がPASSです。実ブラウザではW単独5秒、各WASD / 矢印、斜行、Shift走行、modal抑止と復帰、pointer lockなしの移動、wheel zoom、遮蔽、実入力カート前後進・旋回・解放、重量拒否、冷却コイル積載、partial抽出、帰還、コンソールerror 0件を確認しました。帰還後はRapier collider 12、scene object 60、GPU geometry 47、DOM 122、modal 0、FX 0へ復帰しました。
+
+この技術復旧はPhase Gの感覚受入ではありません。Security Cellの距離、共有delay、scan、音、文言は変更していません。次の状態は `GATE_G_A_RETEST_REQUIRED` であり、ミュートなしのGate G-Aを最初から再実施します。
 
 ## アーキテクチャ
 

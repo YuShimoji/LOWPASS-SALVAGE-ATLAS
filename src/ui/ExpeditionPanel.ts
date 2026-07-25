@@ -234,6 +234,7 @@ export class ExpeditionPanel {
   hide(): void {
     this.overlay.classList.remove("is-visible");
     this.overlay.setAttribute("aria-hidden", "true");
+    this.panel.replaceChildren();
   }
 
   private bindDraftEvents(): void {

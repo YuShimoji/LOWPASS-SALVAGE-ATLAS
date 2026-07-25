@@ -5,7 +5,7 @@ import { createExpeditionManifest, createGateEvaluationContext } from "./Expedit
 import { reserveExpeditionItems, settleExpeditionReservation } from "./ExpeditionReservation";
 import { createInitialExpeditionDraft } from "./expeditionTypes";
 import { FLOODED_MARKET_MISSION } from "./fixed/floodedMarket";
-import { MissionSessionController, missionItemId } from "./MissionSession";
+import { MissionSessionController, missionItemId, type CartMotionRequest } from "./MissionSession";
 
 const context = createGateEvaluationContext(CREW_DEFINITIONS, ITEM_DEFINITIONS, SHIP_INVENTORY);
 const manifest = createExpeditionManifest(createInitialExpeditionDraft(), context, {
@@ -43,13 +43,22 @@ describe("MissionSession", () => {
     expect(controller.state.itemLocations[coilId]).toEqual(groundBefore);
 
     controller.handleInteraction({ type: "mission-cart-toggle" });
-    controller.fixedUpdate(1 / 60, { x: 0, y: 0.93, z: -1.7 }, 0);
+    const cartLocation = controller.state.itemLocations[controller.state.cartId];
+    if (cartLocation?.kind !== "mission-ground") throw new Error("cart missing");
+    cartLocation.position.x = 0;
+    cartLocation.position.y = 0.48;
+    cartLocation.position.z = -0.6;
+    expect(controller.getInteractions().some((entry) => entry.action.type === "mission-cart-toggle")).toBe(false);
+    expect(controller.getInteractions().find((entry) =>
+      entry.action.type === "mission-item" && entry.action.itemInstanceId === coilId
+    )?.prompt).toContain("カートへ積載");
     controller.handleInteraction({ type: "mission-item", itemInstanceId: coilId });
     expect(controller.state.itemLocations[coilId]?.kind).toBe("cart");
+    expect(controller.getInteractions().some((entry) => entry.action.type === "mission-cart-toggle")).toBe(true);
 
-    for (let step = 0; step < 40; step += 1) {
-      controller.fixedUpdate(1 / 60, FLOODED_MARKET_MISSION.extractionPoint, 0);
-    }
+    controller.setCartPoseForQa(FLOODED_MARKET_MISSION.extractionPoint);
+    expect(controller.getInteractions().some((entry) => entry.action.type === "mission-cart-toggle")).toBe(false);
+    expect(controller.getInteractions().some((entry) => entry.action.type === "mission-extract")).toBe(true);
     const resolution = controller.handleInteraction({ type: "mission-extract" });
     expect(resolution.result?.outcome).toBe("complete");
     expect(resolution.result?.cartRecovered).toBe(false);
@@ -158,5 +167,62 @@ describe("MissionSession", () => {
     expect(Object.isFrozen(result?.alliedMachineOutcomes[0])).toBe(true);
     controller.state.alliedMachineOutcomes[0]?.assistedItemIds.slice();
     expect(result?.alliedMachineOutcomes[0]?.disposition).toBe("friendly-left-behind");
+  });
+
+  it("attaches from the handle side and drives a bounded push/reverse/turn model", () => {
+    const { controller } = createSession("cart-controls");
+    const cartInteraction = controller.getInteractions().find((entry) => entry.action.type === "mission-cart-toggle");
+    expect(cartInteraction?.prompt).toBe("E  カートを押す");
+    expect(cartInteraction?.position.z).toBeGreaterThan(controller.getCartPosition().z);
+    controller.handleInteraction({ type: "mission-cart-toggle" });
+    const unrestricted = (request: CartMotionRequest) => ({
+      position: request.desiredPosition,
+      facingYaw: request.desiredFacingYaw,
+      collisionBlocked: false,
+    });
+    const start = { ...controller.getCartPosition() };
+    for (let step = 0; step < 60; step += 1) {
+      controller.stepCartControl(1 / 60, { rawX: 0, rawY: 1 }, unrestricted);
+    }
+    const forward = { ...controller.getCartPosition() };
+    const forwardDistance = start.z - forward.z;
+    expect(forward.x).toBeCloseTo(start.x);
+    expect(forwardDistance).toBeGreaterThan(1);
+
+    controller.releaseCart();
+    controller.handleInteraction({ type: "mission-cart-toggle" });
+    for (let step = 0; step < 60; step += 1) {
+      controller.stepCartControl(1 / 60, { rawX: 0, rawY: -1 }, unrestricted);
+    }
+    const reversed = { ...controller.getCartPosition() };
+    expect(reversed.z).toBeGreaterThan(forward.z);
+    expect(reversed.z - forward.z).toBeLessThan(forwardDistance);
+
+    const yawBefore = controller.state.cartFacingYaw;
+    for (let step = 0; step < 30; step += 1) {
+      controller.stepCartControl(1 / 60, { rawX: -1, rawY: 0.5 }, unrestricted);
+    }
+    expect(controller.state.cartFacingYaw).toBeLessThan(yawBefore);
+    expect(Math.abs(controller.getCartPosition().x - start.x)).toBeLessThan(1);
+  });
+
+  it("stops on collision and releases on cancel-equivalent or interference", () => {
+    const { controller } = createSession("cart-release");
+    controller.handleInteraction({ type: "mission-cart-toggle" });
+    const before = { ...controller.getCartPosition() };
+    const blocked = controller.stepCartControl(1 / 60, { rawX: 0, rawY: 1 }, (request) => ({
+      position: request.currentPosition,
+      facingYaw: request.currentFacingYaw,
+      collisionBlocked: true,
+    }));
+    expect(blocked?.collisionBlocked).toBe(true);
+    expect(controller.getCartPosition()).toEqual(before);
+    expect(controller.state.cartSpeed).toBe(0);
+    expect(controller.releaseCart().notice).toBe("カートを離しました");
+    expect(controller.state.cartAttached).toBe(false);
+
+    controller.handleInteraction({ type: "mission-cart-toggle" });
+    controller.applyInterference("player", { x: 0, y: 0.93, z: 0 }, 1);
+    expect(controller.state.cartAttached).toBe(false);
   });
 });

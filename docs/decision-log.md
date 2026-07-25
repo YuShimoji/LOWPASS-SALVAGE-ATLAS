@@ -2,6 +2,18 @@
 
 この文書は確定済みの設計判断だけを記録します。検討中の案は `idea-ledger.md`、実装・検証の詳細は `README.md` に置きます。
 
+## 2026-07-26 — 感覚評価を停止し、playability baselineを先に復旧する
+
+- 決定: Gate G-Aを `GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` とし、Phase Gの感覚調整とPhase Hを停止してkeyboard、Gamepad、camera distance、push-cartを独立recovery branchで復旧する
+- 理由: 移動、視認、搬送が成立しない状態ではwatcher、chirp、圧力、退避の感覚評価が有効な製品判断にならないため
+- 帰結: recoveryのtechnical PASS後もPhase Gは未受入で、次は `GATE_G_A_RETEST_REQUIRED`。Security Cellの距離、共有delay、scan、音、文言、WorldState V2、migration、settlement、ItemLocation、敵知識、圧力予算は変更しない
+
+## 2026-07-26 — 入力とカートの真実源を明示する
+
+- 決定: keyboardはphysical code、Gamepadは標準API sample、cartはMissionSession stateとcollision-limited kinematic pairを真実源にし、logical action、Three表示、Rapier位置を投影として扱う
+- 理由: alias keyup、pointer lock拒否、camera-relative strafe、割合追従による操作不整合を、保存やSecurity Cell責務へ波及させず解消するため
+- 帰結: ItemLocation、資源積載、抽出契約は維持し、四輪dynamic body、振動、完全menu navigationは非対象とする
+
 ## 2026-07-24 — Phase G branchとPhase F保全tagをremote portabilityのためpushする
 
 - 決定: オーナーの明示依頼「ローカルをリモートに反映」に基づき、`feat/phase-g-security-cell` と `phase-f-world-persistence` tagをoriginへpushする

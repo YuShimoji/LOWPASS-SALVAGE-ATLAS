@@ -1,25 +1,43 @@
 # LOWPASS: SALVAGE ATLAS — 再開引き継ぎ
 
-更新日: 2026-07-25
+更新日: 2026-07-26
 
 ## 現在地
 
-- 現行branch: `feat/phase-g-security-cell`
-- 現HEAD: `71ae93cd43d9b64614404448b97ebf4bf12fe40e`
+- 現行branch: `fix/phase-g-playability-recovery`
+- 分岐元: `756e54b0e54a7b4b6fee7da2a0d5bed47f01a5a3`
+- playability recovery commit: 件名 `fix: restore playable movement camera and cart controls`。正確なIDはこの作業の最終報告と `git log -1` を参照
 - Phase G実装commit: `6df8ba0621baf8976fc56373863cf57565cc12ba`
 - Phase F保全tag: `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a`
-- Phase G到達点: Security Cell、V2 migration、自動151 tests、実browser migration / 3visit / resource検証まで完了
-- 2026-07-25再開検証: remote fetch / ff-only pull、GitHub metadata、依存、型、151 tests、build、diff、HTTP smoke、server停止 / port解放を再確認してPASS
-- remote未取込: 0（現branchとorigin/feat/phase-g-security-cellが0 / 0）
-- local先行: 現branchは `origin/feat/phase-f-world-persistence` に対して6commit、ローカルPhase F branch自体は2commit（remote未取込ではなく、Phase F後の引継ぎdocsとPhase G履歴）
+- Phase G到達点: Security Cellの技術実装は維持。感覚受入はplayability baselineで中断され、未受入
+- playability到達点: keyboard alias、Arrow左右、Gamepad API、wheel zoom、決定論的push-cart、F1診断、UI resource解放
+- 2026-07-26検証: 依存、型、28ファイル176テスト、build、diff、実ブラウザ移動・カート・積載・partial抽出・帰還・resource復帰をPASS
+- remote未取込: このfix branchはpushしていない。分岐元は `origin/feat/phase-g-security-cell` より1commit先
 - remote Phase G branch: `origin/feat/phase-g-security-cell` としてpush済み
 - remote Phase F tag: `phase-f-world-persistence` としてpush済み
-- 次の必須gate: Phase Gミュートなし人間受入
+- 次の必須gate: `GATE_G_A_RETEST_REQUIRED`。Phase Gミュートなし人間受入を最初から再実施
 - Phase G branch/tag push: 実施済み
 - PR更新、main統合、deploy、release: 未実施
-- worktree: 本引継ぎ更新のdocs 4件だけ変更・未commit。実装、manifest、lockfileの変更なし
+- Security Cellの距離、共有delay、scan、音、文言: 変更なし
+- Phase H: 未開始
+- worktree: recovery commit後cleanであることを最終確認する
 
-監修役AIは最初に [`docs/supervising-ai-report.md`](docs/supervising-ai-report.md) を読み、今回ライブ確認した事実、2026-07-23の既存browser証跡、人間所有の感覚評価、条件付きroadmapを分離してください。
+監修役AIは最初に [`docs/supervising-ai-report.md`](docs/supervising-ai-report.md) の2026-07-26節を読み、playability technical PASSとPhase G human acceptance未実施を分離してください。2026-07-25以前の節は履歴証拠です。
+
+## 2026-07-26 recoveryの再現
+
+```powershell
+npm ls --depth=0
+npm run typecheck
+npm test -- --run
+npm run build
+git diff --check
+npm run dev -- --host 127.0.0.1
+```
+
+QA URLは `http://127.0.0.1:5173/?qa=1&audio=muted` です。F1を開き、held codes、actions、raw/world movement、focus、modal、pointer lock、displacement、device、pads、camera、cartを確認します。実移動を先に確認し、積載・抽出の短縮だけ `QA CART→COIL` / `QA CART→EXTRACT` を使います。人間Gate G-Aでは `audio=muted` を外し、既存watchful手順を最初から実行してください。
+
+物理Gamepadは未接続でした。mock testはPASSですが、物理controllerの操作感と完全menu navigationは未受入です。
 
 ## remote状態
 

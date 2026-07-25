@@ -2,6 +2,12 @@
 
 ここは未採用方向、選定理由、負の例を失わないための台帳です。記載は実装承認ではありません。
 
+## 2026-07-26 playability recovery
+
+Gate G-Aは感覚評価の結論を出す前に `GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` で停止しました。入力、camera、cartの操作基準はlocal recovery branchで技術復旧しましたが、Phase Gは未受入です。次の近距離は `GATE_G_A_RETEST_REQUIRED` だけです。
+
+物理Gamepadの感覚と完全menu navigation、カートのより精密な四輪物理、入力設定の永続化は今回の非対象です。現時点で追加実装へ広げず、人間の再受入結果を待ちます。CGAW canaryは別repositoryの独立レーンであり、このゲームbranchへ本番assetを導入しません。
+
 ## 2026-07-23 direction shift
 
 オーナーの明示指示により、Phase Gは「固定上限の協調敵対Security Cell」に選定・実装されました。以前の第一候補「契約と証拠の深化」は棄却ではなく将来候補へ戻します。複数敵協調という語も無制限敵生成ではなく、needle 1 + watcher 1、routine/watchful、限定知識、予約、圧力上限という薄いスライスへ具体化しました。

@@ -50,7 +50,17 @@ export class SquadPanel {
 
   update(view: SquadPanelViewModel | null): void {
     this.root.hidden = view === null;
-    if (!view) return;
+    if (!view) {
+      this.expanded = false;
+      this.lastRevisionKey = "";
+      this.selectedZoneByAgent.clear();
+      this.root.classList.remove("has-threat", "is-expanded");
+      this.summary.setAttribute("aria-expanded", "false");
+      this.summary.replaceChildren();
+      this.details.hidden = true;
+      this.details.replaceChildren();
+      return;
+    }
     const { state } = view;
     const agents = Object.values(state.agents);
     const controlled = state.agents[state.control.controlledAgentId];

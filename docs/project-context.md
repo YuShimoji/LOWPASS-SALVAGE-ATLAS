@@ -1,6 +1,6 @@
 # Project Context
 
-更新日: 2026-07-25
+更新日: 2026-07-26
 
 ## North star
 
@@ -12,14 +12,15 @@
 | --- | --- |
 | 軸 | 状態所有、限定知識、プレイヤー判断の整合性 |
 | レーン | 固定世界を反復訪問する非致死的探索垂直スライス |
-| 完了スライス | Phase G: 協調する敵対機械Security Cell |
-| 作業ブランチ | `feat/phase-g-security-cell` |
+| 完了スライス | Phase G technical implementation。human sensory acceptanceは未完了 |
+| 作業ブランチ | `fix/phase-g-playability-recovery` |
 | Phase F保全 | tag `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a` |
 | Phase G分岐元 | `4e3cdc66d357e8054d45e0a42c4f41f166087b20` |
 | Phase G実装 | `6df8ba0621baf8976fc56373863cf57565cc12ba`、件名 `feat: coordinate hostile machine security cells` |
-| 現HEAD | `71ae93cd43d9b64614404448b97ebf4bf12fe40e`、`6df8ba0` 以後は引継ぎ文書だけ |
-| remote状態 | Phase G branchとPhase F tagをpush済み。現branchはorigin/feat/phase-g-security-cellと0 / 0、mainは0 / 0 |
-| 次のゲート | Phase Gミュートなし人間受入 → Phase H単一目的の承認 |
+| recovery分岐元 | `756e54b0e54a7b4b6fee7da2a0d5bed47f01a5a3` |
+| recovery実装 | 件名 `fix: restore playable movement camera and cart controls` |
+| remote状態 | fix branchはlocal-only。push、PR、merge、deploy未実施 |
+| 次のゲート | `GATE_G_A_RETEST_REQUIRED`。Phase Gミュートなし人間受入を最初から再実施 |
 | 受入の正本 | `README.md` のPhase G検証結果、`PROJECT_HANDOFF.md`、`docs/supervising-ai-report.md` |
 
 ## 現行アーキテクチャ
@@ -35,6 +36,15 @@
 - needleは再視認後のinterdict / sabotage、watcherはobserve / overwatchに限定する。共有していない情報や古い共有位置だけで攻撃しない
 - 表示、Rapier collider、味方A*、敵A*、通信は同じ保存・シミュレーション状態から順序付きで投影する
 - ミッション、探索view、Security Cell、機械audioはdynamic importし、帰還時にRapier world、Three object、geometry、material、DOM購読を破棄する
+- 入力はheld physical codeを真実源にし、logical actionを毎sample解決する。keyboardと標準Gamepad APIは同じaction境界へ統合する
+- カート操作中はMissionSessionのcart-control stateとPhysicsWorldのcollision-limited kinematic pairを使う。ItemLocation、資源積載、抽出は従来の真実源を維持する
+- ThirdPersonCameraはdesired distanceとocclusion後のeffective distanceを分離する
+
+## 2026-07-26 playability recovery
+
+Gate G-Aは `GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` で中断されました。確認した構造的欠陥は、ArrowLeft / ArrowRightの欠落と、aliasをlogical action単位のSetで保持していたため片方のkeyupが残る物理キーのactionを解除し得ることです。実機報告時のW不反応そのものを旧buildで再捕捉できていないため、推測で単一原因へ断定せず、F1診断と物理key stateへの変更で観測可能性と正しさを同時に回復しました。
+
+現在はWASD、矢印、alias混用、Shift、blur / visibility / modal / editable target clear、pointer lock拒否時のkeyboard移動、Gamepad標準mapping、wheel zoom、push-cart、積載・抽出、UI resource解放が自動・ブラウザ証拠を持ちます。Security Cellの状態所有、WorldState V2、migration、settlement、ItemLocation、敵知識、圧力予算と感覚調整値は変更していません。
 
 ## フェーズ履歴
 
@@ -60,7 +70,7 @@
 
 ## 現在の品質基準
 
-Phase G implementation `6df8ba0` で型検査、26ファイル151テスト、production build、トップレベル依存整合、diff checkを通すこと。2026-07-25にこれらと開発URLのHTTP 200、server停止 / port解放を再確認した。実ブラウザのV1→V2、routine→watchful、reload、2機上限、link断・復旧、役割分担、存在量5ケース、lock解除、grace、reset、3訪問後resource/DOM復帰は2026-07-23のREADME証跡を正本とする。感覚品質は自動PASSと混同せず、人間のミュートなし受入へ残す。
+Recovery branchで型検査、28ファイル176テスト、production build、トップレベル依存整合、diff checkを通すこと。実ブラウザでは単独・alias keyboard入力、zoom、push-cart、partial抽出、帰還、console error 0、Rapier / scene / GPU / DOM復帰を確認する。Security Cellの感覚品質はこのtechnical PASSと混同せず、人間のミュートなし受入へ残す。
 
 ## Re-entry snapshot
 

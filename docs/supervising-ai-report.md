@@ -1,6 +1,67 @@
 # 監修役AI向け現状報告
 
-更新日: 2026-07-25 JST
+更新日: 2026-07-26 JST
+
+## 2026-07-26 優先監修結論
+
+この節が現在の正本です。2026-07-25以前の同期・Phase G証跡は履歴として下に残します。
+
+Gate G-AはPASS、G-TUNE、FAILのどれにも分類していません。感覚評価中の実機報告により `GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` で停止し、`756e54b0e54a7b4b6fee7da2a0d5bed47f01a5a3` からlocal branch `fix/phase-g-playability-recovery` を作成しました。Phase H、Security Cell tuning、push、PR、merge、deployは実施していません。
+
+playability recoveryは技術的にPASSです。次の状態は `GATE_G_A_RETEST_REQUIRED` です。ミュートなしの人間評価を最初からやり直すまで、Phase Gをacceptedと記録しないでください。
+
+### 原因と修正
+
+- 旧入力はheld stateをlogical `InputAction`のSetで保持していたため、WとArrowUpのようなaliasを同時保持した後、片方のkeyupでforward全体を解除できました。ArrowLeft / ArrowRightもmappingから欠落していました。
+- 実機報告時のW単独不反応を旧buildで完全再捕捉できていないため、原因をaliasだけへ断定していません。held physical codes、resolved actions、raw/world movement、focus、modal、pointer lock、actual displacement、active device、connected padsをF1へ追加し、再発時に観測可能にしました。
+- 入力はphysical codeを保持し、毎sample時にlogical actionへ解決します。blur、visibility、modal、control switch、editable targetの境界でclearします。
+- 標準Gamepad APIをdeadzone 0.18、正規化stick、D-pad、A/B/L3/Start/LB/RBで統合しました。物理Gamepadは0台だったため、実機確認ではなくmock testのPASSです。完全なDOM menu navigationは未実装です。
+- カメラはdesired distance 2.3〜6.5 mをwheelとLB / RBで変更し、occlusionによるeffective distanceと分離しました。
+- カートは前方追従を廃止し、handle後方のoperatorとcartを固定60 Hzで解くcollision-limited kinematic pairへ変更しました。前進、低速後退、旋回、有界加減速、E/B解放、干渉時解放を提供します。
+- 帰還時は非表示の遠征・結果・分隊UIをclearし、イベント参照とDOMを船内基準へ戻します。
+
+### 自動検証
+
+| Gate | 結果 | 実測 |
+| --- | --- | --- |
+| `npm ls --depth=0` | PASS | 既存6 direct dependencies、manifest / lockfile変更なし |
+| `npm run typecheck` | PASS | TypeScript error 0 |
+| `npm test -- --run` | PASS | 28ファイル176テスト |
+| `npm run build` | PASS | Vite production build。既知の500 kB warningのみ |
+| `git diff --check` | PASS | whitespace error 0 |
+| protected system diff | PASS | Security Cell、threat、machine audio、manifest、lockfile変更なし |
+
+### 実ブラウザ検証
+
+`http://127.0.0.1:5173/?qa=1&audio=muted` で確認しました。
+
+- W単独5秒で0.909 m移動。短い同一pulse条件でW 0.161 m、A 0.212 m、S 0.373 m、D 0.161 m、ArrowUp 0.161 m、ArrowLeft 1.284 m、ArrowDown 0.424 m、ArrowRight 0.324 mを観測
+- W+D斜行0.702 m、walk pulse 0.212 m、Shift+W 0.597 m
+- W+ArrowUpの同時forwardを実ブラウザで観測。片方keyup後の継続は自動テストで全alias群を固定
+- Pause / expedition modal中はWとwheelがworldへ入らず、close後にWが復帰。pointer lockがFREEでもkeyboard移動
+- wheelはdesired 4.10→2.30→6.30 m。modal中は6.30 mを保持。cart中も4.10→2.90 m
+- 船内遮蔽でOCC YES、探索中OCC NOを観測し、desired distanceは遮蔽で変化しない
+- 実入力でcart attach、forward、reverse、left/right turn、releaseを確認。逆方向はforwardより低速で、横滑りではなくyawが変化
+- 重量超過拒否→`QA CART→COIL`で積載位置だけstage→Eで冷却コイル積載→`QA CART→EXTRACT`で抽出位置だけstage→PARTIAL→船内帰還。QA stageは実移動試験の代替にしていない
+- console error 0、unhandled rejection 0。各E操作の結果とresult modalは1回だけ発火
+- 帰還後: Rapier collider 12、scene object 60、GPU geometry 47 / texture 3 / program 4、DOM 122、HUD 69、modal 0、FX 0
+
+ブラウザQA中のlocal IndexedDB world visitは3まで進みました。Gitにはsave、生成物、秘密情報を含めません。これは人間Gate G-Aの受入結果ではありません。
+
+### 変更管理
+
+| contract | before | after | compatibility | migration / user impact |
+| --- | --- | --- | --- | --- |
+| keyboard held state | logical action単位Set | physical code保持→sample時action解決 | public key mappingを拡張 | save migrationなし。alias keyupのstuck/解除競合を解消 |
+| Gamepad input | 未実装 | 標準APIを既存actionへ統合 | keyboard経路を維持 | dependency追加なし。実機感覚は未評価 |
+| camera distance | 固定値とocclusion結果 | desired / effectiveを分離、wheel / LB / RB | 既存camera lookとocclusion維持 | saveしない。world / control switchで不要resetなし |
+| cart movement | player前方を割合追従 | handle後方operator + kinematic pair | ItemLocation / load / extraction維持 | 操作文言を「押す / 離す」へ統一 |
+| UI lifecycle | hidden DOMが内容とlistenerを保持 | hide時に子DOMを解放 | visible時に毎回再構築 | 帰還後resource counterを基準へ復帰 |
+| QA staging | player teleportのみ | cart-to-coil / cart-to-extractを追加 | `?qa=1`限定 | actual movementの検証後だけ使用 |
+
+### 残る人間判断
+
+ミュートなしdesktopでGate G-Aを最初から実施し、結果をPASS / G-TUNE / FAILのいずれかで返してください。物理Gamepadが利用できる場合は、左stick、右stick、A/B/L3/Start/LB/RBの操作感も別記してください。結果前に距離、共有delay、scan、音、文言を変更せず、Phase Hを開始しません。
 
 ## 監修結論
 

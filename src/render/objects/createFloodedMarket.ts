@@ -190,7 +190,7 @@ export function createFloodedMarket(
     const cartLocation = activeSession.itemLocations[activeSession.cartId];
     if (cartLocation?.kind === "mission-ground") {
       cart.position.set(cartLocation.position.x, cartLocation.position.y, cartLocation.position.z);
-      cart.rotation.y = Math.sin(elapsedSeconds * 0.7) * 0.015;
+      cart.rotation.y = activeSession.cartFacingYaw;
     }
     for (const [itemId, view] of resourceViews) {
       const location = activeSession.itemLocations[itemId];

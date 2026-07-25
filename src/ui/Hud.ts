@@ -4,12 +4,18 @@ import type { GameState, VisualSettings } from "../game/simulation/GameState";
 import type { ExpeditionGateEvaluation } from "../game/mission/gateEvaluator";
 import type { MissionObjectiveProgress } from "../game/mission/MissionSession";
 import type { DomDiagnostics } from "../diagnostics/DomDiagnostics";
+import type { InputDiagnostics } from "../game/input/InputController";
+import type { CameraDiagnostics } from "../render/app/ThirdPersonCamera";
+import type { CartDiagnostics } from "../game/mission/MissionSession";
 
 export interface HudDiagnostics {
   fps: number;
   droppedSimulationFrames: number;
   render: RenderDiagnostics;
   physics: PhysicsDiagnostics;
+  input: InputDiagnostics;
+  camera: CameraDiagnostics;
+  cart: CartDiagnostics | null;
   expedition: ExpeditionGateEvaluation;
   mission: MissionObjectiveProgress | null;
   worldContract: {
@@ -157,13 +163,20 @@ export class Hud {
 
     if (this.debugVisible) {
       const { player, runtime } = state;
-      const { render, physics } = diagnostics;
+      const { render, physics, input, camera, cart } = diagnostics;
       this.debug.textContent = [
         "PHASE G DIAGNOSTICS  [F1]",
         `WORLD ${state.world.mode.toUpperCase()}  RUNS ${state.world.completedExpeditions}`,
         `FPS ${diagnostics.fps.toFixed(0).padStart(3)}  FIXED 60Hz  TICK ${runtime.tick}`,
         `POS ${format(player.position.x)}  ${format(player.position.y)}  ${format(player.position.z)}`,
         `SPEED ${player.movementSpeed.toFixed(2)}m/s  GROUND ${player.grounded ? "YES" : "NO"}`,
+        `KEYS ${input.heldCodes.join(",") || "NONE"}  ACTIONS ${input.resolvedActions.join(",") || "NONE"}`,
+        `MOVE RAW ${format(input.rawX)}/${format(input.rawY)}  WORLD ${format(input.worldX)}/${format(input.worldZ)}  DISP ${format(input.actualDisplacementX)}/${format(input.actualDisplacementZ)}`,
+        `INPUT ${input.activeDevice.toUpperCase()}  FOCUS ${input.focusedElement}  MODAL ${input.modalState.toUpperCase()}  POINTER ${input.pointerLocked ? "LOCKED" : "FREE"}  PADS ${input.connectedGamepads.length}`,
+        `CAM DES ${camera.desiredDistance.toFixed(2)}m  EFF ${camera.effectiveDistance.toFixed(2)}m  OCC ${camera.occlusionActive ? "YES" : "NO"}`,
+        cart
+          ? `CART ${cart.attached ? "PUSH" : "FREE"}  POS ${format(cart.position.x)}/${format(cart.position.z)}  SPEED ${cart.speed.toFixed(2)}m/s  YAW ${cart.facingYaw.toFixed(2)}  BLOCK ${cart.collisionBlocked ? "YES" : "NO"}`
+          : "CART INACTIVE",
         `RAPIER BODY ${physics.rigidBodyCount}  COL ${physics.colliderCount}  CONTACT ${physics.collisionCount}`,
         `WEBGL ${render.drawCalls} calls  ${render.triangles} tris  ${render.renderWidth}×${render.renderHeight}`,
         `SCENE OBJECTS ${render.sceneObjects}`,

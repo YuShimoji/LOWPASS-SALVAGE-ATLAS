@@ -47,6 +47,7 @@ export class MissionResultPanel {
   hide(): void {
     this.overlay.classList.remove("is-visible");
     this.overlay.setAttribute("aria-hidden", "true");
+    this.panel.replaceChildren();
   }
 
   dispose(): void {

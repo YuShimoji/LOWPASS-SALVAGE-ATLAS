@@ -4,6 +4,7 @@ import { cloneItemLocationLedger, type ItemLocationLedger } from "../items/itemL
 import type { AlliedMachineOutcome } from "../machines/machineTypes";
 import type { CrewId } from "../squad/squadTypes";
 import { applyInterferencePulse, type InterferencePulseResult } from "../threat/InterferenceService";
+import type { MovementIntent } from "../input/InputActions";
 import type { ExpeditionManifest } from "./expeditionTypes";
 import type { FixedMissionDefinition, FixedSalvageSpawn } from "./fixedMissionTypes";
 
@@ -32,12 +33,53 @@ export interface MissionSessionState {
   readonly itemLocations: ItemLocationLedger;
   readonly cartId: string;
   cartAttached: boolean;
+  cartFacingYaw: number;
+  cartSpeed: number;
+  cartCollisionBlocked: boolean;
   heavyCarryRejections: number;
   eventRevision: number;
   lastEvent: string;
   result: FixedMissionResult | null;
   alliedMachineOutcomes: AlliedMachineOutcome[];
 }
+
+export interface CartMotionRequest {
+  readonly currentPosition: Vec3;
+  readonly currentFacingYaw: number;
+  readonly desiredPosition: Vec3;
+  readonly desiredFacingYaw: number;
+  readonly operatorOffset: number;
+}
+
+export interface CartMotionResolution {
+  readonly position: Vec3;
+  readonly facingYaw: number;
+  readonly collisionBlocked: boolean;
+}
+
+export interface CartControlStep {
+  readonly cartPosition: Vec3;
+  readonly playerPosition: Vec3;
+  readonly facingYaw: number;
+  readonly speed: number;
+  readonly collisionBlocked: boolean;
+}
+
+export interface CartDiagnostics {
+  readonly attached: boolean;
+  readonly position: Vec3;
+  readonly facingYaw: number;
+  readonly speed: number;
+  readonly collisionBlocked: boolean;
+}
+
+const CART_FORWARD_SPEED = 2.35;
+const CART_REVERSE_SPEED = 1.05;
+const CART_ACCELERATION = 7;
+const CART_DECELERATION = 3.6;
+const CART_TURN_RATE = 1.45;
+const CART_HANDLE_OFFSET = 0.72;
+export const CART_OPERATOR_OFFSET = 1.12;
 
 export interface MissionObjectiveProgress {
   readonly securedResources: number;
@@ -84,6 +126,9 @@ export class MissionSessionController {
       itemLocations,
       cartId,
       cartAttached: false,
+      cartFacingYaw: 0,
+      cartSpeed: 0,
+      cartCollisionBlocked: false,
       heavyCarryRejections: 0,
       eventRevision: 0,
       lastEvent: "降下完了。回収対象を確認してください",
@@ -92,35 +137,88 @@ export class MissionSessionController {
     };
   }
 
-  fixedUpdate(dt: number, playerPosition: Vec3, playerFacingYaw: number): void {
+  fixedUpdate(dt: number): void {
     this.assertActive();
     this.state.elapsedSeconds += dt;
-    if (!this.state.cartAttached) return;
+  }
+
+  stepCartControl(
+    dt: number,
+    input: Pick<MovementIntent, "rawX" | "rawY">,
+    limitMotion: (request: CartMotionRequest) => CartMotionResolution,
+  ): CartControlStep | null {
+    this.assertActive();
+    if (!this.state.cartAttached) return null;
     const cartLocation = this.state.itemLocations[this.state.cartId];
-    if (cartLocation?.kind !== "mission-ground") return;
-    const target = {
-      x: clamp(playerPosition.x + Math.sin(playerFacingYaw) * 1.15, -6.2, 6.2),
+    if (cartLocation?.kind !== "mission-ground") return null;
+
+    const targetSpeed = input.rawY >= 0
+      ? input.rawY * CART_FORWARD_SPEED
+      : input.rawY * CART_REVERSE_SPEED;
+    const acceleration = Math.abs(targetSpeed) > Math.abs(this.state.cartSpeed)
+      ? CART_ACCELERATION
+      : CART_DECELERATION;
+    this.state.cartSpeed = approach(this.state.cartSpeed, targetSpeed, acceleration * dt);
+    if (Math.abs(input.rawY) < 0.01 && Math.abs(this.state.cartSpeed) < 0.02) this.state.cartSpeed = 0;
+
+    const steeringScale = 0.42 + Math.min(1, Math.abs(this.state.cartSpeed) / CART_FORWARD_SPEED) * 0.58;
+    const desiredFacingYaw = normalizeYaw(
+      this.state.cartFacingYaw + input.rawX * CART_TURN_RATE * steeringScale * dt,
+    );
+    const desiredPosition = {
+      x: clamp(cartLocation.position.x - Math.sin(desiredFacingYaw) * this.state.cartSpeed * dt, -6.2, 6.2),
       y: this.definition.cart.initialPosition.y,
-      z: clamp(playerPosition.z + Math.cos(playerFacingYaw) * 1.15, -6.2, 6.2),
+      z: clamp(cartLocation.position.z - Math.cos(desiredFacingYaw) * this.state.cartSpeed * dt, -6.2, 6.2),
     };
-    cartLocation.position.x += (target.x - cartLocation.position.x) * 0.28;
-    cartLocation.position.y = target.y;
-    cartLocation.position.z += (target.z - cartLocation.position.z) * 0.28;
+    const requestedDistance = Math.hypot(
+      desiredPosition.x - cartLocation.position.x,
+      desiredPosition.z - cartLocation.position.z,
+    );
+    const resolved = limitMotion({
+      currentPosition: { ...cartLocation.position },
+      currentFacingYaw: this.state.cartFacingYaw,
+      desiredPosition,
+      desiredFacingYaw,
+      operatorOffset: CART_OPERATOR_OFFSET,
+    });
+    const actualDistance = Math.hypot(
+      resolved.position.x - cartLocation.position.x,
+      resolved.position.z - cartLocation.position.z,
+    );
+    cartLocation.position.x = resolved.position.x;
+    cartLocation.position.y = resolved.position.y;
+    cartLocation.position.z = resolved.position.z;
+    this.state.cartFacingYaw = resolved.facingYaw;
+    this.state.cartCollisionBlocked = resolved.collisionBlocked
+      || (requestedDistance > 0.001 && actualDistance < requestedDistance * 0.4);
+    if (this.state.cartCollisionBlocked) this.state.cartSpeed = 0;
+
+    return {
+      cartPosition: { ...cartLocation.position },
+      playerPosition: this.getCartOperatorPosition(),
+      facingYaw: this.state.cartFacingYaw,
+      speed: Math.abs(this.state.cartSpeed),
+      collisionBlocked: this.state.cartCollisionBlocked,
+    };
   }
 
   getInteractions(): readonly InteractionDefinition[] {
     if (this.state.phase !== "deployed") return [];
     const interactions: InteractionDefinition[] = [];
     const cartPosition = this.getCartPosition();
+    let cartLoadAvailable = false;
+    let cartHasLoad = false;
 
     for (const [itemId, resource] of this.resourceByInstanceId) {
       const location = this.state.itemLocations[itemId];
+      cartHasLoad ||= location?.kind === "cart";
       if (location?.kind !== "mission-ground") continue;
       const cartCanLoad =
         resource.carryMode === "cart-only" &&
         this.state.heavyCarryRejections > 0 &&
         this.state.cartAttached &&
         distanceSquared(location.position, cartPosition) <= 2.2 ** 2;
+      cartLoadAvailable ||= cartCanLoad;
       interactions.push({
         id: `salvage-${itemId}`,
         position: location.position,
@@ -131,14 +229,17 @@ export class MissionSessionController {
       });
     }
 
-    interactions.push({
-      id: `cart-${this.state.cartId}`,
-      position: cartPosition,
-      radius: 1.45,
-      prompt: this.state.cartAttached ? "E  カートを放す" : "E  カートを牽引する",
-      response: "現地カート操作",
-      action: { type: "mission-cart-toggle" },
-    });
+    const cartReadyForExtraction = cartHasLoad && this.isCartAtExtraction();
+    if (!cartLoadAvailable && !cartReadyForExtraction) {
+      interactions.push({
+        id: `cart-${this.state.cartId}`,
+        position: this.getCartHandlePosition(),
+        radius: 0.95,
+        prompt: this.state.cartAttached ? "E  カートを離す" : "E  カートを押す",
+        response: "現地カート操作",
+        action: { type: "mission-cart-toggle" },
+      });
+    }
     interactions.push({
       id: "mission-extraction",
       position: this.definition.extractionPoint,
@@ -154,11 +255,52 @@ export class MissionSessionController {
     this.assertActive();
     if (action.type === "mission-item") return this.handleItem(action.itemInstanceId, actorId);
     if (action.type === "mission-cart-toggle") {
-      this.state.cartAttached = !this.state.cartAttached;
-      return this.record(this.state.cartAttached ? "カートを牽引します" : "カートをその場に固定しました");
+      if (this.state.cartAttached) return this.releaseCart();
+      this.state.cartAttached = true;
+      this.state.cartSpeed = 0;
+      this.state.cartCollisionBlocked = false;
+      return this.record("カートを押します");
     }
     if (action.type === "mission-extract") return this.extract();
     return this.record("この操作は探索セッションでは使用できません");
+  }
+
+  releaseCart(notice = "カートを離しました"): MissionActionResolution {
+    this.state.cartAttached = false;
+    this.state.cartSpeed = 0;
+    this.state.cartCollisionBlocked = false;
+    return this.record(notice);
+  }
+
+  getCartOperatorPosition(): Vec3 {
+    const cartPosition = this.getCartPosition();
+    return {
+      x: cartPosition.x + Math.sin(this.state.cartFacingYaw) * CART_OPERATOR_OFFSET,
+      y: 0.93,
+      z: cartPosition.z + Math.cos(this.state.cartFacingYaw) * CART_OPERATOR_OFFSET,
+    };
+  }
+
+  setCartPoseForQa(position: Vec3, facingYaw = 0): void {
+    const cartLocation = this.state.itemLocations[this.state.cartId];
+    if (cartLocation?.kind !== "mission-ground") throw new Error("Mission cart is unavailable");
+    cartLocation.position.x = position.x;
+    cartLocation.position.y = position.y;
+    cartLocation.position.z = position.z;
+    this.state.cartAttached = true;
+    this.state.cartFacingYaw = facingYaw;
+    this.state.cartSpeed = 0;
+    this.state.cartCollisionBlocked = false;
+  }
+
+  getCartDiagnostics(): CartDiagnostics {
+    return {
+      attached: this.state.cartAttached,
+      position: { ...this.getCartPosition() },
+      facingYaw: this.state.cartFacingYaw,
+      speed: this.state.cartSpeed,
+      collisionBlocked: this.state.cartCollisionBlocked,
+    };
   }
 
   getObjectiveProgress(): MissionObjectiveProgress {
@@ -253,6 +395,8 @@ export class MissionSessionController {
       this.state.itemLocations,
     );
     this.state.cartAttached = false;
+    this.state.cartSpeed = 0;
+    this.state.cartCollisionBlocked = false;
     this.record(result.droppedItemId
       ? `INTERFERENCE // ${result.droppedItemId}を落としました`
       : "INTERFERENCE // 通信と操作が一時妨害されました");
@@ -269,6 +413,8 @@ export class MissionSessionController {
   dispose(): void {
     this.disposed = true;
     this.state.cartAttached = false;
+    this.state.cartSpeed = 0;
+    this.state.cartCollisionBlocked = false;
   }
 
   private handleItem(itemId: string, actorId: CrewId): MissionActionResolution {
@@ -313,6 +459,8 @@ export class MissionSessionController {
       };
     }
     this.state.cartAttached = false;
+    this.state.cartSpeed = 0;
+    this.state.cartCollisionBlocked = false;
     this.state.phase = "results";
     this.state.result = deepFreeze({
       missionId: this.definition.id,
@@ -346,6 +494,15 @@ export class MissionSessionController {
     return distanceSquared(this.getCartPosition(), this.definition.extractionPoint) <= this.definition.extractionRadius ** 2;
   }
 
+  private getCartHandlePosition(): Vec3 {
+    const cartPosition = this.getCartPosition();
+    return {
+      x: cartPosition.x + Math.sin(this.state.cartFacingYaw) * CART_HANDLE_OFFSET,
+      y: 0.93,
+      z: cartPosition.z + Math.cos(this.state.cartFacingYaw) * CART_HANDLE_OFFSET,
+    };
+  }
+
   private record(notice: string, result: FixedMissionResult | null = null): MissionActionResolution {
     this.state.lastEvent = notice;
     this.state.eventRevision += 1;
@@ -363,6 +520,16 @@ export function missionItemId(sessionId: string, sourceId: string): string {
 
 function clamp(value: number, minimum: number, maximum: number): number {
   return Math.max(minimum, Math.min(maximum, value));
+}
+
+function approach(current: number, target: number, maximumDelta: number): number {
+  if (current < target) return Math.min(target, current + maximumDelta);
+  if (current > target) return Math.max(target, current - maximumDelta);
+  return target;
+}
+
+function normalizeYaw(value: number): number {
+  return Math.atan2(Math.sin(value), Math.cos(value));
 }
 
 function deepFreeze<T>(value: T): T {

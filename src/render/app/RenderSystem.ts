@@ -96,6 +96,14 @@ export class RenderSystem {
     this.cameraRig.applyLookDelta(deltaX, deltaY);
   }
 
+  applyWheelZoom(deltaY: number): void {
+    this.cameraRig.applyWheelZoom(deltaY);
+  }
+
+  applyZoomInput(direction: number, frameSeconds: number): void {
+    this.cameraRig.applyZoomInput(direction, frameSeconds);
+  }
+
   enterMission(
     createView: (materials: Ps1MaterialFactory) => MissionWorldView,
     cameraStart?: { readonly playerPosition: { x: number; y: number; z: number }; readonly cameraPosition: { x: number; y: number; z: number } },

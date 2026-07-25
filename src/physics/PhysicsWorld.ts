@@ -22,6 +22,13 @@ export interface PhysicsWorldConfig {
   readonly kinematicObjects?: readonly KinematicObjectSpec[];
 }
 
+export interface KinematicCartPairStep {
+  readonly cartPosition: Vec3;
+  readonly cartFacingYaw: number;
+  readonly player: PhysicsSnapshot;
+  readonly collisionBlocked: boolean;
+}
+
 const DEFAULT_CONFIG: PhysicsWorldConfig = {
   colliders: SHIP_COLLIDERS,
   initialPlayerPosition: INITIAL_PLAYER_POSITION,
@@ -41,6 +48,7 @@ export class PhysicsWorld {
     private readonly characterController: RAPIER.KinematicCharacterController,
     private readonly colliderCount: number,
     private readonly kinematicBodies: ReadonlyMap<string, RAPIER.RigidBody>,
+    private readonly kinematicColliders: ReadonlyMap<string, RAPIER.Collider>,
     private readonly worldColliders: ReadonlyMap<string, RAPIER.Collider>,
   ) {}
 
@@ -81,6 +89,7 @@ export class PhysicsWorld {
     characterController.setMaxSlopeClimbAngle(Math.PI * 0.28);
 
     const kinematicBodies = new Map<string, RAPIER.RigidBody>();
+    const kinematicColliders = new Map<string, RAPIER.Collider>();
     for (const object of config.kinematicObjects ?? []) {
       const body = world.createRigidBody(
         RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(
@@ -89,7 +98,7 @@ export class PhysicsWorld {
           object.position.z,
         ),
       );
-      world.createCollider(
+      const collider = world.createCollider(
         RAPIER.ColliderDesc.cuboid(
           object.halfExtents.x,
           object.halfExtents.y,
@@ -98,6 +107,7 @@ export class PhysicsWorld {
         body,
       );
       kinematicBodies.set(object.id, body);
+      kinematicColliders.set(object.id, collider);
     }
 
     world.timestep = 1 / 60;
@@ -109,6 +119,7 @@ export class PhysicsWorld {
       characterController,
       config.colliders.length + 1 + kinematicBodies.size,
       kinematicBodies,
+      kinematicColliders,
       worldColliders,
     );
   }
@@ -143,6 +154,112 @@ export class PhysicsWorld {
       position: { x: updated.x, y: updated.y, z: updated.z },
       grounded: this.grounded,
       speed: Math.hypot(movement.x, movement.z) / dt,
+    };
+  }
+
+  stepKinematicCartPair(
+    id: string,
+    currentPosition: Vec3,
+    currentFacingYaw: number,
+    desiredPosition: Vec3,
+    desiredFacingYaw: number,
+    operatorOffset: number,
+    dt: number,
+  ): KinematicCartPairStep {
+    const body = this.kinematicBodies.get(id);
+    const collider = this.kinematicColliders.get(id);
+    if (!body || !collider) {
+      return {
+        cartPosition: { ...currentPosition },
+        cartFacingYaw: currentFacingYaw,
+        player: {
+          position: copyPosition(this.playerBody.translation()),
+          grounded: this.grounded,
+          speed: 0,
+        },
+        collisionBlocked: true,
+      };
+    }
+
+    const clearanceShape = new RAPIER.Cuboid(0.62, 0.38, 0.98);
+    const startCenter = cartPairCenter(currentPosition, currentFacingYaw);
+    const desiredCenter = cartPairCenter(desiredPosition, desiredFacingYaw);
+    const translation = {
+      x: desiredCenter.x - startCenter.x,
+      y: 0,
+      z: desiredCenter.z - startCenter.z,
+    };
+    const hit = this.world.castShape(
+      startCenter,
+      yawRotation(currentFacingYaw),
+      translation,
+      clearanceShape,
+      0.02,
+      1,
+      false,
+      RAPIER.QueryFilterFlags.EXCLUDE_SENSORS,
+      undefined,
+      collider,
+      body,
+      (candidate) =>
+        candidate.handle !== this.playerCollider.handle
+        && candidate.handle !== collider.handle,
+    );
+    const movementFraction = Math.max(0, Math.min(1, hit?.time_of_impact ?? 1));
+    const cartPosition = {
+      x: currentPosition.x + (desiredPosition.x - currentPosition.x) * movementFraction,
+      y: currentPosition.y,
+      z: currentPosition.z + (desiredPosition.z - currentPosition.z) * movementFraction,
+    };
+
+    let rotationBlocked = false;
+    this.world.intersectionsWithShape(
+      cartPairCenter(cartPosition, desiredFacingYaw),
+      yawRotation(desiredFacingYaw),
+      clearanceShape,
+      () => {
+        rotationBlocked = true;
+        return false;
+      },
+      RAPIER.QueryFilterFlags.EXCLUDE_SENSORS,
+      undefined,
+      collider,
+      body,
+      (candidate) =>
+        candidate.handle !== this.playerCollider.handle
+        && candidate.handle !== collider.handle,
+    );
+    const cartFacingYaw = rotationBlocked ? currentFacingYaw : desiredFacingYaw;
+    body.setNextKinematicTranslation(cartPosition);
+    body.setNextKinematicRotation(yawRotation(cartFacingYaw));
+    const playerPosition = {
+      x: cartPosition.x + Math.sin(cartFacingYaw) * operatorOffset,
+      y: 0.93,
+      z: cartPosition.z + Math.cos(cartFacingYaw) * operatorOffset,
+    };
+    const previousPlayer = copyPosition(this.playerBody.translation());
+    this.playerBody.setNextKinematicTranslation(playerPosition);
+    this.world.timestep = dt;
+    this.world.step();
+    const updatedPlayer = this.playerBody.translation();
+    const actualDistance = Math.hypot(
+      updatedPlayer.x - previousPlayer.x,
+      updatedPlayer.z - previousPlayer.z,
+    );
+    const collisionBlocked = movementFraction < 0.999 || rotationBlocked;
+    this.grounded = true;
+    this.verticalVelocity = 0;
+    this.collisionCount = collisionBlocked ? 1 : 0;
+
+    return {
+      cartPosition,
+      cartFacingYaw,
+      player: {
+        position: copyPosition(updatedPlayer),
+        grounded: true,
+        speed: dt > 0 ? actualDistance / dt : 0,
+      },
+      collisionBlocked,
     };
   }
 
@@ -199,4 +316,25 @@ export class PhysicsWorld {
   dispose(): void {
     this.world.free();
   }
+}
+
+function cartPairCenter(position: Vec3, facingYaw: number): Vec3 {
+  return {
+    x: position.x + Math.sin(facingYaw) * 0.52,
+    y: position.y + 0.12,
+    z: position.z + Math.cos(facingYaw) * 0.52,
+  };
+}
+
+function yawRotation(facingYaw: number): RAPIER.Rotation {
+  return {
+    x: 0,
+    y: Math.sin(facingYaw / 2),
+    z: 0,
+    w: Math.cos(facingYaw / 2),
+  };
+}
+
+function copyPosition(position: RAPIER.Vector): Vec3 {
+  return { x: position.x, y: position.y, z: position.z };
 }
