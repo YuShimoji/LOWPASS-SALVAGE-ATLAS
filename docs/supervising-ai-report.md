@@ -1,14 +1,42 @@
 # 監修役AI向け現状報告
 
-更新日: 2026-07-26 JST
+更新日: 2026-07-27 JST
 
-## 2026-07-26 優先監修結論
+## 2026-07-27 優先監修結論
 
-この節が現在の正本です。2026-07-25以前の同期・Phase G証跡は履歴として下に残します。
+この節が現在の正本です。2026-07-26以前のrecovery・Phase G証跡は履歴として下に残します。
 
-Gate G-AはPASS、G-TUNE、FAILのどれにも分類していません。感覚評価中の実機報告により `GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` で停止し、`756e54b0e54a7b4b6fee7da2a0d5bed47f01a5a3` からlocal branch `fix/phase-g-playability-recovery` を作成しました。Phase H、Security Cell tuning、push、PR、merge、deployは実施していません。
+Gate G-AはPASS、G-TUNE、FAILのどれにも分類していません。playability recoveryの技術基準は `fix/phase-g-playability-recovery` の `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90` で、同名upstreamへ取得可能です。2026-07-27のfetch時にlocal HEADと `origin/fix/phase-g-playability-recovery` は0 / 0、remoteから取り込むcommitはありませんでした。recovery branchのremote portabilityは成立していますが、PR更新、main統合、deploy、release、人間受入を意味しません。
 
-playability recoveryは技術的にPASSです。次の状態は `GATE_G_A_RETEST_REQUIRED` です。ミュートなしの人間評価を最初からやり直すまで、Phase Gをacceptedと記録しないでください。
+playability recoveryは技術的にPASSです。次の状態は `GATE_G_A_RETEST_REQUIRED` です。ミュートなしの人間評価を最初からやり直すまで、Phase Gをacceptedと記録せず、距離、共有delay、scan、音、文言を変更せず、Phase Hを開始しないでください。
+
+### 2026-07-27同期・開発可能性
+
+| 項目 | ライブ確認値 | 判定 |
+| --- | --- | --- |
+| branch / upstream | `fix/phase-g-playability-recovery` / `origin/fix/phase-g-playability-recovery` | 一致 |
+| fetch時HEAD / upstream | `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90` / 同一 | 0 / 0 |
+| fetch | `git fetch --prune --tags origin` | PASS。取り込み対象0件、pull不要 |
+| 事前worktree | staged 0、unstaged 0、untracked 0、進行中Git operation 0 | 安全 |
+| game / manifest / lockfile | 差分0 | 保全 |
+| `npm ls --depth=0` | direct dependencies整合 | PASS |
+| `npm run typecheck` | TypeScript error 0 | PASS |
+| `npm test -- --run` | 28 files / 176 tests | PASS |
+| `npm run build` | Vite 8.1.5 / 69 modules | PASS。既知のlarge chunk warningのみ |
+| `git diff --check` | whitespace error 0 | PASS |
+| browser runtime | scene描画、fixed 60 Hz、console error 0 | PASS。既知のRapier warningのみ |
+
+現branchは `origin/feat/phase-g-security-cell` より2commit、`origin/main` より16commit先です。この差はPhase G後の引継ぎとplayability recoveryであり、main統合済みという意味ではありません。remote CIはなく、physical Gamepad、ミュートなしGate G-A、rights、PR review、main integration、deployment、releaseは未検証または未承認です。
+
+portableな成果はtracked source、lockfile、正本文書、remote branchです。`node_modules`、build後の`dist`、`.serena`、browser IndexedDB、実行中Vite processはignoredまたは端末ローカルで、remote再開証拠に含めません。ユーザー起動中のplain `npm run dev` は今回 `[::1]:5173` だけをlistenしていたため、`127.0.0.1` ではなく `http://localhost:5173/?qa=1&security-posture=watchful` で正常sceneを確認しました。再現可能な標準起動は `npm run dev -- --host 127.0.0.1` です。ゲームコードとVite設定は変更していません。
+
+現在の唯一の製品判断bottleneckはGate G-Aです。次の具体手は、コードを変更せず、desktop・音あり・watchfulでwatcher識別、共有chirp、孤立圧力、援軍によるlock解除、cautious / outnumbered / disengageを人間が1回評価し、`PASS` / `G-TUNE` / `FAIL` のどれかを返すことです。
+
+## 2026-07-26 playability recovery証跡（履歴）
+
+Gate G-Aは感覚評価中の実機報告により `GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` で停止し、`756e54b0e54a7b4b6fee7da2a0d5bed47f01a5a3` からlocal branch `fix/phase-g-playability-recovery` を作成しました。この時点ではPhase H、Security Cell tuning、push、PR、merge、deployを実施していませんでした。
+
+playability recoveryは技術的にPASSです。次の状態を `GATE_G_A_RETEST_REQUIRED` としました。
 
 ### 原因と修正
 
@@ -63,7 +91,7 @@ playability recoveryは技術的にPASSです。次の状態は `GATE_G_A_RETEST
 
 ミュートなしdesktopでGate G-Aを最初から実施し、結果をPASS / G-TUNE / FAILのいずれかで返してください。物理Gamepadが利用できる場合は、左stick、右stick、A/B/L3/Start/LB/RBの操作感も別記してください。結果前に距離、共有delay、scan、音、文言を変更せず、Phase Hを開始しません。
 
-## 監修結論
+## 2026-07-25同期結論（履歴）
 
 `LOWPASS: SALVAGE ATLAS` は、remoteにもpush済みの `feat/phase-g-security-cell` の現HEAD `71ae93cd43d9b64614404448b97ebf4bf12fe40e` から開発再開可能です。Phase G実装基準は祖先commit `6df8ba0621baf8976fc56373863cf57565cc12ba` です。2026-07-25に `git fetch --prune --tags origin` と `git pull --ff-only --prune origin feat/phase-g-security-cell` を実施し、pull結果が `Already up to date`、現branchとupstreamが0 / 0であることを確認しました。その後、依存整合、型検査、26ファイル151テスト、production build、diff check、開発URLのHTTP 200、smoke用server停止までライブ再確認しました。
 
@@ -193,7 +221,7 @@ Security Cell、機械audio、mission logic、固定map、探索viewのdynamic i
 | 区分 | 判定 |
 | --- | --- |
 | must-fix before development restart | なし |
-| 今回verified | remote fetch / ff-only pull、branch/tag/PR metadata、依存、型、151 tests、build、diff、HTTP entry、server stop / port解放 |
+| 今回verified | remote fetch、同名upstream parity、clean / Git operation、依存、型、176 tests、build、diff、browser scene / 60 Hz / console |
 | 既存証跡を再利用 | V1→V2 browser migration、3visit、敵cell分業、presence、grace、resource復帰 |
 | acceptable debt | Vite大chunk warning、Rapier既知warning、PR CI未設定、production device性能未計測 |
 | human-owned | watcher識別、chirp、lock/interference音量、圧力tempo、退避の自然さ |
@@ -205,10 +233,10 @@ Security Cell、機械audio、mission logic、固定map、探索viewのdynamic i
 
 | 対象 | 目安 | 根拠 |
 | --- | --- | --- |
-| Phase G technical slice | `██████████ 100%` | 実装、151 tests、build、browser証跡、save migration、resource復帰 |
+| Phase G technical slice | `██████████ 100%` | 実装、176 tests、build、browser証跡、save migration、resource復帰 |
 | Phase G product acceptance | `████████░░ 80%` | 技術gate済み、ミュートなし人間評価待ち |
-| development restart readiness | `██████████ 100%` | remote未取込0、clean、依存・自動gate・HTTP PASS |
-| remote portability | `██████████ 100%` | Phase G branchとPhase F tagをpush済み、現branchとのparity 0 / 0 |
+| development restart readiness | `██████████ 100%` | recovery upstream未取込0、clean、依存・自動gate・browser runtime PASS |
+| remote portability | `██████████ 100%` | recovery branch、Phase G branch、Phase F tagをremote取得可能。同名recovery upstreamと0 / 0 |
 | major vertical loop | `███████░░░ 約70%` | 編成、探索、分隊、機械生態系、継続世界、敵協調が成立 |
 | release readiness | `████░░░░░░ 約40%` | device matrix、accessibility、rights、CI/review、配布・rollback未完了 |
 
@@ -277,8 +305,7 @@ blockingがあればPhase Hへ進まずPhase Gを修正します。tuningなら�
 | --- | --- | --- | --- | --- | --- |
 | Phase G感覚評価 | 視覚・音・tempoを製品判断できる | ミュートなしdesktop、5観点メモ | 待ち | human game design / UX | Gate G-Aを1回実施 |
 | Phase H選定 | 次sliceを最大の実測gapへ集中する | Gate G-A結果、目的1文、受入、非対象、停止条件 | 未承認 | owner / supervising AI | 4候補から1つだけ承認 |
-| 2026-07-25 handoff docs | 次のAIへ最新の同期・検証値を渡す | 本報告、project context、idea ledger、root handoffの整合 | 4ファイル変更・未commit | current operator / owner | 内容review後、commit / pushは明示方針に従う |
-| Phase G remote portability | 別端末で同じHEADから再開する | branch/tag内容確認、明示push権限、push後parity | 完了・parity 0 / 0 | owner | 別端末でfetch後に同じbranchをcheckout |
+| recovery remote portability | 別端末で操作復旧済み基準から再開する | 同名branch、fetch/readback、push後parity | 実装branchはremote取得可能。handoff更新は本作業で同期 | current operator | docsだけcommit / normal push後に0 / 0をreadback |
 | draft PR #1 | Phase C〜Fをreview可能にする | human review、CI方針、merge/rollback | OPEN / DRAFT / mergeable | owner / reviewer | G-A後にPR維持・更新・分離を判断 |
 | CI | local gateをPRで再現する | typecheck/test/build workflow | 未設定 | repo owner | merge方針決定時に導入判断 |
 | device performance | chunk warningの実影響を判断する | cold/warm/revisit、frame、memoryの実機値 | 未計測・非ブロッキング | performance | 問題端末で計測 |
@@ -289,8 +316,8 @@ blockingがあればPhase Hへ進まずPhase Gを修正します。tuningなら�
 ## 次のAIが最初に行うこと
 
 1. `PROJECT_HANDOFF.md`、本文書、`docs/project-context.md`、READMEのPhase G節を読む。
-2. `git status -sb`、`git rev-parse HEAD`、Phase F tag参照先を確認する。
-3. `git fetch --prune --tags origin` 後、remote Phase G branchの有無とdivergenceを再確認する。
+2. `git status -sb`、`git rev-parse HEAD`、同名recovery upstream、Phase F tag参照先を確認する。
+3. `git fetch --prune --tags origin` 後、`HEAD...origin/fix/phase-g-playability-recovery` のdivergenceを再確認する。
 4. Phase G人間評価メモを探す。なければ音量、scan幅、距離、delayを最終調整しない。
 5. メモがあればGate G-Aを判定し、blockingならGだけを修正、acceptedならPhase Hを1目的だけ仕様化する。
 6. 追加push、PR、merge、deploy、releaseはそれぞれ明示権限を確認する。今回のbranch/tag pushは完了済み。

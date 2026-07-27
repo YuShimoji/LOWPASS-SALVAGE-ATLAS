@@ -1,6 +1,6 @@
 # Project Context
 
-更新日: 2026-07-26
+更新日: 2026-07-27
 
 ## North star
 
@@ -18,8 +18,8 @@
 | Phase G分岐元 | `4e3cdc66d357e8054d45e0a42c4f41f166087b20` |
 | Phase G実装 | `6df8ba0621baf8976fc56373863cf57565cc12ba`、件名 `feat: coordinate hostile machine security cells` |
 | recovery分岐元 | `756e54b0e54a7b4b6fee7da2a0d5bed47f01a5a3` |
-| recovery実装 | 件名 `fix: restore playable movement camera and cart controls` |
-| remote状態 | fix branchはlocal-only。push、PR、merge、deploy未実施 |
+| recovery実装 | `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`、件名 `fix: restore playable movement camera and cart controls` |
+| remote状態 | `origin/fix/phase-g-playability-recovery` と0 / 0。PR、merge、deploy、release未実施 |
 | 次のゲート | `GATE_G_A_RETEST_REQUIRED`。Phase Gミュートなし人間受入を最初から再実施 |
 | 受入の正本 | `README.md` のPhase G検証結果、`PROJECT_HANDOFF.md`、`docs/supervising-ai-report.md` |
 
@@ -74,14 +74,14 @@ Recovery branchで型検査、28ファイル176テスト、production build、�
 
 ## Re-entry snapshot
 
-- 2026-07-25に `git fetch --prune --tags origin` と `git pull --ff-only --prune origin feat/phase-g-security-cell` を実施し、`Already up to date` とremote側の未取込commit 0を確認した
-- remote `main` はlocalと0 / 0、remote Phase Fは `d25a9c0`。現branchはremote Phase Fより6commit先、local Phase F branch自体は2commit先で、いずれもremote未取込ではなくPhase F後のdocs / Phase G履歴である
-- remoteにPhase G branchとPhase F tagが存在し、現branchとのparityは0 / 0。別端末から取得可能
-- Node `v24.13.0` / npm `11.6.2` で依存、型検査、151 tests、build、diff、HTTP smoke、server停止 / port解放を再確認した
-- V1→V2 browser migrationと3visit resource計測は同じ `6df8ba0` の2026-07-23証跡を参照する
-- 実ブラウザ後はworld reset済みのV2 routineを基準とし、保存fixtureやQA artifactをrepositoryへ残さない
+- 2026-07-27に `git fetch --prune --tags origin` を実施した。現branch `fix/phase-g-playability-recovery` のHEADとupstreamはともに `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`、ahead / behindは0 / 0で、取り込むremote commitがないためpullは不要だった
+- fetch前のworktreeはcleanで、staged / unstaged / untrackedは0件、進行中のmerge / rebase / cherry-pick等もなかった。ゲーム実装、manifest、lockfile、保持中のreview成果物に差分はない
+- 現branchは `origin/feat/phase-g-security-cell` より2commit先、`origin/main` より16commit先である。これは現在のrecovery履歴であり、main統合やPhase G受入を意味しない
+- Node `v24.13.0` / npm `11.6.2` で `npm ls --depth=0`、型検査、28ファイル176テスト、production build、`git diff --check` を再確認した
+- 同一HEADを既存Vite serverで `http://localhost:5173/?qa=1&security-posture=watchful` から開き、scene描画、固定60 Hz、console error 0を確認した。既知のRapier警告だけが残る
+- Windows上のplain `npm run dev` は今回 `[::1]:5173` にbindし、`127.0.0.1` では接続できなかった。再現可能な正規コマンドは `npm run dev -- --host 127.0.0.1` とする。これは端末の名前解決・listener境界で、ゲーム描画障害ではない
+- portableな状態はtracked source、lockfile、正本文書、remote branchである。`node_modules`、`dist`、`.serena`、IndexedDB、実行中Vite processはignoredまたは端末ローカルで、commit対象・remote証拠にしない
+- V1→V2 browser migrationと3visit resource計測は同じ `6df8ba0` の2026-07-23証跡を参照する。物理GamepadとミュートなしGate G-Aは未検証のまま
 - Vite大容量warningとRapier初期化warningは既知・非ブロッキング。警告隠しは行わない
-- draft PR #1は2026-07-25時点でOPEN / DRAFT / mergeable、Phase C〜Fのみでchecksは0件
-- Phase G branchとPhase F tagのpushは実施済み。PR更新、merge、deploy、releaseは未実施でオーナー所有
-- worktreeは本再開引継ぎの4文書だけ変更・未commitで、ゲーム実装、manifest、lockfileに変更はない
-- 最短コマンド、残作業のpurpose/effect/requirements/state/owner/nextはルート `PROJECT_HANDOFF.md` を参照する
+- PR更新、main統合、deploy、release、rights判断は未実施でオーナー所有。現在のbottleneckは `GATE_G_A_RETEST_REQUIRED` だけで、次の具体手はコードを変えずミュートなし人間評価を最初から1回行うこと
+- 最短コマンド、残作業のpurpose / effect / requirements / state / owner / nextはルート `PROJECT_HANDOFF.md` を参照する
