@@ -30,6 +30,9 @@ export interface RenderDiagnostics {
   geometries: number;
   textures: number;
   programs: number;
+  assetPackMode: "primitive" | "canary-v1";
+  assetPackHash: string | null;
+  assetLoadDurationMs: number;
 }
 
 export class RenderSystem {
@@ -173,6 +176,9 @@ export class RenderSystem {
       geometries: this.renderer.info.memory.geometries,
       textures: this.renderer.info.memory.textures,
       programs: this.renderer.info.programs?.length ?? 0,
+      assetPackMode: this.missionView?.assetPackReadback.mode ?? "primitive",
+      assetPackHash: this.missionView?.assetPackReadback.exactHash ?? null,
+      assetLoadDurationMs: this.missionView?.assetPackReadback.loadDurationMs ?? 0,
     };
   }
 

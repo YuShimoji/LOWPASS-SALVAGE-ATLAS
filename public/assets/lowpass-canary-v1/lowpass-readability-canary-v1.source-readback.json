@@ -1,0 +1,87 @@
+{
+  "assetPackId": "lowpass-readability-canary-v1",
+  "blender": {
+    "commandOnPath": false,
+    "headlessExport": "NOT_TESTED_BLENDER_UNAVAILABLE",
+    "pythonScripting": "NOT_TESTED_BLENDER_UNAVAILABLE"
+  },
+  "checks": {
+    "collisionProxyIdsResolved": true,
+    "disposeSmoke": true,
+    "externalNetworkDependency": false,
+    "finiteTransformsAndBounds": true,
+    "gltfLoaderParse": true,
+    "invalidDefinitionStructuredError": true,
+    "invalidRecipeStructuredError": true,
+    "jsonSchema": true,
+    "localDisclosureAbsent": true,
+    "materialBudget": true,
+    "sameRecipeSeedSameGlb": true,
+    "sameRecipeSeedSameManifest": true,
+    "socketIdsResolved": true,
+    "stableNodeIdsPreserved": true,
+    "textureBudget": true,
+    "triangleBudget": true
+  },
+  "counts": {
+    "anchors": 9,
+    "assets": 5,
+    "collisionProxies": 5,
+    "materials": 10,
+    "parsedMeshes": 44,
+    "stableNodes": 50,
+    "textures": 0,
+    "triangles": 1068,
+    "vertices": 728
+  },
+  "disposal": {
+    "geometries": 44,
+    "materials": 10
+  },
+  "files": {
+    "glb": {
+      "bytes": 70892,
+      "name": "lowpass-readability-canary-v1.runtime.glb",
+      "sha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102"
+    },
+    "manifest": {
+      "bytes": 38961,
+      "name": "lowpass-readability-canary-v1.manifest.json",
+      "sha256": "sha256:a1dd222f98c109697849279f3f5644266d685bc7b4d543534c8e4191b225c353"
+    },
+    "visualProofs": [
+      {
+        "bytes": 108630,
+        "file": "lowpass-readability-canary-v1.ps1-off.png",
+        "height": 675,
+        "mode": "ps1-off",
+        "sha256": "sha256:92906033639ffeb9d077b1170e7ab39a1fed659b7414089eda8d4b0944d02dc6",
+        "width": 1200
+      },
+      {
+        "bytes": 51717,
+        "file": "lowpass-readability-canary-v1.ps1-on.png",
+        "height": 675,
+        "mode": "ps1-on",
+        "sha256": "sha256:b3197e78c644f9dcfd98387a0877a09912b08c9d07ef92f1a04f2aab18c33f50",
+        "width": 1200
+      }
+    ]
+  },
+  "generatorVersion": "cgawe-lowpass-canary-1.0.0",
+  "recipeHash": "fnv1a-ca6600c5",
+  "rights": {
+    "notice": "Project-owned procedural Recipe source is recorded, but this canary does not make a distribution license assertion.",
+    "status": "NOASSERTION"
+  },
+  "schemaVersion": "lowpass-runtime-asset-pack-1.0.0",
+  "state": "LOWPASS_ASSET_CANARY_V1_LOCAL_GREEN",
+  "suitability": "B_SMALL_EXTENSION",
+  "textureStage": {
+    "note": "Blender was not available on PATH; this canary proves geometry, stable semantics, materials, and runtime packaging only.",
+    "productionTexturingComplete": false,
+    "status": "UNAVAILABLE_NO_BLENDER",
+    "textureCount": 0,
+    "uvPresent": false
+  }
+}

@@ -1,0 +1,298 @@
+{
+  "anchorMap": {
+    "feature-cart-wheel-front-left": "scene-part--instance-shopping-cart--cart-wheel-front-left",
+    "feature-cart-wheel-front-right": "scene-part--instance-shopping-cart--cart-wheel-front-right",
+    "feature-cart-wheel-rear-left": "scene-part--instance-shopping-cart--cart-wheel-rear-left",
+    "feature-cart-wheel-rear-right": "scene-part--instance-shopping-cart--cart-wheel-rear-right",
+    "feature-terminal-screen": "scene-part--instance-field-terminal--terminal-screen",
+    "feature-watcher-visual-center": "scene-part--instance-watcher-drone--watcher-visual-center",
+    "socket-cart-handle": "scene-part--instance-shopping-cart--cart-anchor-handle",
+    "socket-cart-load": "scene-part--instance-shopping-cart--cart-anchor-load",
+    "socket-needle-lock-origin": "scene-part--instance-needle-drone--needle-anchor-lock",
+    "socket-needle-scan-origin": "scene-part--instance-needle-drone--needle-anchor-scan",
+    "socket-porter-carry": "scene-part--instance-porter-android--porter-anchor-carry",
+    "socket-porter-communication": "scene-part--instance-porter-android--porter-anchor-communication",
+    "socket-porter-interaction": "scene-part--instance-porter-android--porter-anchor-interaction",
+    "socket-terminal-interaction": "scene-part--instance-field-terminal--terminal-anchor-interaction",
+    "socket-watcher-scan-origin": "scene-part--instance-watcher-drone--watcher-anchor-scan"
+  },
+  "assetDefinitions": {
+    "allied-porter": {
+      "anchorIds": [
+        "socket-porter-carry",
+        "socket-porter-communication",
+        "socket-porter-interaction"
+      ],
+      "assetId": "asset-porter-android",
+      "assetKey": "lowpass:machines/porter-android",
+      "bounds": {
+        "max": [
+          0.90270617362572,
+          2.54,
+          0.31
+        ],
+        "min": [
+          -0.90270617362572,
+          0,
+          -0.3375
+        ]
+      },
+      "collisionProxyIds": [
+        "scene-part--instance-porter-android--porter-collision"
+      ],
+      "featureIds": [],
+      "forwardAxis": "-Z",
+      "role": "allied-porter",
+      "rootNodeId": "scene-instance--instance-porter-android",
+      "visualNodeIds": [
+        "scene-part--instance-porter-android--porter-arm-left",
+        "scene-part--instance-porter-android--porter-arm-right",
+        "scene-part--instance-porter-android--porter-head",
+        "scene-part--instance-porter-android--porter-leg-left",
+        "scene-part--instance-porter-android--porter-leg-right",
+        "scene-part--instance-porter-android--porter-torso",
+        "scene-part--instance-porter-android--porter-visor"
+      ]
+    },
+    "field-terminal": {
+      "anchorIds": [
+        "socket-terminal-interaction"
+      ],
+      "assetId": "asset-field-terminal",
+      "assetKey": "lowpass:equipment/field-terminal",
+      "bounds": {
+        "max": [
+          0.33,
+          1.125,
+          0.17
+        ],
+        "min": [
+          -0.33,
+          0.54,
+          -0.20750000000000002
+        ]
+      },
+      "collisionProxyIds": [
+        "scene-part--instance-field-terminal--terminal-collision"
+      ],
+      "featureIds": [
+        "feature-terminal-screen"
+      ],
+      "forwardAxis": "-Z",
+      "role": "field-terminal",
+      "rootNodeId": "scene-instance--instance-field-terminal",
+      "visualNodeIds": [
+        "scene-part--instance-field-terminal--terminal-body",
+        "scene-part--instance-field-terminal--terminal-handle",
+        "scene-part--instance-field-terminal--terminal-screen"
+      ]
+    },
+    "hostile-needle": {
+      "anchorIds": [
+        "socket-needle-lock-origin",
+        "socket-needle-scan-origin"
+      ],
+      "assetId": "asset-needle-drone",
+      "assetKey": "lowpass:security/needle-drone",
+      "bounds": {
+        "max": [
+          0.5307226733941217,
+          1.82,
+          0.555
+        ],
+        "min": [
+          -0.5307226733941217,
+          1.34,
+          -1.48
+        ]
+      },
+      "collisionProxyIds": [
+        "scene-part--instance-needle-drone--needle-collision"
+      ],
+      "featureIds": [],
+      "forwardAxis": "-Z",
+      "role": "hostile-needle",
+      "rootNodeId": "scene-instance--instance-needle-drone",
+      "visualNodeIds": [
+        "scene-part--instance-needle-drone--needle-body",
+        "scene-part--instance-needle-drone--needle-eye",
+        "scene-part--instance-needle-drone--needle-fin-left",
+        "scene-part--instance-needle-drone--needle-fin-right",
+        "scene-part--instance-needle-drone--needle-nose"
+      ]
+    },
+    "hostile-watcher": {
+      "anchorIds": [
+        "socket-watcher-scan-origin"
+      ],
+      "assetId": "asset-watcher-drone",
+      "assetKey": "lowpass:security/watcher-drone",
+      "bounds": {
+        "max": [
+          1.4868371612078493,
+          3.29,
+          0.48351713288445614
+        ],
+        "min": [
+          -1.4868371612078493,
+          2.0376,
+          -0.5900000000000001
+        ]
+      },
+      "collisionProxyIds": [
+        "scene-part--instance-watcher-drone--watcher-collision"
+      ],
+      "featureIds": [
+        "feature-watcher-visual-center"
+      ],
+      "forwardAxis": "-Z",
+      "role": "hostile-watcher",
+      "rootNodeId": "scene-instance--instance-watcher-drone",
+      "visualNodeIds": [
+        "scene-part--instance-watcher-drone--watcher-body",
+        "scene-part--instance-watcher-drone--watcher-eye-band",
+        "scene-part--instance-watcher-drone--watcher-mast",
+        "scene-part--instance-watcher-drone--watcher-wing-left",
+        "scene-part--instance-watcher-drone--watcher-wing-right"
+      ]
+    },
+    "push-cart": {
+      "anchorIds": [
+        "socket-cart-handle",
+        "socket-cart-load"
+      ],
+      "assetId": "asset-shopping-cart",
+      "assetKey": "lowpass:props/shopping-cart",
+      "bounds": {
+        "max": [
+          0.61,
+          1.27,
+          0.93
+        ],
+        "min": [
+          -0.61,
+          0.07,
+          -0.81
+        ]
+      },
+      "collisionProxyIds": [
+        "scene-part--instance-shopping-cart--cart-collision"
+      ],
+      "featureIds": [
+        "feature-cart-wheel-front-left",
+        "feature-cart-wheel-front-right",
+        "feature-cart-wheel-rear-left",
+        "feature-cart-wheel-rear-right"
+      ],
+      "forwardAxis": "-Z",
+      "role": "push-cart",
+      "rootNodeId": "scene-instance--instance-shopping-cart",
+      "visualNodeIds": [
+        "scene-part--instance-shopping-cart--cart-basket",
+        "scene-part--instance-shopping-cart--cart-frame",
+        "scene-part--instance-shopping-cart--cart-handle-bar",
+        "scene-part--instance-shopping-cart--cart-handle-left",
+        "scene-part--instance-shopping-cart--cart-handle-right",
+        "scene-part--instance-shopping-cart--cart-wheel-front-left",
+        "scene-part--instance-shopping-cart--cart-wheel-front-right",
+        "scene-part--instance-shopping-cart--cart-wheel-rear-left",
+        "scene-part--instance-shopping-cart--cart-wheel-rear-right"
+      ]
+    }
+  },
+  "assetPackId": "lowpass-canary-v1",
+  "collisionProxyMap": {
+    "allied-porter": "scene-part--instance-porter-android--porter-collision",
+    "field-terminal": "scene-part--instance-field-terminal--terminal-collision",
+    "hostile-needle": "scene-part--instance-needle-drone--needle-collision",
+    "hostile-watcher": "scene-part--instance-watcher-drone--watcher-collision",
+    "push-cart": "scene-part--instance-shopping-cart--cart-collision"
+  },
+  "counts": {
+    "anchors": 9,
+    "assets": 5,
+    "collisionProxies": 5,
+    "materials": 10,
+    "meshes": 44,
+    "stableNodes": 50,
+    "triangles": 1068
+  },
+  "displayName": "LOWPASS Semantic Canary v1",
+  "distributionApproved": false,
+  "exactGlbSha256": "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+  "glbPath": "assets/lowpass-canary-v1/lowpass-readability-canary-v1.runtime.glb",
+  "internalOnly": true,
+  "manifestPath": "assets/lowpass-canary-v1/lowpass-readability-canary-v1.manifest.json",
+  "manifestVersion": "lowpass-runtime-asset-pack-1.0.0",
+  "materialMap": {
+    "mat-allied-dark": "mat-allied-dark",
+    "mat-allied-shell": "mat-allied-shell",
+    "mat-cart-shell": "mat-cart-shell",
+    "mat-hostile-dark": "mat-hostile-dark",
+    "mat-hostile-signal": "mat-hostile-signal",
+    "mat-terminal-screen": "mat-terminal-screen",
+    "mat-terminal-shell": "mat-terminal-shell"
+  },
+  "reviewLabel": "INTERNAL REVIEW ONLY",
+  "rightsStatus": "NOASSERTION",
+  "schemaVersion": "lowpass-asset-pack-registry-1.0.0",
+  "source": {
+    "artifactGlbSha256": "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+    "branch": "feat/lowpass-asset-canary-v1",
+    "commit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+    "repository": "CodexGameAssetWorkbench"
+  },
+  "sourceReadbackPath": "assets/lowpass-canary-v1/lowpass-readability-canary-v1.source-readback.json",
+  "stableNodeMap": {
+    "runtime-root--lowpass-readability-canary-v1": "runtime-root--lowpass-readability-canary-v1",
+    "scene-instance--instance-field-terminal": "scene-instance--instance-field-terminal",
+    "scene-instance--instance-needle-drone": "scene-instance--instance-needle-drone",
+    "scene-instance--instance-porter-android": "scene-instance--instance-porter-android",
+    "scene-instance--instance-shopping-cart": "scene-instance--instance-shopping-cart",
+    "scene-instance--instance-watcher-drone": "scene-instance--instance-watcher-drone",
+    "scene-part--instance-field-terminal--terminal-anchor-interaction": "scene-part--instance-field-terminal--terminal-anchor-interaction",
+    "scene-part--instance-field-terminal--terminal-body": "scene-part--instance-field-terminal--terminal-body",
+    "scene-part--instance-field-terminal--terminal-collision": "scene-part--instance-field-terminal--terminal-collision",
+    "scene-part--instance-field-terminal--terminal-handle": "scene-part--instance-field-terminal--terminal-handle",
+    "scene-part--instance-field-terminal--terminal-screen": "scene-part--instance-field-terminal--terminal-screen",
+    "scene-part--instance-needle-drone--needle-anchor-lock": "scene-part--instance-needle-drone--needle-anchor-lock",
+    "scene-part--instance-needle-drone--needle-anchor-scan": "scene-part--instance-needle-drone--needle-anchor-scan",
+    "scene-part--instance-needle-drone--needle-body": "scene-part--instance-needle-drone--needle-body",
+    "scene-part--instance-needle-drone--needle-collision": "scene-part--instance-needle-drone--needle-collision",
+    "scene-part--instance-needle-drone--needle-eye": "scene-part--instance-needle-drone--needle-eye",
+    "scene-part--instance-needle-drone--needle-fin-left": "scene-part--instance-needle-drone--needle-fin-left",
+    "scene-part--instance-needle-drone--needle-fin-right": "scene-part--instance-needle-drone--needle-fin-right",
+    "scene-part--instance-needle-drone--needle-nose": "scene-part--instance-needle-drone--needle-nose",
+    "scene-part--instance-porter-android--porter-anchor-carry": "scene-part--instance-porter-android--porter-anchor-carry",
+    "scene-part--instance-porter-android--porter-anchor-communication": "scene-part--instance-porter-android--porter-anchor-communication",
+    "scene-part--instance-porter-android--porter-anchor-interaction": "scene-part--instance-porter-android--porter-anchor-interaction",
+    "scene-part--instance-porter-android--porter-arm-left": "scene-part--instance-porter-android--porter-arm-left",
+    "scene-part--instance-porter-android--porter-arm-right": "scene-part--instance-porter-android--porter-arm-right",
+    "scene-part--instance-porter-android--porter-collision": "scene-part--instance-porter-android--porter-collision",
+    "scene-part--instance-porter-android--porter-head": "scene-part--instance-porter-android--porter-head",
+    "scene-part--instance-porter-android--porter-leg-left": "scene-part--instance-porter-android--porter-leg-left",
+    "scene-part--instance-porter-android--porter-leg-right": "scene-part--instance-porter-android--porter-leg-right",
+    "scene-part--instance-porter-android--porter-torso": "scene-part--instance-porter-android--porter-torso",
+    "scene-part--instance-porter-android--porter-visor": "scene-part--instance-porter-android--porter-visor",
+    "scene-part--instance-shopping-cart--cart-anchor-handle": "scene-part--instance-shopping-cart--cart-anchor-handle",
+    "scene-part--instance-shopping-cart--cart-anchor-load": "scene-part--instance-shopping-cart--cart-anchor-load",
+    "scene-part--instance-shopping-cart--cart-basket": "scene-part--instance-shopping-cart--cart-basket",
+    "scene-part--instance-shopping-cart--cart-collision": "scene-part--instance-shopping-cart--cart-collision",
+    "scene-part--instance-shopping-cart--cart-frame": "scene-part--instance-shopping-cart--cart-frame",
+    "scene-part--instance-shopping-cart--cart-handle-bar": "scene-part--instance-shopping-cart--cart-handle-bar",
+    "scene-part--instance-shopping-cart--cart-handle-left": "scene-part--instance-shopping-cart--cart-handle-left",
+    "scene-part--instance-shopping-cart--cart-handle-right": "scene-part--instance-shopping-cart--cart-handle-right",
+    "scene-part--instance-shopping-cart--cart-wheel-front-left": "scene-part--instance-shopping-cart--cart-wheel-front-left",
+    "scene-part--instance-shopping-cart--cart-wheel-front-right": "scene-part--instance-shopping-cart--cart-wheel-front-right",
+    "scene-part--instance-shopping-cart--cart-wheel-rear-left": "scene-part--instance-shopping-cart--cart-wheel-rear-left",
+    "scene-part--instance-shopping-cart--cart-wheel-rear-right": "scene-part--instance-shopping-cart--cart-wheel-rear-right",
+    "scene-part--instance-watcher-drone--watcher-anchor-scan": "scene-part--instance-watcher-drone--watcher-anchor-scan",
+    "scene-part--instance-watcher-drone--watcher-body": "scene-part--instance-watcher-drone--watcher-body",
+    "scene-part--instance-watcher-drone--watcher-collision": "scene-part--instance-watcher-drone--watcher-collision",
+    "scene-part--instance-watcher-drone--watcher-eye-band": "scene-part--instance-watcher-drone--watcher-eye-band",
+    "scene-part--instance-watcher-drone--watcher-mast": "scene-part--instance-watcher-drone--watcher-mast",
+    "scene-part--instance-watcher-drone--watcher-visual-center": "scene-part--instance-watcher-drone--watcher-visual-center",
+    "scene-part--instance-watcher-drone--watcher-wing-left": "scene-part--instance-watcher-drone--watcher-wing-left",
+    "scene-part--instance-watcher-drone--watcher-wing-right": "scene-part--instance-watcher-drone--watcher-wing-right"
+  }
+}

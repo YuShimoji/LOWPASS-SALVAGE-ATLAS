@@ -6,6 +6,7 @@ import {
   PlaneGeometry,
   PointLight,
   TorusGeometry,
+  Vector3,
   type Object3D,
 } from "three";
 import type { ExpeditionManifest } from "../../game/mission/expeditionTypes";
@@ -17,6 +18,10 @@ import type { PorterAndroidState } from "../../game/machines/machineTypes";
 import type { Ps1MaterialFactory } from "../materials/Ps1MaterialFactory";
 import { disposeObjectTree } from "./disposeObjectTree";
 import type { MissionWorldView } from "./missionWorldView";
+import type {
+  CanaryRoleInstance,
+  LoadedCanaryMissionAssetPack,
+} from "../assets/CanaryMissionAssetPack";
 
 export function createFloodedMarket(
   materials: Ps1MaterialFactory,
@@ -26,6 +31,7 @@ export function createFloodedMarket(
   squad: DistributedSquadState,
   threat: ThreatEncounterState,
   porter: PorterAndroidState,
+  canaryAssetPack: LoadedCanaryMissionAssetPack | null = null,
 ): MissionWorldView {
   const root = new Group();
   root.name = "phase-d-flooded-market";
@@ -171,6 +177,58 @@ export function createFloodedMarket(
   const porterView = createPorterAndroid(materials);
   porterView.root.name = "phase-e-friendly-porter-android";
   root.add(porterView.root);
+  const canaryViews = canaryAssetPack
+    ? {
+        needle: canaryAssetPack.createInstance("hostile-needle"),
+        watcher: canaryAssetPack.createInstance("hostile-watcher"),
+        porter: canaryAssetPack.createInstance("allied-porter"),
+        cart: canaryAssetPack.createInstance("push-cart"),
+        terminal: canaryAssetPack.createInstance("field-terminal"),
+      }
+    : null;
+  if (canaryViews) {
+    root.add(
+      canaryViews.needle.root,
+      canaryViews.watcher.root,
+      canaryViews.porter.root,
+      canaryViews.cart.root,
+      canaryViews.terminal.root,
+    );
+    canaryViews.needle.root.visible = false;
+    canaryViews.watcher.root.visible = false;
+    canaryViews.porter.root.visible = false;
+    canaryViews.cart.root.visible = false;
+    canaryViews.terminal.root.visible = false;
+    cart.visible = false;
+    porterView.root.visible = false;
+  }
+  const canaryLockBeam = canaryViews
+    ? new Mesh(new BoxGeometry(0.055, 0.055, 1), materials.createEmissive("#ef745f", 1.15))
+    : null;
+  const canaryWideScan = canaryViews
+    ? new Mesh(
+        new BoxGeometry(3.4, 0.018, 4.4),
+        materials.create({
+          color: "#d9b56f",
+          emissive: "#9b7843",
+          emissiveIntensity: 0.35,
+          transparent: true,
+          opacity: 0.1,
+          depthWrite: false,
+        }),
+      )
+    : null;
+  if (canaryLockBeam) {
+    canaryLockBeam.visible = false;
+    root.add(canaryLockBeam);
+  }
+  if (canaryWideScan) {
+    canaryWideScan.visible = false;
+    root.add(canaryWideScan);
+  }
+  const terminalItem = manifest.items.find((item) => item.definitionId === "field-terminal") ?? null;
+  const worldAnchor = new Vector3();
+  const worldTarget = new Vector3();
   const lastKnownMarker = new Mesh(
     new TorusGeometry(0.7, 0.045, 5, 16),
     materials.createEmissive("#df9259", 0.58),
@@ -191,6 +249,10 @@ export function createFloodedMarket(
     if (cartLocation?.kind === "mission-ground") {
       cart.position.set(cartLocation.position.x, cartLocation.position.y, cartLocation.position.z);
       cart.rotation.y = activeSession.cartFacingYaw;
+      if (canaryViews) {
+        setCanaryTransform(canaryViews.cart, cartLocation.position.x, cartLocation.position.y - 0.48, cartLocation.position.z, activeSession.cartFacingYaw);
+        canaryViews.cart.root.visible = true;
+      }
     }
     for (const [itemId, view] of resourceViews) {
       const location = activeSession.itemLocations[itemId];
@@ -254,7 +316,7 @@ export function createFloodedMarket(
       beaconViews.delete(beaconId);
     }
     const drone = activeThreat.drone;
-    scoutDrone.root.visible = drone.visible;
+    scoutDrone.root.visible = drone.visible && !canaryViews;
     scoutDrone.root.position.set(drone.position.x, drone.position.y, drone.position.z);
     scoutDrone.root.rotation.y = drone.facingYaw;
     scoutDrone.root.rotation.z = drone.mode === "disabled" ? 0.72 : 0;
@@ -264,6 +326,25 @@ export function createFloodedMarket(
       orientScanBeam(scoutDrone.scanBeam, drone.position, drone.lastKnownTargetPosition);
     }
     scoutDrone.rotor.rotation.y = elapsedSeconds * (drone.active ? 8 : 0.25);
+    if (canaryViews) {
+      setCanaryTransform(canaryViews.needle, drone.position.x, drone.position.y - 1.55, drone.position.z, drone.facingYaw);
+      canaryViews.needle.root.visible = drone.visible;
+      canaryViews.needle.root.rotation.x = drone.mode === "lock-on" ? -0.24 : 0;
+      if (canaryLockBeam) {
+        canaryLockBeam.visible = drone.mode === "lock-on" && Boolean(drone.lastKnownTargetPosition);
+        const lockOrigin = canaryViews.needle.bindings["socket-needle-lock-origin"];
+        if (canaryLockBeam.visible && lockOrigin && drone.lastKnownTargetPosition) {
+          canaryViews.needle.root.updateMatrixWorld(true);
+          lockOrigin.getWorldPosition(worldAnchor);
+          worldTarget.set(
+            drone.lastKnownTargetPosition.x,
+            drone.lastKnownTargetPosition.y,
+            drone.lastKnownTargetPosition.z,
+          );
+          orientWorldScanBeam(canaryLockBeam, worldAnchor, worldTarget);
+        }
+      }
+    }
     const controlledKnowledge = activeThreat.byAgent[activeSquad.control.controlledAgentId];
     const controlledContact = controlledKnowledge?.contact ?? null;
     scoutDrone.contactHalo.visible = Boolean(controlledContact?.freshness === "live" && drone.visible);
@@ -277,7 +358,7 @@ export function createFloodedMarket(
     for (const view of additionalDroneViews.values()) view.root.visible = false;
     activeThreat.additionalDrones.forEach((additional) => {
       const view = ensureAdditionalDroneView(additional);
-      view.root.visible = additional.visible;
+      view.root.visible = additional.visible && !(canaryViews && additional.definitionId === "hostile-observation-drone");
       view.root.position.set(additional.position.x, additional.position.y, additional.position.z);
       view.root.rotation.y = additional.facingYaw;
       view.rotor.rotation.y = elapsedSeconds * 7.2;
@@ -285,6 +366,26 @@ export function createFloodedMarket(
       if (view.wideScan) {
         view.wideScan.visible = additional.active && additional.mode !== "disabled";
         view.wideScan.rotation.y = Math.sin(elapsedSeconds * 0.85) * 0.46;
+      }
+      if (canaryViews && additional.definitionId === "hostile-observation-drone") {
+        setCanaryTransform(
+          canaryViews.watcher,
+          additional.position.x,
+          additional.position.y - 2.65,
+          additional.position.z,
+          additional.facingYaw,
+        );
+        canaryViews.watcher.root.visible = additional.visible;
+        if (canaryWideScan) {
+          const scanOrigin = canaryViews.watcher.bindings["socket-watcher-scan-origin"];
+          canaryWideScan.visible = additional.active && additional.mode !== "disabled";
+          if (scanOrigin) {
+            canaryViews.watcher.root.updateMatrixWorld(true);
+            scanOrigin.getWorldPosition(worldAnchor);
+            canaryWideScan.position.set(worldAnchor.x, worldAnchor.y - 0.72, worldAnchor.z - 2.1);
+            canaryWideScan.rotation.y = additional.facingYaw + Math.sin(elapsedSeconds * 0.85) * 0.46;
+          }
+        }
       }
     });
     for (const [id, view] of additionalDroneViews) {
@@ -295,14 +396,70 @@ export function createFloodedMarket(
     porterView.statusLight.visible = activePorter.authenticated;
     porterView.loadArms.rotation.x = activePorter.carriedItemId ? -0.34 : Math.sin(elapsedSeconds * 2) * 0.03;
     porterView.root.rotation.z = activePorter.mode === "gate-rejected" ? Math.sin(elapsedSeconds * 8) * 0.025 : 0;
+    if (canaryViews) {
+      setCanaryTransform(
+        canaryViews.porter,
+        activePorter.position.x,
+        activePorter.position.y - 0.93,
+        activePorter.position.z,
+        activePorter.facing,
+      );
+      canaryViews.porter.root.visible = true;
+      canaryViews.porter.root.rotation.z = activePorter.mode === "gate-rejected" ? Math.sin(elapsedSeconds * 8) * 0.025 : 0;
+      const terminalOwner = terminalItem ? activeSquad.agents[terminalItem.assignedAgentId] : null;
+      const terminalLocation = terminalItem ? activeSession.itemLocations[terminalItem.instanceId] : null;
+      canaryViews.terminal.root.visible = Boolean(terminalOwner && terminalLocation?.kind === "crew");
+      if (terminalOwner && canaryViews.terminal.root.visible) {
+        setCanaryTransform(
+          canaryViews.terminal,
+          terminalOwner.position.x + 0.38,
+          terminalOwner.position.y - 0.93,
+          terminalOwner.position.z + 0.18,
+          terminalOwner.facingYaw,
+        );
+      }
+      const cartLoadAnchor = canaryViews.cart.bindings["socket-cart-load"];
+      if (cartLoadAnchor) {
+        canaryViews.cart.root.updateMatrixWorld(true);
+        cartLoadAnchor.getWorldPosition(worldAnchor);
+        for (const [itemId, view] of resourceViews) {
+          if (activeSession.itemLocations[itemId]?.kind === "cart") view.position.copy(worldAnchor);
+        }
+      }
+      const porterCarryAnchor = canaryViews.porter.bindings["socket-porter-carry"];
+      if (porterCarryAnchor) {
+        canaryViews.porter.root.updateMatrixWorld(true);
+        porterCarryAnchor.getWorldPosition(worldAnchor);
+        for (const [itemId, view] of resourceViews) {
+          const location = activeSession.itemLocations[itemId];
+          if (location?.kind === "machine-carried" && location.machineId === activePorter.id) view.position.copy(worldAnchor);
+        }
+      }
+    }
   };
 
   update(session, squad, threat, porter, 0);
   return {
     root,
     cameraOccluders,
+    assetPackReadback: canaryAssetPack
+      ? {
+          mode: "canary-v1",
+          exactHash: canaryAssetPack.registry.exactGlbSha256,
+          loadDurationMs: canaryAssetPack.loadDurationMs,
+          glbBytes: canaryAssetPack.glbBytes,
+          resolvedBindingIds: canaryAssetPack.resolvedBindingIds,
+        }
+      : {
+          mode: "primitive",
+          exactHash: null,
+          loadDurationMs: 0,
+          glbBytes: 0,
+          resolvedBindingIds: [],
+        },
     update,
     dispose(): void {
+      canaryAssetPack?.dispose();
       disposeObjectTree(root);
     },
   };
@@ -314,6 +471,28 @@ interface DroneView {
   readonly contactHalo: Mesh;
   readonly scanBeam: Mesh;
   readonly wideScan: Mesh | null;
+}
+
+function setCanaryTransform(
+  instance: CanaryRoleInstance,
+  x: number,
+  y: number,
+  z: number,
+  yaw: number,
+): void {
+  instance.root.position.set(x, y, z);
+  instance.root.rotation.y = yaw;
+}
+
+function orientWorldScanBeam(beam: Mesh, from: Vector3, to: Vector3): void {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const dz = to.z - from.z;
+  const distance = Math.max(0.1, Math.hypot(dx, dy, dz));
+  beam.position.set((from.x + to.x) * 0.5, (from.y + to.y) * 0.5, (from.z + to.z) * 0.5);
+  beam.rotation.y = Math.atan2(-dx, -dz);
+  beam.rotation.x = Math.atan2(dy, Math.hypot(dx, dz));
+  beam.scale.z = distance;
 }
 
 function createScoutDrone(materials: Ps1MaterialFactory): DroneView {

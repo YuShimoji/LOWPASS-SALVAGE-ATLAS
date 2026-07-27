@@ -2,12 +2,23 @@ import { BoxGeometry, Mesh, MeshBasicMaterial, Vector3 } from "three";
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_CAMERA_DISTANCE,
+  MAX_CAMERA_PITCH,
   MAX_CAMERA_DISTANCE,
+  MIN_CAMERA_PITCH,
   MIN_CAMERA_DISTANCE,
   ThirdPersonCamera,
 } from "./ThirdPersonCamera";
 
 describe("ThirdPersonCamera zoom", () => {
+  it("applies yaw and pitch look deltas and clamps pitch", () => {
+    const rig = new ThirdPersonCamera();
+    rig.applyLookDelta(2400, -100_000);
+    expect(rig.getDiagnostics().yaw).toBeLessThan(-6);
+    expect(rig.getDiagnostics().pitch).toBe(MAX_CAMERA_PITCH);
+    rig.applyLookDelta(0, 100_000);
+    expect(rig.getDiagnostics().pitch).toBe(MIN_CAMERA_PITCH);
+  });
+
   it("zooms with wheel input and clamps to the supported range", () => {
     const rig = new ThirdPersonCamera();
     rig.applyWheelZoom(-10_000);

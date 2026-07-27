@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "primitive-canary-readback-1.0.0",
+  "result": "PASS",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "fixedConditions": {
+    "missionSeed": "atlas-01",
+    "securityPosture": "watchful",
+    "controlledAgent": "player",
+    "qaPlacementDefinitions": "GuidedQaPanel / GuidedPhaseGAudit",
+    "lighting": "same runtime",
+    "fog": "paired by ps1-off / ps1-on",
+    "camera": "same default mission entry camera within each A/B replay"
+  },
+  "states": [
+    "needle-watcher",
+    "watcher-share",
+    "security-disengage",
+    "porter-cooling",
+    "cart-handle",
+    "field-terminal"
+  ],
+  "conditions": [
+    "primitive-ps1-off",
+    "primitive-ps1-on",
+    "canary-v1-ps1-off",
+    "canary-v1-ps1-on"
+  ],
+  "screenshotCount": 24,
+  "assetPack": {
+    "assetPackId": "lowpass-canary-v1",
+    "exactGlbSha256": "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+    "glbBytes": 70892,
+    "fallbackObserved": false,
+    "rightsStatus": "NOASSERTION",
+    "internalOnly": true,
+    "distributionApproved": false
+  },
+  "representativeDiagnostics": {
+    "primitivePs1Off": {
+      "drawCalls": 75,
+      "triangles": 1486,
+      "sceneObjects": 98,
+      "geometries": 50,
+      "textures": 3,
+      "programs": 3,
+      "loadDurationMs": 0
+    },
+    "primitivePs1On": {
+      "drawCalls": 68,
+      "triangles": 1186,
+      "sceneObjects": 98,
+      "geometries": 44,
+      "textures": 3,
+      "programs": 3,
+      "loadDurationMs": 0
+    },
+    "canaryV1Ps1Off": {
+      "drawCalls": 123,
+      "triangles": 2490,
+      "sceneObjects": 149,
+      "geometries": 77,
+      "textures": 3,
+      "programs": 4,
+      "loadDurationMs": 6.3
+    },
+    "canaryV1Ps1On": {
+      "drawCalls": 138,
+      "triangles": 2942,
+      "sceneObjects": 149,
+      "geometries": 78,
+      "textures": 3,
+      "programs": 4,
+      "loadDurationMs": 6.2
+    }
+  },
+  "notes": [
+    "Diagnostics are representative samples captured after mission stabilization; draw calls and visible triangles vary slightly with camera occlusion.",
+    "The six named rows were replayed through the same Guided QA and raw navigation controls for each visual condition.",
+    "Canary remains internal review only and is not a production asset approval."
+  ]
+}

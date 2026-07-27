@@ -2,6 +2,18 @@
 
 この文書は確定済みの設計判断だけを記録します。検討中の案は `idea-ledger.md`、実装・検証の詳細は `README.md` に置きます。
 
+## 2026-07-28 — Phase Gの自動受入と人間感覚レビューを分離する
+
+- 決定: camera orbit、Guided QA、22段階audit、semantic cueと字幕が自動・ブラウザ証拠を満たした時点を `PHASE_G_AUTOMATED_ACCEPTANCE_GREEN` とし、音量・音色・疲労感と最終game feelは `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING` とする
+- 理由: 既に人間PASSのmovement、zoom、cart、外観を再び必須停止へ戻さず、機械判定可能な因果・操作・非無音・字幕を再現可能な証拠で閉じるため
+- 帰結: `GATE_G_A_RETEST_REQUIRED` は履歴へ移す。human sensory PASS、production audio complete、final game feel acceptedとは記録せず、観測事実なしに距離、delay、scan、lock、pressureを調整しない。Phase Hは別承認
+
+## 2026-07-28 — Canaryをsimulation非所有の内部visual packとして統合する
+
+- 決定: `AssetPackRegistry` でprimitive / canary-v1を選択し、exact hash検証済みGLBをmission chunkで遅延loadする。Needle、Watcher、Porter、Shopping cart、Field terminalは既存simulation stateを投影するvisual adapterとし、load失敗時はprimitiveへfallbackする
+- 理由: CGAWのstable node / material / anchor契約をconsumer側で実証しながら、GLB transformやcollision proxyをgameplay authorityへ昇格せず、primitive経路を回帰基準として保持するため
+- 帰結: source packageをproduction dependencyにせず、import時に絶対pathを除去する。rights `NOASSERTION`、internal only、distribution未承認を固定し、UV、texture、Blender、rights、production approvalは別gateとする
+
 ## 2026-07-26 — 感覚評価を停止し、playability baselineを先に復旧する
 
 - 決定: Gate G-Aを `GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` とし、Phase Gの感覚調整とPhase Hを停止してkeyboard、Gamepad、camera distance、push-cartを独立recovery branchで復旧する

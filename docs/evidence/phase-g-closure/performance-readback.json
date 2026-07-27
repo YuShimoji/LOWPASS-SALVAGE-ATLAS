@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "phase-g-performance-readback-1.0.0",
+  "result": "PASS",
+  "assetMode": "canary-v1",
+  "cycles": [
+    {
+      "cycle": 1,
+      "mission": {
+        "sceneObjects": 149,
+        "geometries": 78,
+        "textures": 3,
+        "programs": 4
+      },
+      "shipAfterReturn": {
+        "worldRunCount": 4,
+        "sceneObjects": 60,
+        "geometries": 47,
+        "textures": 3,
+        "programs": 4
+      }
+    },
+    {
+      "cycle": 2,
+      "mission": {
+        "loadDurationMs": 5.7,
+        "sceneObjects": 149,
+        "geometries": 78,
+        "textures": 3,
+        "programs": 4
+      },
+      "shipAfterReturn": {
+        "worldRunCount": 5,
+        "sceneObjects": 60,
+        "geometries": 47,
+        "textures": 3,
+        "programs": 4
+      }
+    },
+    {
+      "cycle": 3,
+      "mission": {
+        "loadDurationMs": 3.7,
+        "sceneObjects": 149,
+        "geometries": 78,
+        "textures": 3,
+        "programs": 4
+      },
+      "shipAfterReturn": {
+        "worldRunCount": 6,
+        "sceneObjects": 60,
+        "geometries": 47,
+        "textures": 3,
+        "programs": 4
+      }
+    }
+  ],
+  "stability": {
+    "missionSceneObjectGrowth": 0,
+    "missionGeometryGrowth": 0,
+    "missionTextureGrowth": 0,
+    "missionProgramGrowth": 0,
+    "shipSceneObjectGrowth": 0,
+    "shipGeometryGrowth": 0,
+    "shipTextureGrowth": 0,
+    "shipProgramGrowth": 0,
+    "returnPath": "normal mission extract result -> ABORTED -> ship return",
+    "settlementPathExercised": true
+  }
+}

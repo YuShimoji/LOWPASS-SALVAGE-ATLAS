@@ -1,6 +1,6 @@
 # Project Context
 
-更新日: 2026-07-27
+更新日: 2026-07-28
 
 ## North star
 
@@ -12,15 +12,18 @@
 | --- | --- |
 | 軸 | 状態所有、限定知識、プレイヤー判断の整合性 |
 | レーン | 固定世界を反復訪問する非致死的探索垂直スライス |
-| 完了スライス | Phase G technical implementation。human sensory acceptanceは未完了 |
-| 作業ブランチ | `fix/phase-g-playability-recovery` |
+| 完了スライス | Phase G UX Closure。`PHASE_G_AUTOMATED_ACCEPTANCE_GREEN` |
+| 人間感覚レビュー | `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING` |
+| Canary consumer | `LOWPASS_CANARY_CONSUMER_READY_INTERNAL_ONLY` |
+| 作業ブランチ | `feat/phase-g-guided-qa-canary-v1` |
+| 作業base | `52f0cf9db9f563963243e4954e48de9c448ec487` |
 | Phase F保全 | tag `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a` |
 | Phase G分岐元 | `4e3cdc66d357e8054d45e0a42c4f41f166087b20` |
 | Phase G実装 | `6df8ba0621baf8976fc56373863cf57565cc12ba`、件名 `feat: coordinate hostile machine security cells` |
 | recovery分岐元 | `756e54b0e54a7b4b6fee7da2a0d5bed47f01a5a3` |
 | recovery実装 | `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`、件名 `fix: restore playable movement camera and cart controls` |
-| remote状態 | `origin/fix/phase-g-playability-recovery` と0 / 0。PR、merge、deploy、release未実施 |
-| 次のゲート | `GATE_G_A_RETEST_REQUIRED`。Phase Gミュートなし人間受入を最初から再実施 |
+| remote状態 | 現feature branchはlocalのみ・upstream未設定。push、PR、merge、deploy、release未実施 |
+| 次のゲート | Phase H1 Promptのオーナー承認。Phase H未実装 |
 | 受入の正本 | `README.md` のPhase G検証結果、`PROJECT_HANDOFF.md`、`docs/supervising-ai-report.md` |
 
 ## 現行アーキテクチャ
@@ -39,6 +42,22 @@
 - 入力はheld physical codeを真実源にし、logical actionを毎sample解決する。keyboardと標準Gamepad APIは同じaction境界へ統合する
 - カート操作中はMissionSessionのcart-control stateとPhysicsWorldのcollision-limited kinematic pairを使う。ItemLocation、資源積載、抽出は従来の真実源を維持する
 - ThirdPersonCameraはdesired distanceとocclusion後のeffective distanceを分離する
+- Pointer Lockに依存しないcanvas右ドラッグはInputControllerがpointer stateを所有し、ThirdPersonCameraへyaw / pitch deltaだけを渡す。modal、Guided QA、editable controlでは入力しない
+- Guided QAは既存controllerとQA配置を順序付ける診断adapterで、AI状態を直接PASSへ書き換えない。22段階readbackはruntime stateとrevisionから判定する
+- semantic cueと字幕はstate eventの投影で、Security Cell判断を所有しない。常時Porter pulseは使わず、認証・搬送遷移などの意味eventだけをrate-limitして鳴らす
+- `AssetPackRegistry` はprimitive / canary-v1を選択し、Canary GLBはmission chunkで遅延loadする。5 visual adapterはsimulation stateを真実源に保ち、失敗時はprimitiveへfallbackする
+
+## 2026-07-28 Phase G UX Closure
+
+- 人間確認済みのmovement、wheel zoom、cart、Watcher / Needle appearanceはPASSとして保持した
+- canvas右drag yaw / pitch、clamp、click threshold、modal / QA exclusion、Pointer Lock fallback、wheel / Gamepad regressionを自動固定した。physical Gamepadは未接続
+- Guided QAはraw button列をdrawerへ置き換え、孤立復帰の目的、before / expected / actual、現在状態を表示する。raw controlは削除せず折り畳んだ
+- one-click Guided Auditはwatchful開始からflare fact失効まで22 / 22 PASS、timeout 0、duplicate 0
+- semantic audioは17 cue、AudioContext状態、単独試聴、同時字幕を提供し、waveform / peak / duration / distinctness / mute / resume / rate-limitを自動監査した
+- CGAWの契約commit `c893374ab0edd7329bd1482dbd6b99960acbbb68` とexact GLB SHA-256 `54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102` を検証し、決定論的importを追加した
+- rightsは `NOASSERTION`、internal only、distribution未承認。UV、low-resolution texture、Blender headless、rights declaration、production approvalは未完了
+- A/B 24枚、contact sheet、console / performance readback、3 lifecycleを [`evidence/phase-g-closure/`](evidence/phase-g-closure/) へ保存した
+- Phase H、WorldState schema、Security Cell規則、contract進捗は変更していない
 
 ## 2026-07-26 playability recovery
 
@@ -70,9 +89,19 @@ Gate G-Aは `GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` で中断されました�
 
 ## 現在の品質基準
 
-Recovery branchで型検査、28ファイル176テスト、production build、トップレベル依存整合、diff checkを通すこと。実ブラウザでは単独・alias keyboard入力、zoom、push-cart、partial抽出、帰還、console error 0、Rapier / scene / GPU / DOM復帰を確認する。Security Cellの感覚品質はこのtechnical PASSと混同せず、人間のミュートなし受入へ残す。
+現branchでトップレベル依存整合、型検査、全Vitest、production build、diff checkを通すこと。実ブラウザではGuided Audit 22 / 22、audio/caption、primitive / Canary、exact hash、A/B、3 lifecycle、console error 0、resource復帰を確認する。音量・音色・疲労感とphysical Gamepadは自動受入と混同しない。
 
 ## Re-entry snapshot
+
+- current branchは `feat/phase-g-guided-qa-canary-v1`、baseは `52f0cf9db9f563963243e4954e48de9c448ec487`、upstream未設定
+- 再現URLは `http://127.0.0.1:5173/?qa=1&security-posture=watchful&asset-mode=primitive` と `asset-mode=canary-v1`
+- portableな状態はsource、Canary runtime copy、registry、consumer metadata / fixture、tests、closure evidence、authority docs
+- `node_modules`、`dist`、`.serena`、browser IndexedDB、音量設定、実行中Viteは端末ローカル。browser QAのvisit 6はcommitしない
+- CGAWはread-only供給元としてcleanを維持し、LOWPASS consumer integrationのための変更・commitは作っていない
+- current bottleneckは技術blockerではなくPhase H1のowner decision。human sensory reviewはdeferred / non-blocking
+- final local gateはdependencies、typecheck、34 files / 199 tests、production build、diff checkがPASS。buildは79 modulesで、MachineFeedbackAudioとCanaryMissionAssetPackの遅延chunkを維持
+
+### 2026-07-27 snapshot（履歴）
 
 - 2026-07-27に `git fetch --prune --tags origin` を実施した。現branch `fix/phase-g-playability-recovery` のHEADとupstreamはともに `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`、ahead / behindは0 / 0で、取り込むremote commitがないためpullは不要だった
 - fetch前のworktreeはcleanで、staged / unstaged / untrackedは0件、進行中のmerge / rebase / cherry-pick等もなかった。ゲーム実装、manifest、lockfile、保持中のreview成果物に差分はない

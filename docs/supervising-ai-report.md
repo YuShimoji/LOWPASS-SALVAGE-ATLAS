@@ -1,10 +1,74 @@
 # 監修役AI向け現状報告
 
-更新日: 2026-07-27 JST
+更新日: 2026-07-28 JST
 
-## 2026-07-27 優先監修結論
+## 2026-07-28 優先監修結論
 
-この節が現在の正本です。2026-07-26以前のrecovery・Phase G証跡は履歴として下に残します。
+この節が現在の正本です。2026-07-27以前のGate・recovery・Phase G証跡は履歴として下に残します。
+
+現在の分類は次です。
+
+- `PHASE_G_AUTOMATED_ACCEPTANCE_GREEN`
+- `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING`
+- `LOWPASS_CANARY_CONSUMER_READY_INTERNAL_ONLY`
+
+人間レビュー済みのmovement、wheel zoom、cart、Watcher / Needle外観はPASSです。以前の `GATE_G_A_RETEST_REQUIRED` は、camera orbit、raw QA、意味イベント音の不足が判明する前の停止表現で、現在の必須停止条件ではありません。右ドラッグcamera、Guided QA、one-click 22段階監査、17 semantic cuesと字幕を追加し、Security Cellの状態所有、個体知識と共有知識、WorldState V2 / migration、settlement、ItemLocation、Presence基本重み、共有delay、scan距離、lock判定、pressure budget、contract進捗は変更していません。Phase Hは未実装です。
+
+### 自動・ブラウザ受入
+
+| Gate | 結果 | 証拠 |
+| --- | --- | --- |
+| Camera | PASS | 右drag yaw / pitch、4px threshold、clamp、modal / QA / editable除外、Pointer Lock fallback、wheel / Gamepad回帰 |
+| Guided QA | PASS | 360〜420px drawer、14px本文、40px主要操作、raw折り畳み、Esc、world input exclusion、明示的な孤立復帰文言 |
+| Guided Audit | PASS | 22 / 22、timeout 0、duplicate 0、structured resultとrevision |
+| Semantic Audio | PASS | 17 cue、non-silent、peak非clip、duration、distinct fingerprint、rate-limit、mute、context resume、字幕 |
+| Browser console | PASS | error 0、unhandled rejection 0。既知のRapier初期化非推奨warning 1種類 |
+| Canary contract | PASS | 5 assets、50 nodes、44 meshes、1,068 triangles、10 material objects、9 anchors、5 collision proxies |
+| A/B evidence | PASS | 6状態 × primitive / Canary × PS1 OFF / ON = 24枚、contact sheetとreadback |
+| lifecycle | PASS | 3回のship→mission→ship、帰還後scene 60 / geometry 47 / texture 3 / program 4で単調増加なし |
+| dependencies / typecheck | PASS | 6 direct dependencies、TypeScript error 0 |
+| Vitest | PASS | 34 files / 199 tests |
+| production build | PASS | Vite 8.1.5、79 modules、MachineFeedbackAudio 3.33 kB、CanaryMissionAssetPack 46.72 kBの遅延chunk。既知の500 kB warningのみ |
+| diff check | PASS | whitespace error 0 |
+
+Guided Audit JSON / HTML、audio audit、QA panel、A/B screenshots、console、performanceは [`docs/evidence/phase-g-closure/`](evidence/phase-g-closure/) にあります。camera右dragはDOM PointerEventとcameraテストで固定しました。physical Gamepadは接続しておらず、実機確認済みとは報告しません。音量・音色・疲労感、最終game feelは人間感覚レビューへ残しますが、製品進行を止めるgateではありません。
+
+### CGAW Canary consumer
+
+- source branch: `feat/lowpass-asset-canary-v1`
+- contract commit: `c893374ab0edd7329bd1482dbd6b99960acbbb68`
+- source HEAD確認時: `ba689ff`。contract commitは祖先で、以後は文書差分のみ
+- exact GLB SHA-256: `54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102`
+- import: manifest / hash / schema / stable node / material / anchor / collision proxy / boundsを検証し、絶対pathを除去して決定論的copyとregistry / readbackを生成
+- runtime: `asset-mode=primitive` / `canary-v1`、既定primitive、mission chunk遅延load、5 visual adapters、primitive fallback、構造化warning
+- authority: simulation stateが真実源。GLB node transformとcollision proxyをgameplay authorityへ使わない
+- rights: `NOASSERTION`、`internalOnly: true`、`distributionApproved: false`、`INTERNAL REVIEW ONLY`
+- source repo: clean確認済み、変更・commitなし
+
+UV、low-resolution texture、Blender headless validation、rights declaration、production asset approvalは残っています。Canaryは内部review専用で、配布・公開・製品採用を意味しません。
+
+### 変更管理
+
+| contract | before | after | compatibility | migration / user impact | evidence |
+| --- | --- | --- | --- | --- | --- |
+| camera orbit | Pointer Lock mouse / Gamepad right stick | canvas右dragを同じyaw / pitchへ追加 | Pointer Lock、wheel、Gamepad、desired / effective distance、occlusion維持 | save migrationなし。初回hint追加 | InputController / ThirdPersonCamera tests |
+| QA surface | 小さいraw button列、`QA WITHDRAW` | Guided drawer、意味・順序・before / expected / actual、raw折り畳み | `?qa=1`限定、既存controller再利用 | 通常プレイ影響なし | QA tests、panel screenshot |
+| Phase G audit | 手動の段階再現 | 一操作22段階structured audit | AI stateを直接PASSへ変更しない | save schema変更なし | guided audit JSON / HTML |
+| machine audio | 連続機械音と一部状態音 | 17 semantic event cue + caption | 既存mute尊重、外部音源なし | 設定migrationなし | audio audit |
+| asset selection | primitiveのみ | registryでprimitive / canary-v1、失敗時fallback | 既定primitive、simulation authority維持 | save migrationなし、query選択だけ | consumer readback、runtime tests |
+| runtime visuals | primitive projection | 5 Canary visual adapters | gameplay state / ItemLocation / collision authority維持 | internal-only visual差 | A/B 24枚、3 lifecycle |
+
+### 開発可能性と次の一手
+
+現行branchは `feat/phase-g-guided-qa-canary-v1`、作業baseは `52f0cf9db9f563963243e4954e48de9c448ec487`、upstreamは未設定です。このsliceはlocal commitだけとし、push、PR、merge、tag、deploy、release、public visibility変更は行いません。
+
+portableな状態はtracked source、import済みCanary、consumer metadata / fixture、テスト、証拠、正本文書です。`node_modules`、`dist`、`.serena`、ブラウザIndexedDB、音量設定、実行中Viteは端末ローカルです。ブラウザQAでlocal visitは6まで進みましたが、save dataをcommitしません。
+
+次の具体手は、オーナーがPhase H1「契約・証拠・再訪判断の因果深化」の完全Promptを承認することです。目的は、既存のstatic definition / persisted state境界を保ち、帰還済みevidenceから次訪問のrouteまたはsupport差を説明可能にすることです。WorldState migrationを避ける設計を優先し、承認前には実装しません。
+
+## 2026-07-27 優先監修結論（履歴）
+
+この節は2026-07-27時点の正本でした。2026-07-26以前のrecovery・Phase G証跡は履歴として下に残します。
 
 Gate G-AはPASS、G-TUNE、FAILのどれにも分類していません。playability recoveryの技術基準は `fix/phase-g-playability-recovery` の `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90` で、同名upstreamへ取得可能です。2026-07-27のfetch時にlocal HEADと `origin/fix/phase-g-playability-recovery` は0 / 0、remoteから取り込むcommitはありませんでした。recovery branchのremote portabilityは成立していますが、PR更新、main統合、deploy、release、人間受入を意味しません。
 
@@ -303,8 +367,8 @@ blockingがあればPhase Hへ進まずPhase Gを修正します。tuningなら�
 
 | 目的 | 効果 | 要件 | 状態 | 担当 | 次の一手 |
 | --- | --- | --- | --- | --- | --- |
-| Phase G感覚評価 | 視覚・音・tempoを製品判断できる | ミュートなしdesktop、5観点メモ | 待ち | human game design / UX | Gate G-Aを1回実施 |
-| Phase H選定 | 次sliceを最大の実測gapへ集中する | Gate G-A結果、目的1文、受入、非対象、停止条件 | 未承認 | owner / supervising AI | 4候補から1つだけ承認 |
+| Phase G人間感覚レビュー | 音量・音色・疲労感、最終game feelを製品判断できる | ミュートなしdesktop、観察メモ | deferred / non-blocking | human game design / UX | 問題が観測された場合だけG-TUNE候補を作る |
+| Phase H1選定 | 契約・証拠・再訪判断の因果へ次sliceを限定する | 完全Prompt、目的、受入、非対象、停止条件の承認 | 未実装・未承認 | owner / supervising AI | Phase H1 Promptを明示承認 |
 | recovery remote portability | 別端末で操作復旧済み基準から再開する | 同名branch、fetch/readback、push後parity | 実装branchはremote取得可能。handoff更新は本作業で同期 | current operator | docsだけcommit / normal push後に0 / 0をreadback |
 | draft PR #1 | Phase C〜Fをreview可能にする | human review、CI方針、merge/rollback | OPEN / DRAFT / mergeable | owner / reviewer | G-A後にPR維持・更新・分離を判断 |
 | CI | local gateをPRで再現する | typecheck/test/build workflow | 未設定 | repo owner | merge方針決定時に導入判断 |
@@ -315,17 +379,17 @@ blockingがあればPhase Hへ進まずPhase Gを修正します。tuningなら�
 
 ## 次のAIが最初に行うこと
 
-1. `PROJECT_HANDOFF.md`、本文書、`docs/project-context.md`、READMEのPhase G節を読む。
-2. `git status -sb`、`git rev-parse HEAD`、同名recovery upstream、Phase F tag参照先を確認する。
-3. `git fetch --prune --tags origin` 後、`HEAD...origin/fix/phase-g-playability-recovery` のdivergenceを再確認する。
-4. Phase G人間評価メモを探す。なければ音量、scan幅、距離、delayを最終調整しない。
-5. メモがあればGate G-Aを判定し、blockingならGだけを修正、acceptedならPhase Hを1目的だけ仕様化する。
-6. 追加push、PR、merge、deploy、releaseはそれぞれ明示権限を確認する。今回のbranch/tag pushは完了済み。
+1. `PROJECT_HANDOFF.md`、本文書の2026-07-28節、`docs/project-context.md`、READMEのPhase G UX Closure節を読む。
+2. `feat/phase-g-guided-qa-canary-v1`、local commit、clean worktree、upstream未設定、Phase F tagを確認する。
+3. evidence index、guided / audio / consumer readback、A/B contact sheet、3 lifecycleを確認する。
+4. Phase G人間感覚レビューは任意とし、観測事実なしにG-TUNEしない。
+5. Phase H1を開始する場合は、最終報告の完全Promptをオーナーが明示承認し、1目的だけ実装する。
+6. push、PR、merge、tag、deploy、release、public visibilityはそれぞれ明示権限を確認する。
 
 ## 監修役AIへの判断依頼
 
-現時点の必須判断は1つです。
+現時点の次開発判断は1つです。
 
-**Phase Gをミュートなしで評価し、watcher識別、共有chirp、孤立圧力、reinforcement解除、役割分担を `accepted` / `tuning` / `blocking` のどれに分類するか。**
+**帰還済みの契約・証拠を、WorldState migrationなしで次訪問のrouteまたはsupport差へどう結び付け、プレイヤーが因果を説明できるようにするか。**
 
-acceptedの場合のみ、Phase Hを「契約・証拠・再訪判断の因果深化」に限定して仕様化することを推奨します。この判断にPhase G push、PR更新、merge、deploy、releaseの許可は含みません。
+Phase H1は「契約・証拠・再訪判断の因果深化」に限定して提案します。この提案に実装、push、PR更新、merge、deploy、releaseの許可は含みません。

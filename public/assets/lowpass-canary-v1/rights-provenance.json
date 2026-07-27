@@ -1,0 +1,19 @@
+{
+  "assetPackId": "lowpass-canary-v1",
+  "blenderHeadless": "NOT_TESTED_BLENDER_UNAVAILABLE",
+  "distributionApproved": false,
+  "generatedFromPrimitives": true,
+  "internalOnly": true,
+  "productionTexturingComplete": false,
+  "reviewLabel": "INTERNAL REVIEW ONLY",
+  "rightsStatus": "NOASSERTION",
+  "schemaVersion": "lowpass-asset-provenance-1.0.0",
+  "source": {
+    "artifactGlbSha256": "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+    "branch": "feat/lowpass-asset-canary-v1",
+    "commit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+    "repository": "CodexGameAssetWorkbench"
+  },
+  "textureCount": 0,
+  "uvPresent": false
+}

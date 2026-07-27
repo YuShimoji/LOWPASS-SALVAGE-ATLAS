@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase G Guided Audit</title>
+  <style>
+    :root{color-scheme:dark;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#08110f;color:#dce7df}
+    body{margin:0;padding:24px;background:#08110f}h1{margin:0 0 8px;color:#ecdcae}.lede{margin:0 0 24px;color:#9fb3a8}
+    table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid #294238;padding:8px;text-align:left;vertical-align:top}th{color:#d9c98f;background:#101d19}.pass{color:#72d69c}.failed{color:#ee766d}
+    .comparison-row{margin:0 0 28px}.comparison-row h2{margin:0 0 8px;color:#c9d5ce;font-size:16px}.grid{display:grid;grid-template-columns:repeat(4,minmax(260px,1fr));gap:10px}
+    figure{margin:0;border:1px solid #294238;background:#101816}img{display:block;width:100%;height:auto}figcaption{padding:7px;color:#b9c8be;font-size:11px}
+
+  </style>
+</head>
+<body><h1>Phase G Guided Audit</h1>
+   <p class="lede">PASS · 22/22 steps · timeout 0 · duplicate 0</p>
+   <table><thead><tr><th>ID</th><th>Step</th><th>Ticks</th><th>Duration</th><th>Timeout</th><th>Expected</th><th>Result</th><th>Failure</th></tr></thead>
+   <tbody>
+  <tr>
+    <td>watchful-mission</td>
+    <td>Watchful mission starts</td>
+    <td>578 → 578</td>
+    <td>46 ms</td>
+    <td>12000 ms</td>
+    <td>world=mission, posture revision available</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>player-isolated</td>
+    <td>Player is isolated</td>
+    <td>578 → 584</td>
+    <td>108 ms</td>
+    <td>3000 ms</td>
+    <td>isolation=isolated</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>watcher-recognition</td>
+    <td>Watcher directly recognizes player</td>
+    <td>584 → 584</td>
+    <td>0 ms</td>
+    <td>5000 ms</td>
+    <td>watcher local agent fact</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>watcher-local-fact</td>
+    <td>Watcher local fact is recorded</td>
+    <td>584 → 584</td>
+    <td>0 ms</td>
+    <td>2000 ms</td>
+    <td>watcher localFacts contains agent-sighting</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>hostile-share</td>
+    <td>Contact crosses hostile link</td>
+    <td>584 → 621</td>
+    <td>610 ms</td>
+    <td>6000 ms</td>
+    <td>shared agent fact and connected link</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>needle-shared-response</td>
+    <td>Needle reacts to shared information</td>
+    <td>621 → 700</td>
+    <td>1311 ms</td>
+    <td>4000 ms</td>
+    <td>Needle task leaves patrol</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>needle-direct-reacquire</td>
+    <td>Needle directly re-acquires player</td>
+    <td>700 → 700</td>
+    <td>0 ms</td>
+    <td>5000 ms</td>
+    <td>needle local agent fact</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>lock-on-start</td>
+    <td>Lock-on begins</td>
+    <td>700 → 729</td>
+    <td>495 ms</td>
+    <td>6000 ms</td>
+    <td>lock=locking or locked</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>reinforcement-presence</td>
+    <td>Reinforcement enters local presence</td>
+    <td>729 → 736</td>
+    <td>118 ms</td>
+    <td>3000 ms</td>
+    <td>allied presence &gt;= 2</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>lock-release</td>
+    <td>Reinforcement releases lock</td>
+    <td>736 → 778</td>
+    <td>685 ms</td>
+    <td>4000 ms</td>
+    <td>lock=inactive</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>cautious-transition</td>
+    <td>Security Cell becomes cautious</td>
+    <td>778 → 778</td>
+    <td>0 ms</td>
+    <td>5000 ms</td>
+    <td>band=cautious</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>porter-authentication</td>
+    <td>Porter authenticates</td>
+    <td>778 → 778</td>
+    <td>4 ms</td>
+    <td>7000 ms</td>
+    <td>porter=friendly</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>outnumbered-transition</td>
+    <td>Security Cell becomes outnumbered</td>
+    <td>778 → 785</td>
+    <td>112 ms</td>
+    <td>5000 ms</td>
+    <td>band=outnumbered</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>cell-disengage</td>
+    <td>Security Cell disengages</td>
+    <td>785 → 791</td>
+    <td>102 ms</td>
+    <td>5000 ms</td>
+    <td>Needle and Watcher disengage</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>relay-deploy</td>
+    <td>Relay is deployed</td>
+    <td>791 → 791</td>
+    <td>2 ms</td>
+    <td>4000 ms</td>
+    <td>relay=active</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>relay-sabotage-start</td>
+    <td>Relay sabotage begins</td>
+    <td>791 → 924</td>
+    <td>2212 ms</td>
+    <td>12000 ms</td>
+    <td>relay=sabotaging</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>relay-disabled</td>
+    <td>Relay becomes disabled</td>
+    <td>924 → 1197</td>
+    <td>4543 ms</td>
+    <td>12000 ms</td>
+    <td>relay=disabled</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>relay-restart</td>
+    <td>Relay restarts</td>
+    <td>1197 → 1289</td>
+    <td>1533 ms</td>
+    <td>5000 ms</td>
+    <td>relay=active</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>flare-deploy</td>
+    <td>Flare is deployed</td>
+    <td>1289 → 1289</td>
+    <td>1 ms</td>
+    <td>4000 ms</td>
+    <td>flare=active</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>flare-local-fact</td>
+    <td>Flare fact is generated</td>
+    <td>1289 → 1299</td>
+    <td>173 ms</td>
+    <td>5000 ms</td>
+    <td>local flare-sighting</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>flare-shared-fact</td>
+    <td>Flare fact is shared</td>
+    <td>1299 → 1340</td>
+    <td>697 ms</td>
+    <td>6000 ms</td>
+    <td>shared flare-sighting</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>flare-expiry</td>
+    <td>Flare fact expires</td>
+    <td>1340 → 1875</td>
+    <td>8900 ms</td>
+    <td>12000 ms</td>
+    <td>no local/shared flare-sighting</td>
+    <td class="pass">PASS</td>
+    <td>—</td>
+  </tr></tbody></table></body>
+</html>

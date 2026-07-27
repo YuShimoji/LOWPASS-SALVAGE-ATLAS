@@ -30,7 +30,16 @@ import { CREW_DEFINITIONS, type CrewId, type SquadOrderType } from "./game/squad
 import type { ThreatEcologyContext } from "./game/threat/ScoutDroneController";
 import type { SecurityCellController } from "./game/security/SecurityCellController";
 import type { PorterAndroidController } from "./game/machines/PorterAndroidController";
+import {
+  LOWPASS_CANARY_ASSET_PACK,
+  primitiveAssetPackSelection,
+  resolveAssetPackMode,
+  type AssetPackMode,
+  type AssetPackSelection,
+} from "./game/content/AssetPackRegistry";
 import type { MachineFeedbackAudio } from "./render/audio/MachineFeedbackAudio";
+import type { SemanticAudioState, SemanticCueId } from "./render/audio/SemanticCueCatalog";
+import type { LoadedCanaryMissionAssetPack } from "./render/assets/CanaryMissionAssetPack";
 import { FixedStepRunner } from "./game/simulation/FixedStepRunner";
 import { GameSimulation } from "./game/simulation/GameSimulation";
 import {
@@ -43,10 +52,18 @@ import { PhysicsWorld } from "./physics/PhysicsWorld";
 import { RenderSystem } from "./render/app/RenderSystem";
 import { SquadFeedbackAudio } from "./render/audio/SquadFeedbackAudio";
 import { ExpeditionPanel } from "./ui/ExpeditionPanel";
+import { GuidedQaPanel } from "./ui/GuidedQaPanel";
 import { Hud } from "./ui/Hud";
 import { MissionResultPanel } from "./ui/MissionResultPanel";
+import { SemanticCaptionOverlay } from "./ui/SemanticCaptionOverlay";
 import { SquadPanel } from "./ui/SquadPanel";
 import { WorldStatusPanel } from "./ui/WorldStatusPanel";
+import {
+  runGuidedPhaseGAudit,
+  type GuidedAuditReport,
+  type GuidedQaActionId,
+  type GuidedQaReadback,
+} from "./qa/GuidedPhaseGAudit";
 import {
   FLOODED_MARKET_WORLD,
   FLOODED_MARKET_WORLD_INSTANCE_ID,
@@ -120,6 +137,14 @@ declare global {
       threatReadback(): ReturnType<SecurityCellController["getDebugReadback"]> | null;
       worldState(): PersistedWorldState;
       resetWorldStateForQa(): Promise<void>;
+      guidedQaReadback(): GuidedQaReadback;
+      runGuidedAudit(): Promise<GuidedAuditReport>;
+      guidedAudit(): GuidedAuditReport | null;
+      performGuidedQaAction(action: GuidedQaActionId): Promise<string>;
+      audioState(): SemanticAudioState;
+      playAudioCue(cueId: SemanticCueId): boolean;
+      assetReadback(): AssetPackSelection;
+      setQaEvidenceHidden(hidden: boolean): void;
     };
   }
 }
@@ -143,6 +168,8 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   state.world.completedExpeditions = persistedWorldState.visitCount;
   const query = new URLSearchParams(window.location.search);
   const audioEnabled = query.get("audio") !== "muted";
+  let selectedAssetMode: AssetPackMode = resolveAssetPackMode(window.location.search);
+  let assetPackSelection: AssetPackSelection = primitiveAssetPackSelection(selectedAssetMode);
   const simulation = new GameSimulation(state);
   const gateContext = createGateEvaluationContext(
     CREW_DEFINITIONS,
@@ -165,17 +192,35 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   let transitionInFlight = false;
   let appDisposed = false;
   let frameHandle = 0;
-  let qaPanel: HTMLElement | null = null;
+  let qaPanel: GuidedQaPanel | null = null;
   let ecologyRefreshAccumulator = 0;
   let cachedEcologyContext: ThreatEcologyContext | null = null;
   let porterWasAuthenticated = false;
   let handledFirstRetreatAnalysisRevision = 0;
   let handledSharedContactRevision = 0;
   let activeWorldVisitBase: PersistedWorldState | null = null;
+  let guidedAudit: GuidedAuditReport | null = null;
+  let guidedFlareWasDeployed = false;
+  let guidedDuplicateEventCount = 0;
+  let lastWatcherAgentFactCount = 0;
+  let lastNeedleAgentFactCount = 0;
+  let lastPresenceBand = "";
+  let lastRelayDisabledCount = 0;
+  let lastRelaySabotageReservationCount = 0;
+  let lastFlareFactCount = 0;
+  let guidedFlareObserverReleaseTimer = 0;
+  let guidedFlareObserverHoldInterval = 0;
+  const emittedSemanticEventKeys = new Set<string>();
 
   const releaseWorldInput = (): void => {
     input?.clearMovement();
     if (document.pointerLockElement) document.exitPointerLock();
+  };
+
+  const playSemanticEvent = (eventKey: string, cueId: SemanticCueId): void => {
+    if (emittedSemanticEventKeys.has(eventKey)) return;
+    emittedSemanticEventKeys.add(eventKey);
+    machineAudio?.playCue(cueId, state.runtime.elapsedSeconds);
   };
 
   const setModal = (requestedModal: ActiveModal): void => {
@@ -212,6 +257,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     onPauseToggle: () => setModal(state.ui.activeModal === "settings" ? "none" : "settings"),
     onVisualSetting: updateVisualSetting,
   });
+  const semanticCaption = new SemanticCaptionOverlay(root);
   const squadAudio = new SquadFeedbackAudio(audioEnabled);
   resultPanel = new MissionResultPanel(root, () => void returnToShip());
 
@@ -391,11 +437,11 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       ["relay-01", "player"],
       ["terminal-01", "player"],
       ["crowbar-01", "player"],
+      ["flare-01", "player"],
     ] as const;
     runPlannerAction(() => {
-      const draft = planner.getDraftSnapshot();
       for (const [itemId, agentId] of desiredAssignments) {
-        if (!draft.itemInstanceIds.includes(itemId)) planner.assignItem(itemId, agentId);
+        planner.assignItem(itemId, agentId);
       }
     });
     simulation.setNotice("QA PHASE D LOADOUT // 28U READY");
@@ -449,7 +495,9 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       isWorldInputAllowed: () =>
         state.runtime.mode === "playing"
         && state.ui.activeModal === "none"
-        && !transitionInFlight,
+        && !transitionInFlight
+        && !(qaPanel?.isOpen() ?? false),
+      isDragLookBlocked: () => qaPanel?.isOpen() ?? false,
       getModalState: () => state.ui.activeModal,
     });
   } catch (error) {
@@ -469,105 +517,451 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   let handledActivationRevision = 0;
   let gateScanRevision = 0;
 
-  if (query.has("qa")) {
-    qaPanel = createQaNavigation(root, (target) => {
-      if (target === "phase-d-loadout") {
-        configureQaPhaseDLoadout();
-        return;
-      }
-      if (target === "isolate-contact" && squadController && threatController) {
-        const isolated = { x: 3.45, y: 0.93, z: -3.5 };
-        squadController.setAgentPositionForQa("player", isolated);
-        squadController.setAgentPositionForQa("mara", { x: -6, y: 0.93, z: 6 });
-        squadController.setAgentPositionForQa("ito", { x: -5.5, y: 0.93, z: 6 });
-        threatController.armIsolatedContactForQa(
-          { x: 3.45, y: threatController.definition.cruiseAltitude, z: -4.65 },
-          state.runtime.elapsedSeconds,
-          Math.PI,
-        );
-        physics?.teleportCharacter(isolated);
-        simulation.teleportPlayer(isolated);
-        simulation.setNotice("QA // ISOLATED CONTACT CONFIGURED");
-        return;
-      }
-      if (target === "reinforce-contact" && squadController) {
-        const targetAgent = squadController.state.agents.player;
-        if (targetAgent) squadController.setAgentPositionForQa("mara", { ...targetAgent.position, x: targetAgent.position.x - 0.7 });
-        simulation.setNotice("QA // ALLIED REINFORCEMENT ARRIVED");
-        return;
-      }
-      if (target === "withdraw-contact" && squadController) {
-        squadController.setAgentPositionForQa("mara", { x: -6, y: 0.93, z: 6 });
-        simulation.setNotice("QA // ALLIED REINFORCEMENT WITHDREW");
-        return;
-      }
-      if (target === "deploy-relay") {
-        runEquipmentAction("deploy-relay");
-        return;
-      }
-      if (target === "disable-relay" && squadController) {
-        const result = squadController.disableRelay("relay-01", state.runtime.elapsedSeconds);
-        setSquadNotice(`${result.code} // ${result.reason}`);
-        return;
-      }
-      if (target === "restart-relay" && squadController) {
-        const result = squadController.beginRelayRestart("relay-01", state.runtime.elapsedSeconds);
-        setSquadNotice(`${result.code} // ${result.reason}`);
-        return;
-      }
-      if (target === "porter-auth") {
-        const position = porterController?.state.position;
-        if (position) {
-          physics?.teleportCharacter(position);
-          simulation.teleportPlayer(position);
-          squadController?.setAgentPositionForQa(squadController.state.control.controlledAgentId, position);
-        }
-        runPorterAuthentication();
-        return;
-      }
-      if (target === "porter-carry") {
-        runPorterCommand("carry-to");
-        return;
-      }
-      if ((target === "cart-coil" || target === "cart-extract") && missionController && physics) {
-        const cartPosition = target === "cart-coil"
-          ? { x: 0, y: 0.48, z: -0.6 }
-          : missionController.definition.extractionPoint;
-        missionController.setCartPoseForQa(cartPosition, target === "cart-coil" ? Math.PI : 0);
-        physics.setKinematicObjectPosition(missionController.state.cartId, cartPosition);
-        const operatorPosition = missionController.getCartOperatorPosition();
-        activeInput.clearMovement();
-        physics.teleportCharacter(operatorPosition);
-        simulation.teleportPlayer(operatorPosition);
-        squadController?.setAgentPositionForQa(
-          squadController.state.control.controlledAgentId,
-          operatorPosition,
-        );
-        refreshMissionInteractions();
-        simulation.setNotice(
-          target === "cart-coil"
-            ? "QA // CART STAGED FOR COIL LOAD"
-            : "QA // LOADED CART STAGED FOR EXTRACTION",
-        );
-        return;
-      }
-      let position = SHIP_INTERACTIONS.find((interaction) => interaction.id === "expedition-console")?.position;
-      if (missionController) {
-        if (target === "extract") position = missionController.definition.extractionPoint;
-        else if (target === "cart") position = missionController.getCartPosition();
-        else if (target === "drone") position = threatController?.state.drone.position;
-        else if (target === "porter") position = porterController?.state.position;
-        else position = missionController.definition.salvage.find((resource) => resource.sourceId === target)?.position
-          ?? missionController.definition.searchZones.find((zone) => zone.id === target)?.entrance
-          ?? missionController.definition.toolShortcuts.find((shortcut) => shortcut.id === target)?.interactionPosition;
-      }
-      if (!position) return;
-      const playerPosition = { x: position.x, y: 0.93, z: position.z };
-      activeInput.clearMovement();
-      physics?.teleportCharacter(playerPosition);
-      simulation.teleportPlayer(playerPosition);
-      refreshMissionInteractions();
+  const readGuidedQa = (): GuidedQaReadback => {
+    const cell = threatController?.state.securityCell ?? null;
+    const watcherKnowledge = cell?.knowledgeByMachine["machine:security:watcher-01"];
+    const needleKnowledge = cell?.knowledgeByMachine["machine:security:needle-01"];
+    const watcherLocalFactKinds = watcherKnowledge
+      ? [...new Set(Object.values(watcherKnowledge.localFacts).map((fact) => fact.kind))].sort()
+      : [];
+    const needleLocalFactKinds = needleKnowledge
+      ? [...new Set(Object.values(needleKnowledge.localFacts).map((fact) => fact.kind))].sort()
+      : [];
+    const sharedFactKinds = cell
+      ? [...new Set(Object.values(cell.blackboard.sharedFacts).map((fact) => fact.kind))].sort()
+      : [];
+    const presence = cell?.presence ?? threatController?.state.drone.presence ?? null;
+    const controlledAgent = squadController?.state.control.controlledAgentId ?? "player";
+    const deployedRelay = squadController?.state.deployedRelayItemIds[0] ?? null;
+    const relayState: GuidedQaReadback["relayState"] = !deployedRelay
+      ? "not-deployed"
+      : squadController?.state.relayRestartByItemId[deployedRelay]
+        ? "restarting"
+        : squadController?.state.disabledRelayItemIds.includes(deployedRelay)
+          ? "disabled"
+          : threatController?.state.drone.sabotageRelayId === deployedRelay
+            ? "sabotaging"
+            : "active";
+    const activeBeaconCount = Object.values(squadController?.state.signals.beacons ?? {})
+      .filter((beacon) => beacon.expiresAtSeconds > state.runtime.elapsedSeconds)
+      .length;
+    const localFlareObserved = [...watcherLocalFactKinds, ...needleLocalFactKinds].includes("flare-sighting");
+    const sharedFlareObserved = sharedFactKinds.includes("flare-sighting");
+    const flareState: GuidedQaReadback["flareState"] = sharedFlareObserved
+      ? "shared"
+      : localFlareObserved
+        ? "observed"
+        : activeBeaconCount > 0
+          ? "active"
+          : guidedFlareWasDeployed
+            ? "expired"
+            : "not-deployed";
+    const lockState: GuidedQaReadback["lockState"] = threatController?.state.drone.mode === "lock-on"
+      ? threatController.state.drone.lockOnProgress >= 1 ? "locked" : "locking"
+      : threatController?.state.drone.mode === "interdict"
+        ? "locked"
+        : "inactive";
+    return {
+      tick: state.runtime.tick,
+      elapsedSeconds: state.runtime.elapsedSeconds,
+      world: state.world.mode,
+      controlledAgent,
+      playerIsolationState: !presence
+        ? "unknown"
+        : presence.alliedPresence < 2
+          ? "isolated"
+          : "reinforced",
+      alliedPresence: presence?.alliedPresence ?? 0,
+      hostilePresence: presence?.hostilePresence ?? 0,
+      presenceBand: presence?.band ?? "unknown",
+      watcherTask: cell?.blackboard.currentAssignments["machine:security:watcher-01"]?.task
+        ?? cell?.watcher?.mode
+        ?? "none",
+      needleTask: cell?.blackboard.currentAssignments["machine:security:needle-01"]?.task
+        ?? threatController?.state.drone.mode
+        ?? "none",
+      hostileLinkState: !cell?.link
+        ? "unavailable"
+        : cell.link.connected
+          ? "connected"
+          : "disconnected",
+      relayState,
+      flareState,
+      porterState: porterController?.state.mode ?? "unavailable",
+      lockState,
+      interferenceState: Object.values(squadController?.state.interferenceUntilByAgentId ?? {})
+        .some((untilSeconds) => untilSeconds > state.runtime.elapsedSeconds)
+        ? "active"
+        : "inactive",
+      watcherLocalFactKinds,
+      needleLocalFactKinds,
+      sharedFactKinds,
+      revisions: {
+        runtimeTick: state.runtime.tick,
+        blackboard: cell?.blackboard.revision ?? 0,
+        sharedContact: cell?.sharedContactRevision ?? 0,
+        needleTransition: threatController?.state.drone.transitionRevision ?? 0,
+        watcherTransition: cell?.watcher?.transitionRevision ?? 0,
+        communication: squadController?.state.communicationRevision ?? 0,
+        squadFeedback: squadController?.state.feedback.revision ?? 0,
+        interference: threatController?.state.interferenceRevision ?? 0,
+      },
+      duplicateEventCount: guidedDuplicateEventCount,
+    };
+  };
+
+  const confirmQaManifest = (): ExpeditionManifest => {
+    if (state.expedition.confirmedManifest) return state.expedition.confirmedManifest;
+    configureQaPhaseDLoadout();
+    const manifest = planner.confirm({
+      manifestId: crypto.randomUUID(),
+      createdAtIso: new Date().toISOString(),
     });
+    state.expedition.draft = planner.getDraftSnapshot();
+    state.expedition.confirmedManifest = manifest;
+    return manifest;
+  };
+
+  const setQaAgentPosition = (agentId: CrewId, position: { x: number; y: number; z: number }): void => {
+    squadController?.setAgentPositionForQa(agentId, position);
+    if (squadController?.state.control.controlledAgentId !== agentId) return;
+    activeInput.clearMovement();
+    physics?.teleportCharacter(position);
+    simulation.teleportPlayer(position);
+  };
+
+  const performGuidedQaAction = async (action: GuidedQaActionId): Promise<string> => {
+    if (action === "apply-loadout") {
+      configureQaPhaseDLoadout();
+      return "QA 28U loadout applied";
+    }
+    if (action === "deploy-watchful") {
+      if (state.world.mode === "ship") {
+        const manifest = confirmQaManifest();
+        await startFixedMission(manifest, { insertionMode: "stable", insertionSeed: "atlas-01" });
+      }
+      if (!threatController || !squadController || state.world.mode !== "mission") {
+        throw new Error("GUIDED_QA_MISSION_START_FAILED");
+      }
+      threatController.forcePostureForQa("watchful");
+      return `watchful mission ready // ${assetPackSelection.activeMode}`;
+    }
+    if (!threatController || !squadController || !missionController) {
+      throw new Error(`GUIDED_QA_SESSION_REQUIRED:${action}`);
+    }
+    if (action === "reset-phase-g") {
+      guidedAudit = null;
+      guidedFlareWasDeployed = false;
+      guidedDuplicateEventCount = 0;
+      window.clearTimeout(guidedFlareObserverReleaseTimer);
+      window.clearInterval(guidedFlareObserverHoldInterval);
+      threatController.forcePostureForQa("watchful");
+      threatController.setHostileLinkSuppressedForQa(true);
+      return "Phase G QA placement reset; persisted world unchanged";
+    }
+    if (action === "isolate-player") {
+      const isolated = { x: 3.45, y: 0.93, z: -3.5 };
+      setQaAgentPosition("player", isolated);
+      squadController.setAgentPositionForQa("mara", { x: -6, y: 0.93, z: 6 });
+      squadController.setAgentPositionForQa("ito", { x: -5.5, y: 0.93, z: 6 });
+      threatController.forcePostureForQa("watchful");
+      threatController.setHostileLinkSuppressedForQa(true);
+      threatController.setWatcherPositionForQa(
+        { x: isolated.x, y: 2.65, z: isolated.z - 0.55 },
+        Math.PI,
+      );
+      threatController.armIsolatedContactForQa(
+        { x: isolated.x + 0.25, y: threatController.definition.cruiseAltitude, z: isolated.z - 0.55 },
+        state.runtime.elapsedSeconds,
+        -Math.PI / 2,
+      );
+      refreshMissionInteractions();
+      return "player isolated; reinforcement removed; hostile link held for watcher-first contact";
+    }
+    if (action === "observe-watcher") {
+      return "watcher recognition observation window opened";
+    }
+    if (action === "share-contact") {
+      threatController.setHostileLinkSuppressedForQa(false);
+      return "hostile link restored; normal share delay retained";
+    }
+    if (action === "needle-reacquire") {
+      const player = squadController.state.agents.player;
+      if (!player) throw new Error("GUIDED_QA_PLAYER_MISSING");
+      threatController.armIsolatedContactForQa(
+        { x: player.position.x, y: threatController.definition.cruiseAltitude, z: player.position.z - 0.55 },
+        state.runtime.elapsedSeconds,
+        Math.PI,
+      );
+      return "Needle placed for direct line-of-sight re-acquisition";
+    }
+    if (action === "reinforcement-arrives") {
+      const player = squadController.state.agents.player;
+      if (!player) throw new Error("GUIDED_QA_PLAYER_MISSING");
+      squadController.setAgentPositionForQa("mara", {
+        ...player.position,
+        x: player.position.x - 0.7,
+      });
+      threatController.setWatcherPositionForQa(
+        { x: player.position.x, y: 2.65, z: player.position.z },
+        Math.PI / 2,
+      );
+      threatController.setDronePositionForQa(
+        { x: player.position.x, y: threatController.definition.cruiseAltitude, z: player.position.z },
+        Math.PI / 2,
+      );
+      machineAudio?.playCue("reinforcement-accepted", state.runtime.elapsedSeconds);
+      return "Mara entered local Presence through normal PresenceService";
+    }
+    if (action === "porter-joins") {
+      const porterPosition = porterController?.state.position;
+      if (!porterController || !porterPosition) throw new Error("GUIDED_QA_PORTER_MISSING");
+      const playerPosition = { ...porterPosition, y: 0.93 };
+      setQaAgentPosition("player", playerPosition);
+      squadController.setAgentPositionForQa("mara", { ...playerPosition, x: playerPosition.x - 0.7 });
+      squadController.setAgentPositionForQa("ito", { x: -5.5, y: 0.93, z: 6 });
+      threatController.setWatcherPositionForQa(
+        { x: playerPosition.x, y: 2.65, z: playerPosition.z },
+        Math.PI / 2,
+      );
+      threatController.setDronePositionForQa(
+        { x: playerPosition.x, y: threatController.definition.cruiseAltitude, z: playerPosition.z },
+        Math.PI / 2,
+      );
+      const code = runPorterAuthentication();
+      return `Porter authentication requested // ${code}`;
+    }
+    if (action === "observe-disengage") {
+      return "outnumbered cell disengage observation window opened";
+    }
+    if (action === "deploy-relay") {
+      const relayPosition = { x: -3.45, y: 0.93, z: -4.65 };
+      setQaAgentPosition("player", relayPosition);
+      squadController.setAgentPositionForQa("mara", { x: 6, y: 0.93, z: 6 });
+      squadController.setAgentPositionForQa("ito", { x: 5.5, y: 0.93, z: 6 });
+      threatController.setWatcherPositionForQa(
+        { x: relayPosition.x, y: 2.65, z: relayPosition.z - 1.2 },
+        Math.PI,
+      );
+      threatController.setDronePositionForQa(
+        { x: relayPosition.x + 1.2, y: threatController.definition.cruiseAltitude, z: relayPosition.z },
+        Math.PI / 2,
+      );
+      const code = runEquipmentAction("deploy-relay");
+      return `relay deployment requested // ${code}`;
+    }
+    if (action === "start-relay-sabotage") {
+      const relayId = squadController.state.deployedRelayItemIds[0];
+      const location = relayId ? missionController.state.itemLocations[relayId] : null;
+      if (!relayId || location?.kind !== "mission-ground") throw new Error("GUIDED_QA_ACTIVE_RELAY_MISSING");
+      setQaAgentPosition("player", { x: location.position.x + 6.2, y: 0.93, z: location.position.z });
+      squadController.setAgentPositionForQa("mara", { x: 6, y: 0.93, z: 6 });
+      squadController.setAgentPositionForQa("ito", { x: 5.5, y: 0.93, z: 6 });
+      const holdSabotagePlacement = (): void => {
+        threatController?.armIsolatedContactForQa(
+          { x: location.position.x + 1.1, y: threatController.definition.cruiseAltitude, z: location.position.z },
+          state.runtime.elapsedSeconds,
+          Math.PI / 2,
+        );
+        threatController?.setWatcherPositionForQa(
+          { x: location.position.x, y: 2.65, z: location.position.z },
+          Math.PI / 2,
+        );
+      };
+      holdSabotagePlacement();
+      const stabilizationInterval = window.setInterval(holdSabotagePlacement, 200);
+      try {
+        await waitForGuidedQa((readback) => readback.presenceBand === "predatory", 2_500);
+      } finally {
+        window.clearInterval(stabilizationInterval);
+      }
+      holdSabotagePlacement();
+      return `existing AI may reserve and sabotage ${relayId}`;
+    }
+    if (action === "restart-relay") {
+      const relayId = squadController.state.deployedRelayItemIds[0];
+      const location = relayId ? missionController.state.itemLocations[relayId] : null;
+      if (!relayId || location?.kind !== "mission-ground") throw new Error("GUIDED_QA_DISABLED_RELAY_MISSING");
+      setQaAgentPosition("player", { ...location.position, y: 0.93 });
+      const result = squadController.beginRelayRestart(relayId, state.runtime.elapsedSeconds);
+      setSquadNotice(`${result.code} // ${result.reason}`);
+      return `relay restart requested // ${result.code}`;
+    }
+    if (action === "deploy-flare") {
+      const code = runEquipmentAction("flare");
+      if (code === "FLARE_DEPLOYED") {
+        guidedFlareWasDeployed = true;
+        machineAudio?.playCue("flare-deployed", state.runtime.elapsedSeconds);
+      }
+      return `flare deployment requested // ${code}`;
+    }
+    const beacon = Object.values(squadController.state.signals.beacons)[0];
+    if (!beacon) throw new Error("GUIDED_QA_ACTIVE_FLARE_MISSING");
+    threatController.setWatcherPositionForQa(
+      { x: beacon.position.x, y: 2.65, z: beacon.position.z - 1.15 },
+      Math.PI,
+    );
+    threatController.setDronePositionForQa(
+      { x: beacon.position.x + 1.15, y: threatController.definition.cruiseAltitude, z: beacon.position.z },
+      Math.PI / 2,
+    );
+    threatController.setHostileLinkSuppressedForQa(false);
+    window.clearTimeout(guidedFlareObserverReleaseTimer);
+    window.clearInterval(guidedFlareObserverHoldInterval);
+    guidedFlareObserverReleaseTimer = window.setTimeout(() => {
+      if (!threatController) return;
+      threatController.setHostileLinkSuppressedForQa(true);
+      const holdObserversAway = (): void => {
+        if (!threatController) return;
+        threatController.setWatcherPositionForQa(
+          { x: 6, y: threatController.securityDefinition.watcherCruiseAltitude, z: 6 },
+          0,
+        );
+        threatController.setDronePositionForQa(
+          { x: 6, y: threatController.definition.cruiseAltitude, z: 6 },
+          0,
+        );
+      };
+      holdObserversAway();
+      guidedFlareObserverHoldInterval = window.setInterval(holdObserversAway, 250);
+      window.setTimeout(() => window.clearInterval(guidedFlareObserverHoldInterval), 10_500);
+    }, 1_600);
+    return "hostile machines placed to observe active flare through existing perception";
+  };
+
+  const waitForGuidedQa = async (
+    predicate: (readback: GuidedQaReadback) => boolean,
+    timeoutMs: number,
+  ): Promise<{ readonly matched: boolean; readonly readback: GuidedQaReadback }> => {
+    const startedAt = performance.now();
+    let readback = readGuidedQa();
+    while (!predicate(readback) && performance.now() - startedAt < timeoutMs) {
+      await new Promise<void>((resolve) => window.setTimeout(resolve, 50));
+      readback = readGuidedQa();
+    }
+    return { matched: predicate(readback), readback };
+  };
+
+  const runFullGuidedAudit = async (): Promise<GuidedAuditReport> => {
+    guidedAudit = await runGuidedPhaseGAudit({
+      read: readGuidedQa,
+      perform: performGuidedQaAction,
+      waitFor: waitForGuidedQa,
+      now: () => performance.now(),
+    });
+    return guidedAudit;
+  };
+
+  const navigateRawQaTarget = (target: string): void => {
+    if (target === "phase-d-loadout") {
+      configureQaPhaseDLoadout();
+      return;
+    }
+    if (target === "isolate-contact") {
+      void performGuidedQaAction("isolate-player");
+      return;
+    }
+    if (target === "reinforce-contact") {
+      void performGuidedQaAction("reinforcement-arrives");
+      return;
+    }
+    if (target === "withdraw-contact" && squadController) {
+      squadController.setAgentPositionForQa("mara", { x: -6, y: 0.93, z: 6 });
+      simulation.setNotice("QA // ALLIED REINFORCEMENT WITHDREW");
+      return;
+    }
+    if (target === "deploy-relay") {
+      runEquipmentAction("deploy-relay");
+      return;
+    }
+    if (target === "disable-relay" && squadController) {
+      const result = squadController.disableRelay("relay-01", state.runtime.elapsedSeconds);
+      setSquadNotice(`${result.code} // ${result.reason}`);
+      return;
+    }
+    if (target === "restart-relay" && squadController) {
+      const result = squadController.beginRelayRestart("relay-01", state.runtime.elapsedSeconds);
+      setSquadNotice(`${result.code} // ${result.reason}`);
+      return;
+    }
+    if (target === "porter-auth") {
+      const position = porterController?.state.position;
+      if (position) setQaAgentPosition(squadController?.state.control.controlledAgentId ?? "player", position);
+      runPorterAuthentication();
+      return;
+    }
+    if (target === "porter-carry") {
+      runPorterCommand("carry-to");
+      return;
+    }
+    if ((target === "cart-coil" || target === "cart-extract") && missionController && physics) {
+      const cartPosition = target === "cart-coil"
+        ? { x: 0, y: 0.48, z: -0.6 }
+        : missionController.definition.extractionPoint;
+      missionController.setCartPoseForQa(cartPosition, target === "cart-coil" ? Math.PI : 0);
+      physics.setKinematicObjectPosition(missionController.state.cartId, cartPosition);
+      const operatorPosition = missionController.getCartOperatorPosition();
+      setQaAgentPosition(squadController?.state.control.controlledAgentId ?? "player", operatorPosition);
+      refreshMissionInteractions();
+      simulation.setNotice(
+        target === "cart-coil"
+          ? "QA // CART STAGED FOR COIL LOAD"
+          : "QA // LOADED CART STAGED FOR EXTRACTION",
+      );
+      return;
+    }
+    let position = SHIP_INTERACTIONS.find((interaction) => interaction.id === "expedition-console")?.position;
+    if (missionController) {
+      if (target === "extract") position = missionController.definition.extractionPoint;
+      else if (target === "cart") position = missionController.getCartPosition();
+      else if (target === "drone") position = threatController?.state.drone.position;
+      else if (target === "porter") position = porterController?.state.position;
+      else position = missionController.definition.salvage.find((resource) => resource.sourceId === target)?.position
+        ?? missionController.definition.searchZones.find((zone) => zone.id === target)?.entrance
+        ?? missionController.definition.toolShortcuts.find((shortcut) => shortcut.id === target)?.interactionPosition;
+    }
+    if (!position) return;
+    setQaAgentPosition(squadController?.state.control.controlledAgentId ?? "player", { x: position.x, y: 0.93, z: position.z });
+    refreshMissionInteractions();
+  };
+
+  if (query.has("qa")) {
+    qaPanel = new GuidedQaPanel(
+      root,
+      {
+        read: readGuidedQa,
+        perform: performGuidedQaAction,
+        runAudit: runFullGuidedAudit,
+        getAudioState: () => machineAudio?.getState() ?? (audioEnabled ? "enabled" : "muted"),
+        resumeAudio: () => machineAudio?.resume() ?? Promise.resolve(audioEnabled ? "enabled" : "muted"),
+        playAudioCue: (cueId) => machineAudio?.playCue(cueId, state.runtime.elapsedSeconds, true) ?? false,
+        getAssetMode: () => selectedAssetMode,
+        setAssetMode: (mode) => {
+          selectedAssetMode = mode;
+          query.set("asset-mode", mode);
+          window.history.replaceState(null, "", `${window.location.pathname}?${query.toString()}${window.location.hash}`);
+          simulation.setNotice(
+            state.world.mode === "ship"
+              ? `ASSET PACK SELECTED // ${mode}`
+              : `ASSET PACK ${mode} // applies on next mission load`,
+          );
+        },
+        getAssetSummary: () => [
+          `requested ${assetPackSelection.requestedMode}`,
+          `active ${assetPackSelection.activeMode}`,
+          assetPackSelection.canary ? `sha ${assetPackSelection.canary.exactGlbSha256.slice(0, 12)}` : "primitive fallback",
+          assetPackSelection.fallbackReason ?? "no fallback",
+        ].join(" · "),
+        onOpenChange: (open) => {
+          if (open) releaseWorldInput();
+        },
+      },
+      RAW_QA_CONTROLS.map(([id, label]) => ({
+        id,
+        label,
+        run: () => navigateRawQaTarget(id),
+      })),
+    );
   }
 
   async function startFixedMission(manifest: ExpeditionManifest, launchOptions: MissionLaunchOptions): Promise<void> {
@@ -597,6 +991,8 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       return;
     }
 
+    let loadedCanaryPack: LoadedCanaryMissionAssetPack | null = null;
+    let canaryPackTransferred = false;
     try {
       const [
         { FLOODED_MARKET_MISSION },
@@ -617,6 +1013,23 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         import("./game/mission/MissionSession"),
       ]);
       if (appDisposed) return;
+      assetPackSelection = primitiveAssetPackSelection(selectedAssetMode);
+      if (selectedAssetMode === "canary-v1") {
+        try {
+          const { loadCanaryMissionAssetPack } = await import("./render/assets/CanaryMissionAssetPack");
+          loadedCanaryPack = await loadCanaryMissionAssetPack();
+          assetPackSelection = {
+            requestedMode: "canary-v1",
+            activeMode: "canary-v1",
+            fallbackReason: null,
+            canary: LOWPASS_CANARY_ASSET_PACK,
+          };
+        } catch (error) {
+          const fallbackReason = error instanceof Error ? error.message : String(error);
+          assetPackSelection = primitiveAssetPackSelection("canary-v1", fallbackReason);
+          console.warn(`CANARY_ASSET_FALLBACK // ${fallbackReason}`);
+        }
+      }
       const sessionId = crypto.randomUUID();
       const navigation = new WaypointNavigationService(FLOODED_MARKET_MISSION.navigation);
       const worldVisit = createWorldVisitProjection(
@@ -683,6 +1096,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       });
       if (appDisposed) {
         nextPhysics.dispose();
+        loadedCanaryPack?.dispose();
         return;
       }
 
@@ -726,11 +1140,13 @@ async function bootstrap(root: HTMLElement): Promise<void> {
           nextSquadController.state,
           nextThreatController.state,
           nextPorterController.state,
+          loadedCanaryPack,
         ),
         controlledPlacement
           ? { playerPosition: controlledPlacement.position, cameraPosition: controlledPlacement.cameraPosition }
           : undefined,
       );
+      canaryPackTransferred = loadedCanaryPack !== null;
       physics?.dispose();
       physics = nextPhysics;
       missionController = nextMissionController;
@@ -738,7 +1154,10 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       threatController = nextThreatController;
       porterController = nextPorterController;
       machineAudio?.dispose();
-      machineAudio = new DynamicMachineFeedbackAudio(audioEnabled);
+      machineAudio = new DynamicMachineFeedbackAudio(
+        audioEnabled,
+        (cueId, label) => semanticCaption.show(cueId, label),
+      );
       activeReservation = reservationCommit.reservation;
       activeWorldVisitBase = persistedWorldState;
       state.inventory.itemLocations = nextMissionController.state.itemLocations;
@@ -752,6 +1171,17 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       porterWasAuthenticated = nextPorterController.state.authenticated;
       handledFirstRetreatAnalysisRevision = 0;
       handledSharedContactRevision = 0;
+      guidedFlareWasDeployed = false;
+      guidedDuplicateEventCount = 0;
+      lastWatcherAgentFactCount = 0;
+      lastNeedleAgentFactCount = 0;
+      lastPresenceBand = "";
+      lastRelayDisabledCount = 0;
+      lastRelaySabotageReservationCount = 0;
+      lastFlareFactCount = 0;
+      window.clearTimeout(guidedFlareObserverReleaseTimer);
+      window.clearInterval(guidedFlareObserverHoldInterval);
+      emittedSemanticEventKeys.clear();
       state.world.mode = "mission";
       simulation.teleportPlayer(controlledSpawn);
       refreshMissionInteractions();
@@ -771,6 +1201,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       simulation.setNotice(`探索マップの開始に失敗しました: ${error instanceof Error ? error.message : String(error)}`);
       console.error(error);
     } finally {
+      if (!canaryPackTransferred) loadedCanaryPack?.dispose();
       transitionInFlight = false;
     }
   }
@@ -1052,6 +1483,10 @@ async function bootstrap(root: HTMLElement): Promise<void> {
                   if (!target) return;
                   const pulse = activeSession.applyInterference(targetAgentId, target.position, state.runtime.elapsedSeconds);
                   activeSquad.applyInterference(targetAgentId, pulse.communicationLimitedUntilSeconds);
+                  playSemanticEvent(
+                    `interference:${targetAgentId}:${threatController?.state.interferenceRevision ?? state.runtime.tick}`,
+                    "interference-pulse",
+                  );
                   if (activeSquad.state.control.controlledAgentId === targetAgentId) {
                     state.interaction.activatedAction = null;
                     input?.clearMovement();
@@ -1061,6 +1496,9 @@ async function bootstrap(root: HTMLElement): Promise<void> {
                 },
                 onRelaySabotage: (relayItemId) => {
                   const result = activeSquad.disableRelay(relayItemId, state.runtime.elapsedSeconds);
+                  if (result.accepted) {
+                    playSemanticEvent(`relay-disabled:${relayItemId}`, "relay-disabled");
+                  }
                   simulation.setNotice(`${result.code} // ${result.reason}`);
                 },
               };
@@ -1093,6 +1531,79 @@ async function bootstrap(root: HTMLElement): Promise<void> {
                 machineAudio?.playHostileShareReceive();
               }
               handledSharedContactRevision = sharedRevision;
+            }
+            const securityCell = threatController.state.securityCell;
+            if (securityCell) {
+              const watcherAgentFactCount = Object.values(
+                securityCell.knowledgeByMachine["machine:security:watcher-01"]?.localFacts ?? {},
+              ).filter((fact) => fact.kind === "agent-sighting").length;
+              if (watcherAgentFactCount > lastWatcherAgentFactCount) {
+                playSemanticEvent(
+                  `watcher-contact:${watcherAgentFactCount}:${securityCell.blackboard.revision}`,
+                  "watcher-contact",
+                );
+              }
+              lastWatcherAgentFactCount = watcherAgentFactCount;
+              const needleAgentFactCount = Object.values(
+                securityCell.knowledgeByMachine["machine:security:needle-01"]?.localFacts ?? {},
+              ).filter((fact) => fact.kind === "agent-sighting").length;
+              if (needleAgentFactCount > lastNeedleAgentFactCount) {
+                playSemanticEvent(
+                  `needle-reacquired:${needleAgentFactCount}:${securityCell.blackboard.revision}`,
+                  "needle-reacquired",
+                );
+              }
+              lastNeedleAgentFactCount = needleAgentFactCount;
+              const presenceBand = securityCell.presence?.band ?? "";
+              if (presenceBand && presenceBand !== lastPresenceBand) {
+                if (presenceBand === "cautious") {
+                  playSemanticEvent(
+                    `presence-cautious:${securityCell.blackboard.revision}`,
+                    "cautious-transition",
+                  );
+                } else if (presenceBand === "outnumbered") {
+                  playSemanticEvent(
+                    `presence-outnumbered:${securityCell.blackboard.revision}`,
+                    "outnumbered-transition",
+                  );
+                }
+                lastPresenceBand = presenceBand;
+              }
+              const sabotageReservationCount = Object.values(securityCell.blackboard.taskReservations)
+                .filter((reservation) => reservation.task === "sabotage-relay")
+                .length;
+              if (sabotageReservationCount > lastRelaySabotageReservationCount) {
+                playSemanticEvent(
+                  `relay-sabotage:${sabotageReservationCount}:${securityCell.blackboard.revision}`,
+                  "relay-sabotage-start",
+                );
+              }
+              lastRelaySabotageReservationCount = sabotageReservationCount;
+              const disabledRelayCount = squadController.state.disabledRelayItemIds.length;
+              if (disabledRelayCount > lastRelayDisabledCount) {
+                playSemanticEvent(
+                  `relay-disabled-count:${disabledRelayCount}:${squadController.state.feedback.revision}`,
+                  "relay-disabled",
+                );
+              } else if (disabledRelayCount < lastRelayDisabledCount) {
+                playSemanticEvent(
+                  `relay-restarted-count:${disabledRelayCount}:${squadController.state.feedback.revision}`,
+                  "relay-restarted",
+                );
+              }
+              lastRelayDisabledCount = disabledRelayCount;
+              const flareFactCount = [
+                ...Object.values(securityCell.knowledgeByMachine["machine:security:watcher-01"]?.localFacts ?? {}),
+                ...Object.values(securityCell.knowledgeByMachine["machine:security:needle-01"]?.localFacts ?? {}),
+                ...Object.values(securityCell.blackboard.sharedFacts),
+              ].filter((fact) => fact.kind === "flare-sighting").length;
+              if (flareFactCount > lastFlareFactCount) {
+                playSemanticEvent(
+                  `flare-observed:${flareFactCount}:${securityCell.sharedContactRevision}`,
+                  "flare-observed",
+                );
+              }
+              lastFlareFactCount = flareFactCount;
             }
             machineAudio?.update(
               threatController.state.drone.mode,
@@ -1158,6 +1669,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         squadPanel.update(null);
       }
       worldStatusPanel.update(persistedWorldState, FLOODED_MARKET_WORLD, state.world.mode === "ship");
+      if (qaPanel?.isOpen()) qaPanel.update();
     }
     frameHandle = requestAnimationFrame(animate);
   };
@@ -1264,6 +1776,14 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     ) ?? null,
     worldState: () => structuredClone(persistedWorldState),
     resetWorldStateForQa: () => resetWorldState(false),
+    guidedQaReadback: readGuidedQa,
+    runGuidedAudit: runFullGuidedAudit,
+    guidedAudit: () => guidedAudit ? structuredClone(guidedAudit) : null,
+    performGuidedQaAction,
+    audioState: () => machineAudio?.getState() ?? (audioEnabled ? "enabled" : "muted"),
+    playAudioCue: (cueId) => machineAudio?.playCue(cueId, state.runtime.elapsedSeconds, true) ?? false,
+    assetReadback: () => structuredClone(assetPackSelection),
+    setQaEvidenceHidden: (hidden) => qaPanel?.setEvidenceHidden(hidden),
   };
   frameHandle = requestAnimationFrame(animate);
 
@@ -1287,7 +1807,10 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     squadPanel.dispose();
     worldStatusPanel.dispose();
     squadAudio.dispose();
-    qaPanel?.remove();
+    semanticCaption.dispose();
+    qaPanel?.dispose();
+    window.clearTimeout(guidedFlareObserverReleaseTimer);
+    window.clearInterval(guidedFlareObserverHoldInterval);
     delete window.__LOWPASS_DEBUG__;
     document.removeEventListener("visibilitychange", handleVisibilityChange);
   };
@@ -1295,48 +1818,32 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   document.addEventListener("visibilitychange", handleVisibilityChange);
 }
 
-function createQaNavigation(
-  root: HTMLElement,
-  onNavigate: (target: string) => void,
-): HTMLElement {
-  const panel = document.createElement("aside");
-  panel.className = "qa-navigation";
-  panel.setAttribute("aria-label", "Phase G QA navigation");
-  for (const [target, label] of [
-    ["phase-d-loadout", "QA Phase D 28U"],
-    ["console", "QA 出撃コンソール"],
-    ["filter-01", "QA フィルター01"],
-    ["filter-02", "QA フィルター02"],
-    ["filter-03", "QA フィルター03"],
-    ["cooling-coil", "QA 冷却コイル"],
-    ["relay-core-01", "QA リレーコア01"],
-    ["relay-core-02", "QA リレーコア02"],
-    ["relay-core-03", "QA リレーコア03"],
-    ["cart", "QA カート"],
-    ["cart-coil", "QA CART→COIL"],
-    ["cart-extract", "QA CART→EXTRACT"],
-    ["sales", "QA 売場"],
-    ["cooling", "QA 冷却室"],
-    ["underground", "QA 地下"],
-    ["cooling-gate", "QA 短縮ゲート"],
-    ["drone", "QA SCOUT DRONE"],
-    ["porter", "QA PORTER"],
-    ["isolate-contact", "QA ISOLATE"],
-    ["reinforce-contact", "QA REINFORCE"],
-    ["withdraw-contact", "QA WITHDRAW"],
-    ["deploy-relay", "QA RELAY DEPLOY"],
-    ["disable-relay", "QA RELAY DISABLE"],
-    ["restart-relay", "QA RELAY RESTART"],
-    ["porter-auth", "QA PORTER AUTH"],
-    ["porter-carry", "QA PORTER CARRY"],
-    ["extract", "QA 抽出地点"],
-  ] as const) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = label;
-    button.addEventListener("click", () => onNavigate(target));
-    panel.append(button);
-  }
-  root.append(panel);
-  return panel;
-}
+const RAW_QA_CONTROLS = [
+  ["phase-d-loadout", "QA Phase D 28U"],
+  ["console", "QA 出撃コンソール"],
+  ["filter-01", "QA フィルター01"],
+  ["filter-02", "QA フィルター02"],
+  ["filter-03", "QA フィルター03"],
+  ["cooling-coil", "QA 冷却コイル"],
+  ["relay-core-01", "QA リレーコア01"],
+  ["relay-core-02", "QA リレーコア02"],
+  ["relay-core-03", "QA リレーコア03"],
+  ["cart", "QA カート"],
+  ["cart-coil", "QA CART→COIL"],
+  ["cart-extract", "QA CART→EXTRACT"],
+  ["sales", "QA 売場"],
+  ["cooling", "QA 冷却室"],
+  ["underground", "QA 地下"],
+  ["cooling-gate", "QA 短縮ゲート"],
+  ["drone", "QA SCOUT DRONE"],
+  ["porter", "QA PORTER"],
+  ["isolate-contact", "QA ISOLATE"],
+  ["reinforce-contact", "QA REINFORCE"],
+  ["withdraw-contact", "QA WITHDRAW"],
+  ["deploy-relay", "QA RELAY DEPLOY"],
+  ["disable-relay", "QA RELAY DISABLE"],
+  ["restart-relay", "QA RELAY RESTART"],
+  ["porter-auth", "QA PORTER AUTH"],
+  ["porter-carry", "QA PORTER CARRY"],
+  ["extract", "QA 抽出地点"],
+] as const;
