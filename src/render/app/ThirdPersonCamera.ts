@@ -1,7 +1,7 @@
 import { MathUtils, PerspectiveCamera, Raycaster, Vector3, type Object3D } from "three";
 
-const MIN_PITCH = -0.08;
-const MAX_PITCH = 0.72;
+export const MIN_CAMERA_PITCH = -0.08;
+export const MAX_CAMERA_PITCH = 0.72;
 export const MIN_CAMERA_DISTANCE = 2.3;
 export const MAX_CAMERA_DISTANCE = 6.5;
 export const DEFAULT_CAMERA_DISTANCE = 4.1;
@@ -10,6 +10,8 @@ export interface CameraDiagnostics {
   readonly desiredDistance: number;
   readonly effectiveDistance: number;
   readonly occlusionActive: boolean;
+  readonly yaw: number;
+  readonly pitch: number;
 }
 
 export class ThirdPersonCamera {
@@ -28,7 +30,7 @@ export class ThirdPersonCamera {
 
   applyLookDelta(deltaX: number, deltaY: number): void {
     this.yaw -= deltaX * 0.0026;
-    this.pitch = MathUtils.clamp(this.pitch - deltaY * 0.0021, MIN_PITCH, MAX_PITCH);
+    this.pitch = MathUtils.clamp(this.pitch - deltaY * 0.0021, MIN_CAMERA_PITCH, MAX_CAMERA_PITCH);
   }
 
   getYaw(): number {
@@ -57,12 +59,14 @@ export class ThirdPersonCamera {
       desiredDistance: this.desiredDistance,
       effectiveDistance: this.effectiveDistance,
       occlusionActive: this.occlusionActive,
+      yaw: this.yaw,
+      pitch: this.pitch,
     };
   }
 
   reset(yaw = 0, pitch = 0.28): void {
     this.yaw = yaw;
-    this.pitch = MathUtils.clamp(pitch, MIN_PITCH, MAX_PITCH);
+    this.pitch = MathUtils.clamp(pitch, MIN_CAMERA_PITCH, MAX_CAMERA_PITCH);
     this.initialized = false;
   }
 

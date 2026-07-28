@@ -1,0 +1,781 @@
+{
+  "schemaVersion": "lowpass-phase-g-reconciliation-files-1.0.0",
+  "generatedAtIso": "2026-07-28T17:46:17.820Z",
+  "localSha": "5db2000f2416aedb8d3f6eb9ec9cb61b7a50cae5",
+  "remoteSha": "f3ea10949a908236adad1d2106ff0634804fc4bd",
+  "changedFileCount": 97,
+  "changedFiles": [
+    {
+      "status": "M",
+      "paths": [
+        ".gitignore"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "PROJECT_HANDOFF.md"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "README.md"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "artifacts/canary-v1/import-readback.json"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "artifacts/phase-g-guided-qa/ab-readback.json"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "artifacts/phase-g-guided-qa/browser-verification-readback.json"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "artifacts/reconciliation/pr2-unique-diff-readback.json"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "docs/PHASE_G_GUIDED_QA_CANARY_V1.md"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "docs/decision-log.md"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/browser-console-readback.json"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/performance-readback.json"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/phase-g-audio-audit.json"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/phase-g-guided-audit.html"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/phase-g-guided-audit.json"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/phase-g-primitive-ship.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/phase-g-qa-panel.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/primitive-canary-contact-sheet.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/primitive-canary-index.html"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/primitive-canary-readback.json"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-cart-handle.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-field-terminal.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-needle-watcher.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-porter-cooling.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-security-disengage.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-watcher-share.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-cart-handle.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-field-terminal.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-needle-watcher.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-porter-cooling.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-security-disengage.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-watcher-share.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-cart-handle.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-field-terminal.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-needle-watcher.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-porter-cooling.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-security-disengage.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-watcher-share.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-cart-handle.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-field-terminal.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-needle-watcher.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-porter-cooling.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-security-disengage.png"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-watcher-share.png"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "docs/idea-ledger.md"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "docs/project-context.md"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "docs/supervising-ai-report.md"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "output/playwright/phase-g-guided-qa/ab-canary-v1-ps1-off.png"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "output/playwright/phase-g-guided-qa/ab-canary-v1-ps1-on.png"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "output/playwright/phase-g-guided-qa/ab-primitive-ps1-off.png"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "output/playwright/phase-g-guided-qa/ab-primitive-ps1-on.png"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "output/playwright/phase-g-guided-qa/canary-ps1-on-guided-complete.png"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "output/playwright/phase-g-guided-qa/contact-sheet.png"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "output/playwright/phase-g-guided-qa/guided-qa-open.png"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "output/playwright/phase-g-guided-qa/index.html"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "output/playwright/phase-g-guided-qa/phase-g-guided-audit.html"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "output/playwright/phase-g-guided-qa/phase-g-guided-audit.json"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "package.json"
+      ]
+    },
+    {
+      "status": "R100",
+      "paths": [
+        "public/assets/lowpass-canary-v1/lowpass-readability-canary-v1.manifest.json",
+        "public/assets/canary-v1/lowpass-readability-canary-v1.manifest.json"
+      ]
+    },
+    {
+      "status": "R086",
+      "paths": [
+        "public/assets/lowpass-canary-v1/lowpass-readability-canary-v1.source-readback.json",
+        "public/assets/canary-v1/lowpass-readability-canary-v1.readback.json"
+      ]
+    },
+    {
+      "status": "R100",
+      "paths": [
+        "public/assets/lowpass-canary-v1/lowpass-readability-canary-v1.runtime.glb",
+        "public/assets/canary-v1/lowpass-readability-canary-v1.runtime.glb"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "public/assets/lowpass-canary-v1/asset-consumer-readback.json"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "public/assets/lowpass-canary-v1/rights-provenance.json"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "scripts/generate-phase-g-evidence.mjs"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "scripts/import-lowpass-canary.mjs"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "src/game/content/AssetPackRegistry.test.ts"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "src/game/content/AssetPackRegistry.ts"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "src/game/content/fixtures/lowpassCanaryConsumerFixture.json"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "src/game/content/generated/lowpassCanaryRegistry.json"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "src/game/input/InputController.test.ts"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "src/game/input/InputController.ts"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "src/main.ts"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "src/qa/GuidedPhaseGAudit.test.ts"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "src/qa/GuidedPhaseGAudit.ts"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "src/qa/GuidedQaPanel.test.ts"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "src/qa/GuidedQaPanel.ts"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "src/render/app/RenderSystem.ts"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "src/render/app/ThirdPersonCamera.test.ts"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "src/render/app/ThirdPersonCamera.ts"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "src/render/assets/AssetPackRegistry.test.ts"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "src/render/assets/AssetPackRegistry.ts"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "src/render/assets/CanaryMissionAssetPack.ts"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "src/render/audio/GateFeedbackAudio.ts"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "src/render/audio/MachineFeedbackAudio.test.ts"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "src/render/audio/MachineFeedbackAudio.ts"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "src/render/audio/SemanticAudio.test.ts"
+      ]
+    },
+    {
+      "status": "A",
+      "paths": [
+        "src/render/audio/SemanticAudio.ts"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "src/render/audio/SemanticCueCatalog.ts"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "src/render/audio/SquadFeedbackAudio.ts"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "src/render/objects/createFloodedMarket.ts"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "src/render/objects/missionWorldView.ts"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "src/style.css"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "src/ui/GuidedQaPanel.test.ts"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "src/ui/GuidedQaPanel.ts"
+      ]
+    },
+    {
+      "status": "M",
+      "paths": [
+        "src/ui/Hud.ts"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "src/ui/SemanticCaptionOverlay.ts"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "tests/CanaryMissionAssetPack.test.ts"
+      ]
+    },
+    {
+      "status": "D",
+      "paths": [
+        "tests/lowpassCanaryImporter.test.ts"
+      ]
+    }
+  ],
+  "categories": {
+    "product": [
+      "package.json",
+      "public/assets/canary-v1/lowpass-readability-canary-v1.manifest.json",
+      "public/assets/canary-v1/lowpass-readability-canary-v1.readback.json",
+      "public/assets/canary-v1/lowpass-readability-canary-v1.runtime.glb",
+      "public/assets/lowpass-canary-v1/asset-consumer-readback.json",
+      "public/assets/lowpass-canary-v1/lowpass-readability-canary-v1.manifest.json",
+      "public/assets/lowpass-canary-v1/lowpass-readability-canary-v1.runtime.glb",
+      "public/assets/lowpass-canary-v1/lowpass-readability-canary-v1.source-readback.json",
+      "public/assets/lowpass-canary-v1/rights-provenance.json",
+      "scripts/generate-phase-g-evidence.mjs",
+      "scripts/import-lowpass-canary.mjs",
+      "src/game/content/AssetPackRegistry.test.ts",
+      "src/game/content/AssetPackRegistry.ts",
+      "src/game/content/fixtures/lowpassCanaryConsumerFixture.json",
+      "src/game/content/generated/lowpassCanaryRegistry.json",
+      "src/game/input/InputController.test.ts",
+      "src/game/input/InputController.ts",
+      "src/main.ts",
+      "src/qa/GuidedPhaseGAudit.test.ts",
+      "src/qa/GuidedPhaseGAudit.ts",
+      "src/qa/GuidedQaPanel.test.ts",
+      "src/qa/GuidedQaPanel.ts",
+      "src/render/app/RenderSystem.ts",
+      "src/render/app/ThirdPersonCamera.test.ts",
+      "src/render/app/ThirdPersonCamera.ts",
+      "src/render/assets/AssetPackRegistry.test.ts",
+      "src/render/assets/AssetPackRegistry.ts",
+      "src/render/assets/CanaryMissionAssetPack.ts",
+      "src/render/audio/GateFeedbackAudio.ts",
+      "src/render/audio/MachineFeedbackAudio.test.ts",
+      "src/render/audio/MachineFeedbackAudio.ts",
+      "src/render/audio/SemanticAudio.test.ts",
+      "src/render/audio/SemanticAudio.ts",
+      "src/render/audio/SemanticCueCatalog.ts",
+      "src/render/audio/SquadFeedbackAudio.ts",
+      "src/render/objects/createFloodedMarket.ts",
+      "src/render/objects/missionWorldView.ts",
+      "src/style.css",
+      "src/ui/GuidedQaPanel.test.ts",
+      "src/ui/GuidedQaPanel.ts",
+      "src/ui/Hud.ts",
+      "src/ui/SemanticCaptionOverlay.ts"
+    ],
+    "contracts": [
+      "src/game/content/AssetPackRegistry.test.ts",
+      "src/game/content/AssetPackRegistry.ts",
+      "src/game/content/fixtures/lowpassCanaryConsumerFixture.json",
+      "src/game/content/generated/lowpassCanaryRegistry.json",
+      "src/game/input/InputController.test.ts",
+      "src/game/input/InputController.ts",
+      "src/qa/GuidedPhaseGAudit.test.ts",
+      "src/qa/GuidedPhaseGAudit.ts",
+      "src/qa/GuidedQaPanel.test.ts",
+      "src/qa/GuidedQaPanel.ts",
+      "src/render/assets/AssetPackRegistry.test.ts",
+      "src/render/assets/AssetPackRegistry.ts",
+      "src/render/assets/CanaryMissionAssetPack.ts",
+      "src/render/audio/MachineFeedbackAudio.test.ts",
+      "src/render/audio/MachineFeedbackAudio.ts",
+      "src/render/audio/SemanticAudio.test.ts",
+      "src/render/audio/SemanticAudio.ts",
+      "src/render/audio/SemanticCueCatalog.ts",
+      "src/ui/GuidedQaPanel.test.ts",
+      "src/ui/GuidedQaPanel.ts",
+      "src/ui/SemanticCaptionOverlay.ts",
+      "tests/CanaryMissionAssetPack.test.ts"
+    ],
+    "tests": [
+      "src/game/content/AssetPackRegistry.test.ts",
+      "src/game/input/InputController.test.ts",
+      "src/qa/GuidedPhaseGAudit.test.ts",
+      "src/qa/GuidedQaPanel.test.ts",
+      "src/render/app/ThirdPersonCamera.test.ts",
+      "src/render/assets/AssetPackRegistry.test.ts",
+      "src/render/audio/MachineFeedbackAudio.test.ts",
+      "src/render/audio/SemanticAudio.test.ts",
+      "src/ui/GuidedQaPanel.test.ts",
+      "tests/CanaryMissionAssetPack.test.ts",
+      "tests/lowpassCanaryImporter.test.ts"
+    ],
+    "artifacts": [
+      "artifacts/canary-v1/import-readback.json",
+      "artifacts/phase-g-guided-qa/ab-readback.json",
+      "artifacts/phase-g-guided-qa/browser-verification-readback.json",
+      "artifacts/reconciliation/pr2-unique-diff-readback.json",
+      "docs/evidence/phase-g-closure/browser-console-readback.json",
+      "docs/evidence/phase-g-closure/performance-readback.json",
+      "docs/evidence/phase-g-closure/phase-g-audio-audit.json",
+      "docs/evidence/phase-g-closure/phase-g-guided-audit.html",
+      "docs/evidence/phase-g-closure/phase-g-guided-audit.json",
+      "docs/evidence/phase-g-closure/phase-g-primitive-ship.png",
+      "docs/evidence/phase-g-closure/phase-g-qa-panel.png",
+      "docs/evidence/phase-g-closure/primitive-canary-contact-sheet.png",
+      "docs/evidence/phase-g-closure/primitive-canary-index.html",
+      "docs/evidence/phase-g-closure/primitive-canary-readback.json",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-cart-handle.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-field-terminal.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-needle-watcher.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-porter-cooling.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-security-disengage.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-watcher-share.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-cart-handle.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-field-terminal.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-needle-watcher.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-porter-cooling.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-security-disengage.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-watcher-share.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-cart-handle.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-field-terminal.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-needle-watcher.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-porter-cooling.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-security-disengage.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-watcher-share.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-cart-handle.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-field-terminal.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-needle-watcher.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-porter-cooling.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-security-disengage.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-watcher-share.png",
+      "output/playwright/phase-g-guided-qa/ab-canary-v1-ps1-off.png",
+      "output/playwright/phase-g-guided-qa/ab-canary-v1-ps1-on.png",
+      "output/playwright/phase-g-guided-qa/ab-primitive-ps1-off.png",
+      "output/playwright/phase-g-guided-qa/ab-primitive-ps1-on.png",
+      "output/playwright/phase-g-guided-qa/canary-ps1-on-guided-complete.png",
+      "output/playwright/phase-g-guided-qa/contact-sheet.png",
+      "output/playwright/phase-g-guided-qa/guided-qa-open.png",
+      "output/playwright/phase-g-guided-qa/index.html",
+      "output/playwright/phase-g-guided-qa/phase-g-guided-audit.html",
+      "output/playwright/phase-g-guided-qa/phase-g-guided-audit.json"
+    ],
+    "documentation": [
+      "PROJECT_HANDOFF.md",
+      "README.md",
+      "docs/PHASE_G_GUIDED_QA_CANARY_V1.md",
+      "docs/decision-log.md",
+      "docs/evidence/phase-g-closure/browser-console-readback.json",
+      "docs/evidence/phase-g-closure/performance-readback.json",
+      "docs/evidence/phase-g-closure/phase-g-audio-audit.json",
+      "docs/evidence/phase-g-closure/phase-g-guided-audit.html",
+      "docs/evidence/phase-g-closure/phase-g-guided-audit.json",
+      "docs/evidence/phase-g-closure/phase-g-primitive-ship.png",
+      "docs/evidence/phase-g-closure/phase-g-qa-panel.png",
+      "docs/evidence/phase-g-closure/primitive-canary-contact-sheet.png",
+      "docs/evidence/phase-g-closure/primitive-canary-index.html",
+      "docs/evidence/phase-g-closure/primitive-canary-readback.json",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-cart-handle.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-field-terminal.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-needle-watcher.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-porter-cooling.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-security-disengage.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-off-watcher-share.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-cart-handle.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-field-terminal.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-needle-watcher.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-porter-cooling.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-security-disengage.png",
+      "docs/evidence/phase-g-closure/screenshots/canary-v1-ps1-on-watcher-share.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-cart-handle.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-field-terminal.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-needle-watcher.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-porter-cooling.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-security-disengage.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-off-watcher-share.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-cart-handle.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-field-terminal.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-needle-watcher.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-porter-cooling.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-security-disengage.png",
+      "docs/evidence/phase-g-closure/screenshots/primitive-ps1-on-watcher-share.png",
+      "docs/idea-ledger.md",
+      "docs/project-context.md",
+      "docs/supervising-ai-report.md"
+    ],
+    "other": [
+      ".gitignore"
+    ]
+  },
+  "counts": {
+    "product": 42,
+    "contracts": 22,
+    "tests": 11,
+    "artifacts": 48,
+    "documentation": 41,
+    "other": 1
+  }
+}

@@ -67,7 +67,7 @@ export class Hud {
       </section>
       <div class="reticle" aria-hidden="true"></div>
       <aside class="controls-hint">
-        <span>WASD</span> 移動　<span>SHIFT</span> 走る　<span>E</span> 操作　<span>MOUSE</span> 視点　<span>F1</span> 診断
+        <span>WASD</span> 移動　<span>RIGHT DRAG</span> CAMERA　<span>WHEEL</span> DISTANCE　<span>E</span> 操作　<span>F1</span> 診断
       </aside>
     `;
 
@@ -173,7 +173,7 @@ export class Hud {
         `KEYS ${input.heldCodes.join(",") || "NONE"}  ACTIONS ${input.resolvedActions.join(",") || "NONE"}`,
         `MOVE RAW ${format(input.rawX)}/${format(input.rawY)}  WORLD ${format(input.worldX)}/${format(input.worldZ)}  DISP ${format(input.actualDisplacementX)}/${format(input.actualDisplacementZ)}`,
         `INPUT ${input.activeDevice.toUpperCase()}  FOCUS ${input.focusedElement}  MODAL ${input.modalState.toUpperCase()}  POINTER ${input.pointerLocked ? "LOCKED" : "FREE"}  PADS ${input.connectedGamepads.length}`,
-        `CAM DES ${camera.desiredDistance.toFixed(2)}m  EFF ${camera.effectiveDistance.toFixed(2)}m  OCC ${camera.occlusionActive ? "YES" : "NO"}`,
+        `CAM YAW ${camera.yaw.toFixed(2)}  PITCH ${camera.pitch.toFixed(2)}  DES ${camera.desiredDistance.toFixed(2)}m  EFF ${camera.effectiveDistance.toFixed(2)}m  OCC ${camera.occlusionActive ? "YES" : "NO"}`,
         cart
           ? `CART ${cart.attached ? "PUSH" : "FREE"}  POS ${format(cart.position.x)}/${format(cart.position.z)}  SPEED ${cart.speed.toFixed(2)}m/s  YAW ${cart.facingYaw.toFixed(2)}  BLOCK ${cart.collisionBlocked ? "YES" : "NO"}`
           : "CART INACTIVE",
@@ -181,6 +181,7 @@ export class Hud {
         `WEBGL ${render.drawCalls} calls  ${render.triangles} tris  ${render.renderWidth}×${render.renderHeight}`,
         `SCENE OBJECTS ${render.sceneObjects}`,
         `GPU MEM GEO ${render.geometries}  TEX ${render.textures}  PROG ${render.programs}`,
+        `ASSET ${render.assetPackMode.toUpperCase()}  HASH ${render.assetPackHash?.slice(0, 12) ?? "NONE"}  LOAD ${render.assetLoadDurationMs.toFixed(1)}ms`,
         `DROPPED CATCH-UP ${diagnostics.droppedSimulationFrames}`,
         `GATE DRAFT ${diagnostics.expedition.accepted ? "VALID" : "BLOCKED"}  ${diagnostics.expedition.capacity.usedUnits}/28U`,
         diagnostics.mission

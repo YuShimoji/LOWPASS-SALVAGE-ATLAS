@@ -21,9 +21,18 @@ class FakeDocument extends EventTarget {
 
 class FakeCanvas extends EventTarget {
   readonly tagName = "CANVAS";
+  readonly capturedPointers = new Set<number>();
 
   requestPointerLock(): Promise<void> {
     return Promise.resolve();
+  }
+
+  setPointerCapture(pointerId: number): void {
+    this.capturedPointers.add(pointerId);
+  }
+
+  releasePointerCapture(pointerId: number): void {
+    this.capturedPointers.delete(pointerId);
   }
 }
 
@@ -32,6 +41,20 @@ function keyboardEvent(type: "keydown" | "keyup", code: string, repeat = false):
   Object.defineProperties(event, {
     code: { value: code },
     repeat: { value: repeat },
+  });
+  return event;
+}
+
+function pointerEvent(
+  type: "pointerdown" | "pointermove" | "pointerup",
+  options: { button?: number; pointerId?: number; clientX?: number; clientY?: number } = {},
+): Event {
+  const event = new Event(type, { cancelable: true });
+  Object.defineProperties(event, {
+    button: { value: options.button ?? 2 },
+    pointerId: { value: options.pointerId ?? 7 },
+    clientX: { value: options.clientX ?? 0 },
+    clientY: { value: options.clientY ?? 0 },
   });
   return event;
 }
@@ -62,31 +85,40 @@ function createController(gamepads: ArrayLike<Gamepad | null> = []): {
   window: FakeWindow;
   document: FakeDocument;
   canvas: FakeCanvas;
+  onLook: ReturnType<typeof vi.fn>;
   onWheelZoom: ReturnType<typeof vi.fn>;
   setWorldInputAllowed(value: boolean): void;
+  setDragLookBlocked(value: boolean): void;
 } {
   const fakeWindow = new FakeWindow();
   const fakeDocument = new FakeDocument();
   const fakeCanvas = new FakeCanvas();
   let worldInputAllowed = true;
+  let dragLookBlocked = false;
   vi.stubGlobal("window", fakeWindow);
   vi.stubGlobal("document", fakeDocument);
   vi.stubGlobal("navigator", { getGamepads: () => gamepads });
   const onWheelZoom = vi.fn();
+  const onLook = vi.fn();
   const options: InputControllerOptions = {
-    onLook: vi.fn(),
+    onLook,
     onWheelZoom,
     isWorldInputAllowed: () => worldInputAllowed,
     getModalState: () => worldInputAllowed ? "none" : "settings",
+    isDragLookBlocked: () => dragLookBlocked,
   };
   return {
     controller: new InputController(fakeCanvas as unknown as HTMLCanvasElement, options),
     window: fakeWindow,
     document: fakeDocument,
     canvas: fakeCanvas,
+    onLook,
     onWheelZoom,
     setWorldInputAllowed: (value) => {
       worldInputAllowed = value;
+    },
+    setDragLookBlocked: (value) => {
+      dragLookBlocked = value;
     },
   };
 }
@@ -181,6 +213,65 @@ describe("InputController keyboard physical state", () => {
     fixture.canvas.dispatchEvent(modalWheel);
     expect(modalWheel.defaultPrevented).toBe(false);
     expect(fixture.onWheelZoom).toHaveBeenCalledTimes(1);
+    fixture.controller.dispose();
+  });
+
+  it("uses right drag as pointer-lock fallback after the movement threshold", () => {
+    const fixture = createController();
+    fixture.canvas.dispatchEvent(pointerEvent("pointerdown", { clientX: 100, clientY: 90 }));
+    fixture.canvas.dispatchEvent(pointerEvent("pointermove", { clientX: 102, clientY: 91 }));
+    expect(fixture.onLook).not.toHaveBeenCalled();
+    fixture.canvas.dispatchEvent(pointerEvent("pointermove", { clientX: 112, clientY: 84 }));
+    expect(fixture.onLook).toHaveBeenCalledWith(12, -6);
+    expect(fixture.controller.getDiagnostics().rightDragActive).toBe(true);
+    fixture.canvas.dispatchEvent(pointerEvent("pointerup", { clientX: 112, clientY: 84 }));
+    expect(fixture.controller.getDiagnostics().rightDragActive).toBe(false);
+    fixture.controller.dispose();
+  });
+
+  it("does not turn a simple right click into drag look", () => {
+    const fixture = createController();
+    fixture.canvas.dispatchEvent(pointerEvent("pointerdown", { clientX: 20, clientY: 20 }));
+    fixture.canvas.dispatchEvent(pointerEvent("pointerup", { clientX: 20, clientY: 20 }));
+    expect(fixture.onLook).not.toHaveBeenCalled();
+    fixture.controller.dispose();
+  });
+
+  it("excludes modal and Guided QA ownership from right-drag look", () => {
+    const fixture = createController();
+    fixture.setWorldInputAllowed(false);
+    fixture.canvas.dispatchEvent(pointerEvent("pointerdown", { clientX: 0, clientY: 0 }));
+    fixture.canvas.dispatchEvent(pointerEvent("pointermove", { clientX: 20, clientY: 10 }));
+    expect(fixture.onLook).not.toHaveBeenCalled();
+    fixture.setWorldInputAllowed(true);
+    fixture.setDragLookBlocked(true);
+    fixture.canvas.dispatchEvent(pointerEvent("pointerdown", { pointerId: 8, clientX: 0, clientY: 0 }));
+    fixture.canvas.dispatchEvent(pointerEvent("pointermove", { pointerId: 8, clientX: 20, clientY: 10 }));
+    expect(fixture.onLook).not.toHaveBeenCalled();
+    fixture.controller.dispose();
+  });
+
+  it("keeps pointer-lock and Gamepad right-stick look paths active", () => {
+    const fixture = createController([gamepad([0, 0, 0.8, -0.6])]);
+    fixture.controller.consumeFrameCommands(1 / 60);
+    expect(fixture.onLook).toHaveBeenCalled();
+    fixture.onLook.mockClear();
+    fixture.document.pointerLockElement = fixture.canvas as unknown as Element;
+    const move = new Event("mousemove");
+    Object.defineProperties(move, {
+      movementX: { value: 14 },
+      movementY: { value: -9 },
+    });
+    fixture.document.dispatchEvent(move);
+    expect(fixture.onLook).toHaveBeenCalledWith(14, -9);
+    fixture.controller.dispose();
+  });
+
+  it("suppresses the context menu on the game canvas only", () => {
+    const fixture = createController();
+    const contextMenu = new Event("contextmenu", { cancelable: true });
+    fixture.canvas.dispatchEvent(contextMenu);
+    expect(contextMenu.defaultPrevented).toBe(true);
     fixture.controller.dispose();
   });
 });

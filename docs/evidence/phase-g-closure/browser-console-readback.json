@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "phase-g-browser-console-readback-2.0.0",
+  "result": "PASS",
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "unhandledRejectionCount": 0,
+  "duplicateEventCount": 0,
+  "externalRequestCount": 0,
+  "externalRequests": [],
+  "checks": {
+    "guidedAudit": "PASS 22/22",
+    "primitiveMode": "PASS",
+    "canaryMode": "PASS",
+    "exactHash": "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+    "threeCycles": "PASS",
+    "rightsFallback": "PASS"
+  }
+}

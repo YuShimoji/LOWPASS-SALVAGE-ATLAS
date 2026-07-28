@@ -28,7 +28,8 @@ npm run build
 
 - `WASD` / 矢印キー: 移動
 - `Shift`: 走る
-- ゲーム画面をクリック後、マウス移動: 三人称カメラ
+- canvas上の右ドラッグ: Pointer Lockを使わない三人称カメラ旋回
+- ゲーム画面をクリック後、Pointer Lock中のマウス移動: 既存の三人称カメラ旋回
 - マウスwheel: カメラ距離を2.3〜6.5 mで調整
 - `E`: 出撃コンソール、資源、カート、抽出を操作
 - `Escape`: 開いている編成・設定画面を閉じる
@@ -39,7 +40,9 @@ npm run build
 
 探索では `E` で資源回収、カートの牽引・解放、工具短縮路、リレー再起動、搬送アンドロイド認証、抽出を操作します。右下の `SQUAD` パネルから `follow`、`hold`、`move-to`、`search-zone`、`rally`、操作対象切替、携帯リレー、フレアを操作できます。接触情報は操作中隊員が直接観測または受信した範囲だけを同じ折り畳みパネルに表示します。敵のロックオンと通信妨害、友好アンドロイドの命令と搬送対象は低干渉な状態表示へ投影されます。
 
-`?qa=1` を付けた開発URLでは、ブラウザ反復試験用の28U編成プリセット、位置移動、孤立・援軍・離脱、リレー状態、Porter認証・搬送の診断操作が追加されます。`QA CART→COIL` と `QA CART→EXTRACT` は、実入力で前後進・旋回・衝突・解放を確認した後に、積載・抽出ライフサイクルだけを短時間で再現するステージングです。移動試験の代替にはしません。`&security-posture=routine` または `&security-posture=watchful` で、その訪問だけ警戒姿勢を強制できます。この指定は永続WorldStateを変更しません。`&audio=muted` を併用すると自動試験中はAudioContextを生成しません。通常の編成、インタラクション、ItemLocation、通信グラフ、抽出処理はQA表示でも迂回しません。
+`?qa=1` を付けた開発URLでは、画面端のGuided QA drawerから28U編成、watchful出撃、孤立→共有→再視認→lock→援軍→Porter→退避、relay、flareを意味と期待結果付きで順に再現できます。`Run full guided audit` は既存controllerとQA配置を用いて22段階の因果列を監査し、AI状態をPASSへ直接書き換えません。従来の位置移動や短縮操作は `Advanced / Raw Controls` に折り畳み、`QA WITHDRAW` は通常表示から外して「援軍を離脱させ、プレイヤーを孤立状態へ戻す」と明示しました。drawer操作中はworld入力を止め、閉じると復帰します。
+
+`&security-posture=routine` または `&security-posture=watchful` はその訪問だけ警戒姿勢を強制し、永続WorldStateを変更しません。`&asset-mode=primitive` / `canary-v1` で表示asset packを選択でき、既定はprimitiveです。Canaryロード失敗時はsessionを継続してprimitiveへfallbackし、理由をGuided QAとreadbackへ残します。`&audio=muted` ではAudioContextを生成せず、通常時は20種類の短いsemantic cueと同時字幕を使います。通常の編成、インタラクション、ItemLocation、通信グラフ、抽出処理はQA表示でも迂回しません。
 
 ## Phase G playability recovery（2026-07-26）
 
@@ -51,7 +54,25 @@ ThirdPersonCameraは希望距離を2.3〜6.5 mで保持し、wheelとLB / RBを�
 
 自動gateはtop-level依存整合、型検査、28ファイル176テスト、production build、`git diff --check` がPASSです。実ブラウザではW単独5秒、各WASD / 矢印、斜行、Shift走行、modal抑止と復帰、pointer lockなしの移動、wheel zoom、遮蔽、実入力カート前後進・旋回・解放、重量拒否、冷却コイル積載、partial抽出、帰還、コンソールerror 0件を確認しました。帰還後はRapier collider 12、scene object 60、GPU geometry 47、DOM 122、modal 0、FX 0へ復帰しました。
 
-この技術復旧はPhase Gの感覚受入ではありません。Security Cellの距離、共有delay、scan、音、文言は変更していません。次の状態は `GATE_G_A_RETEST_REQUIRED` であり、ミュートなしのGate G-Aを最初から再実施します。
+この節は2026-07-26時点の履歴です。当時は `GATE_G_A_RETEST_REQUIRED` でしたが、現在状態は次節のPhase G UX Closureを正本とします。
+
+## Phase G canonical reconciliation / LOWPASS Canary consumer（2026-07-29）
+
+現在の製品進行分類は次です。
+
+- `PHASE_G_AUTOMATED_ACCEPTANCE_GREEN`
+- `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING`
+- `LOWPASS_CANARY_CONSUMER_READY_INTERNAL_ONLY`
+
+人間が既に確認したmovement、wheel zoom、cart操作、Watcher / Needle外観はPASSとして保持します。未完了だったcamera orbitは、canvas右ドラッグの4px閾値、yaw / pitch、pitch clamp、modal・QA・editable除外、Pointer Lock fallback、wheel・Gamepad回帰を追加して自動受入へ閉じました。物理Gamepadは未接続のため実機確認済みとはしません。Guided QAは22段階を一操作で再現し、保存済み監査は22 / 22 PASS、timeout 0、duplicate 0です。各stepはexpected / actual、start / end tick、duration、revision、result、failure reasonを保持します。semantic audioは20 cueの非無音、peak、長さ、波形識別、rate-limit、mute、suspended recovery、字幕対応を自動監査し、Porterはauth、command accepted、carry accepted、path failure、gate rejectedなどの意味eventだけで発音します。1.6秒周期pulseはありません。音量・音色・疲労感などの人間感覚評価は非ブロッキングであり、human sensory PASS、production audio complete、final game feel acceptedとは扱いません。
+
+Canary consumerはCGAW `feat/lowpass-asset-canary-v1` の契約commit `c893374ab0edd7329bd1482dbd6b99960acbbb68` を基準とし、GLB SHA-256 `54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102` をimport時とruntime registryで固定します。Needle、Watcher、Porter、Shopping cart、Field terminalはsimulation stateを真実源とする視覚adapterで、GLB node transformやcollision proxyをgameplay authorityへ昇格しません。rightsは `NOASSERTION`、`internalOnly: true`、`distributionApproved: false` です。registry / manifestのrights一致と型を検証し、欠落・矛盾・external distributionではprimitiveへfail-closed fallbackしてsessionを継続します。external buildへ内部Canary GLBを含めません。UV、low-resolution texture、Blender headless validation、rights declaration、production asset approvalは未完了です。
+
+証拠は [`docs/evidence/phase-g-closure/`](docs/evidence/phase-g-closure/) にまとめました。Guided audit JSON / HTML、audio audit、QA panel、primitive / Canary × PS1 OFF / ONの24枚とcontact sheet、console、performance、3回のship→mission→ship readbackを含みます。Canaryはmission chunkとともに遅延ロードされ、3 cycleでship帰還値はscene 60、geometry 47、texture 3、program 4へ復帰し、単調増加を観測していません。ブラウザconsole errorとunhandled rejectionは0で、既知のRapier初期化非推奨warning 1種類だけが残ります。Phase Hは実装していません。
+
+最終gateはtop-level依存整合、typecheck、34ファイル202テスト、production build、external build、diff checkがPASSです。buildは79 modulesを処理し、Canaryをmission chunkとして遅延loadします。既知の500 kB large-chunk warningだけが残ります。
+
+正本はlocal `d2683ee` 系統を実装採用元として確定し、remote `f3ea109` は `GREEN_BUT_NOT_ACCEPTANCE_EQUIVALENT` の保全baselineへ降格しました。no-force merge `65fb21f992d9b2d8f933c343f1b2ab766311bbe2` は両系統を祖先に持ち、その後のcorrective tip `c9c9cdc16268c60995cf82499dc59ca277d4f1ba` で証拠script末尾とfresh importer portabilityを修正しています。remote baselineで不足したPorter event-only音、22段階の個別因果、rights fail-closed、6状態 × 4条件のA/B証拠はcanonical側で閉じました。Phase Hは実装していません。
 
 ## アーキテクチャ
 
@@ -426,8 +447,9 @@ Viteの500 kB警告は継続しています。警告閾値は変更していま�
 
 | 目的 | 影響 | 要件 | 状態 | 担当 | 次の一手 |
 | --- | --- | --- | --- | --- | --- |
-| Phase G人間受入 | 自動化では観測機の識別性、chirp、圧力テンポ、退避の自然さを最終判断できない | デスクトップ実機、ミュートなし、routine→watchful→集団退避、blocking / tuning / acceptedメモ | 実装・自動・ブラウザ機械検証済み、人間評価待ち | ゲームデザイン / UX | 調整値と文言だけを限定変更し、構造変更が必要ならPhase Hへ送る |
-| Phase H目的選定 | 次の開発を実測上の最大課題へ集中できる | Phase G感覚評価、受入条件、非対象、停止条件を1つの目的へ固定 | 条件付き提案・未承認 | オーナー / 監修役AI | `docs/supervising-ai-report.md` のGate G-Aを判定してから1案だけ承認する |
+| Phase G人間感覚レビュー | cueの音量・音色・疲労感と最終game feelを製品判断できる | デスクトップ実機、ミュートなし、観察メモ | 自動受入green。製品進行を止めない任意レビュー | ゲームデザイン / UX | 問題が観測された場合だけG-TUNE候補を別slice化する |
+| Phase G canonical remote維持 | 共有開発基準をno-forceで一意に保つ | live ref readback、通常push、Draft PR / Authority Guard整合 | local採用元とremote baselineの両履歴を統合済み | 監修役AI / repo owner | live `origin/feat/phase-g-guided-qa-canary-v1` と `origin/project/frontier` をこの文書を含む同一commitへ保つ |
+| Phase H1開始判断 | 契約・証拠・再訪判断の因果を次sliceへ限定する | accepted canonical base、目的、受入、非対象、停止条件のオーナー承認 | 実装未開始・technical unlockのみ | オーナー / 監修役AI | 本報告末尾のPhase H1 Promptを明示承認する |
 | 初期バンドル分割 | 初回ダウンロードが大きい | Three.js/Rapierのvendor分割、実機起動・cache・再訪計測 | warningのみ・非ブロッキング | performance | 体感問題が出た端末で3値を測り、分割効果が見込める場合だけ着手する |
 | Rapier非推奨warning | 開発consoleに既知warningが残る | 依存版と初期化APIの互換性、物理回帰 | 非ブロッキング | 依存更新 | Rapier更新スライスで解消可否を判断する |
 
