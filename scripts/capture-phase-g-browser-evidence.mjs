@@ -515,4 +515,3 @@ async function waitForCdp(port) {
 function delay(ms) {
   return new Promise((resolveDelay) => setTimeout(resolveDelay, ms));
 }
-
