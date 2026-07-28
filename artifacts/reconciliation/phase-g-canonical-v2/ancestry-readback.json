@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "lowpass-phase-g-reconciliation-ancestry-1.0.0",
+  "generatedAtIso": "2026-07-28T17:46:17.426Z",
+  "branch": "feat/phase-g-guided-qa-canary-v1",
+  "local": {
+    "ref": "HEAD",
+    "sha": "5db2000f2416aedb8d3f6eb9ec9cb61b7a50cae5",
+    "tree": "849fe73859558a6afc1aa593d0bd187df98b65c6",
+    "uniqueCommits": 3,
+    "commits": [
+      {
+        "sha": "d2683eeec43dc1befad406508f7d8b52f2a43a27",
+        "subject": "feat: close phase g guided review and integrate canary assets"
+      },
+      {
+        "sha": "ca423ec1e24641d27ca6f39c2518ce02380334e1",
+        "subject": "docs: record divergent Phase G restart state"
+      },
+      {
+        "sha": "5db2000f2416aedb8d3f6eb9ec9cb61b7a50cae5",
+        "subject": "docs: recommend canonical Phase G candidate"
+      }
+    ]
+  },
+  "remote": {
+    "ref": "origin/project/frontier",
+    "sha": "f3ea10949a908236adad1d2106ff0634804fc4bd",
+    "tree": "faf4d58f342a569cfbf825c973c4fb72b2a3d8dc",
+    "uniqueCommits": 3,
+    "commits": [
+      {
+        "sha": "42c8b8a59874996abf1208ebeda8fd3596c5c9a4",
+        "subject": "fix: add camera orbit and guided phase g review"
+      },
+      {
+        "sha": "e1207b22fd3e2e07f599d3d0a1497451b2892b5c",
+        "subject": "feat: integrate lowpass semantic canary assets"
+      },
+      {
+        "sha": "f3ea10949a908236adad1d2106ff0634804fc4bd",
+        "subject": "merge: align Phase G review base"
+      }
+    ]
+  },
+  "mergeBase": "52f0cf9db9f563963243e4954e48de9c448ec487",
+  "requiredAncestors": {
+    "localImplementation": "d2683eeec43dc1befad406508f7d8b52f2a43a27",
+    "remoteGreenBaseline": "f3ea10949a908236adad1d2106ff0634804fc4bd"
+  },
+  "noForcePolicy": true
+}
