@@ -21,7 +21,8 @@
       "sourceChange": "Ignore Playwright CLI runtime artifacts.",
       "frontierEvidence": "The active Phase G worktree produced an untracked .playwright-cli directory.",
       "resolution": "REIMPLEMENTED_MINIMALLY",
-      "productPath": ".gitignore"
+      "productPath": ".gitignore",
+      "productCommit": "42c8b8a"
     },
     {
       "paths": [

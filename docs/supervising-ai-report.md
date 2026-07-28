@@ -1,6 +1,27 @@
 # 監修役AI向け現状報告
 
-更新日: 2026-07-26 JST
+更新日: 2026-07-28 JST
+
+## 2026-07-28 優先監修結論
+
+この節が現在の正本です。Phase Gの自動受入はgreenで、Canary consumer integrationはreview可能です。残る感覚判断は非ブロッキングで、Phase Hを開始したとは扱いません。
+
+| 判定面 | 結果 | 根拠 |
+| --- | --- | --- |
+| frontier authority | `origin/project/frontier` | playability recovery `a3b5e73` を起点にし、main / duplicate Phase Cを開発起点にしていない |
+| duplicate closure | PR #2はmergeしない | unique commitを4分類し、still usefulなignoreだけを再実装 |
+| automated acceptance | `PHASE_G_AUTOMATED_ACCEPTANCE_GREEN` | 18-step Guided audit、31 files / 187 tests、typecheck、build、browser操作 |
+| sensory review | `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING` | audio context / caption / cue auditはgreen。主観音量・可読性をAIが捏造していない |
+| Canary | `CANARY_CONSUMER_INTEGRATION_READY` | exact commit/hash、5 roles、semantic anchors、fallback、A/B、3-cycle disposal |
+| rights | `NOASSERTION` / internal review only | 配布licenseや公開権限を主張していない |
+
+CanaryはNeedle、Watcher、Porter、shopping cart、field terminalへ明示的に対応し、scan / lock-on / carry / interaction / communication / handle / load anchorをstable nodeへ解決します。visualはcontroller stateを一方向に読むだけです。GLB loadやcontractが失敗するとprimitiveへ戻り、readbackに理由を残します。
+
+ブラウザではPointer Lock拒否を実際に通した右drag fallbackでyaw/pitchが変化し、W移動、wheel zoom、cart attach / collision、Guided QAのworld-input exclusionとEscape、17 semantic cueのrunning AudioContext / caption、unknown asset mode fallback、3回のmission reloadでresource / DOM非増加を確認しました。console error、unhandled error、external requestはいずれも0です。
+
+primitive / canary × PS1 off / onは同じseed、routine posture、controlled player、camera start、2秒capture delayで比較しました。Canaryの観測増分は8 draw calls、96 triangles、21 scene objects、7〜8 geometriesで、texturesとprogramsは増えていません。見た目の採否とrights宣言は別判断です。
+
+## 2026-07-26以前の履歴
 
 ## 2026-07-26 優先監修結論
 

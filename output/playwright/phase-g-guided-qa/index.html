@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23091114'/%3E%3Cpath d='M3 4h10v2H3zm0 3h7v2H3zm0 3h9v2H3z' fill='%23e0a35c'/%3E%3C/svg%3E">
+  <title>LOWPASS Phase G A/B Contact Sheet</title>
+  <style>
+    :root { color-scheme: dark; font-family: "Courier New", monospace; }
+    body { margin: 0; padding: 24px; color: #d1ded6; background: #091114; }
+    h1 { margin: 0 0 8px; color: #e0a35c; font-size: 24px; }
+    p { color: #91aaa0; }
+    main { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    figure { margin: 0; border: 1px solid #486057; background: #0d1717; }
+    img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+    figcaption { display: flex; justify-content: space-between; gap: 12px; padding: 10px; }
+    strong { color: #d8b56e; }
+    table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+    th, td { border: 1px solid #486057; padding: 8px; text-align: left; }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <h1>LOWPASS Phase G A/B Contact Sheet</h1>
+  <p>Fixed scenario: 18-step Guided QA · seed phase-g-guided-audit-v1 · routine posture · player control · 2s capture delay.</p>
+  <main>
+    <figure><img src="ab-primitive-ps1-off.png" alt="Primitive assets with PS1 effects off"><figcaption><strong>Primitive</strong><span>PS1 off · 49 calls · 786 tris</span></figcaption></figure>
+    <figure><img src="ab-primitive-ps1-on.png" alt="Primitive assets with PS1 effects on"><figcaption><strong>Primitive</strong><span>PS1 on · 49 calls · 786 tris</span></figcaption></figure>
+    <figure><img src="ab-canary-v1-ps1-off.png" alt="Canary assets with PS1 effects off"><figcaption><strong>Canary v1</strong><span>PS1 off · 57 calls · 882 tris</span></figcaption></figure>
+    <figure><img src="ab-canary-v1-ps1-on.png" alt="Canary assets with PS1 effects on"><figcaption><strong>Canary v1</strong><span>PS1 on · 57 calls · 882 tris</span></figcaption></figure>
+  </main>
+  <table>
+    <thead><tr><th>Comparison</th><th>Draw calls</th><th>Triangles</th><th>Geometries</th><th>Textures</th><th>Programs</th></tr></thead>
+    <tbody>
+      <tr><td>Primitive</td><td>49</td><td>786</td><td>61–62</td><td>3</td><td>3</td></tr>
+      <tr><td>Canary v1</td><td>57</td><td>882</td><td>69</td><td>3</td><td>3</td></tr>
+      <tr><td>Canary delta</td><td>+8</td><td>+96</td><td>+7–8</td><td>0</td><td>0</td></tr>
+    </tbody>
+  </table>
+</body>
+</html>

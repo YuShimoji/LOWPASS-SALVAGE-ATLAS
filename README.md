@@ -1,6 +1,6 @@
 # LOWPASS: SALVAGE ATLAS
 
-デスクトップブラウザ向け3Dゲームの垂直スライスです。TypeScript、Vite、Three.js、Rapier、DOM UIで構成されています。フェーズAの三人称アクション基盤、フェーズBの遠征編成、フェーズCの固定探索・回収ループ、フェーズDの分散分隊、フェーズEの非致死的な機械生態系、フェーズFの訪問間世界永続化に加え、フェーズGでは永続警戒姿勢を持つ2機上限の敵対Security Cellを接続しています。
+デスクトップブラウザ向け3Dゲームの垂直スライスです。TypeScript、Vite、Three.js、Rapier、DOM UIで構成されています。フェーズAの三人称アクション基盤、フェーズBの遠征編成、フェーズCの固定探索・回収ループ、フェーズDの分散分隊、フェーズEの非致死的な機械生態系、フェーズFの訪問間世界永続化に加え、フェーズGでは永続警戒姿勢を持つ2機上限の敵対Security Cell、Guided QA、semantic audio、readability Canaryを接続しています。
 
 ## 再開ポイント
 
@@ -11,7 +11,7 @@
 ```powershell
 npm ci
 npm ls --depth=0
-npm run dev
+npm run dev -- --host 127.0.0.1
 ```
 
 検証コマンド:
@@ -21,6 +21,23 @@ npm run typecheck
 npm test
 npm run build
 ```
+
+## Phase G Guided QA / Canary v1
+
+`?qa=1` で開く「GUIDED PHASE G QA」は、Setup / Contact sequence / Relay / Flare / Audio test / Results の18ステップを順番に実行し、各ステップのcontroller-owned readbackをJSON / HTMLへ出力します。パネルを開いている間はworld inputを停止し、`Escape`は設定画面を開かずパネルだけを閉じます。生の位置移動や個別cueは `Advanced` に隔離しています。
+
+マウスカメラは右ボタンを保持してdrag、wheelでzoomします。Pointer Lockが拒否された埋め込みブラウザでもdrag差分へfallbackします。Gamepad右stick、LB/RB zoom、camera occlusion、cart kinematic pairは同じcamera / simulation authorityを使います。
+
+Asset modeはqueryで明示します。
+
+```text
+?asset-mode=primitive
+?asset-mode=canary-v1
+```
+
+Canary v1はCodexGameAssetWorkbenchのexact commit `c893374ab0edd7329bd1482dbd6b99960acbbb68`、GLB SHA-256 `54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102`を固定します。runtime validationまたはloadに失敗した場合は、構造化readbackを残してprimitiveへ戻ります。Canary表示は `MissionSession`、`SecurityCellController`、`PorterAndroidController`、`ItemLocation` を読むだけで、見た目からsimulation stateを逆算しません。
+
+`?ps1=off` / `?ps1=on` は固定A/B用です。証拠の入口は [`output/playwright/phase-g-guided-qa/index.html`](output/playwright/phase-g-guided-qa/index.html)、機械可読値は [`artifacts/phase-g-guided-qa/ab-readback.json`](artifacts/phase-g-guided-qa/ab-readback.json) です。Canaryのrights statusは `NOASSERTION`、用途はinternal review onlyです。
 
 ## 操作
 

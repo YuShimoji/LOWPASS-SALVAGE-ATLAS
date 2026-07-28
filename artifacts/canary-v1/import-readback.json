@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "lowpass-canary-consumer-import-1.0.0",
+  "state": "CANARY_SOURCE_IDENTITY_VALIDATED",
+  "source": {
+    "repository": "YuShimoji/CodexGameAssetWorkbench",
+    "commit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+    "assetPackId": "lowpass-readability-canary-v1",
+    "rightsStatus": "NOASSERTION",
+    "distributionStatus": "INTERNAL_REVIEW_ONLY"
+  },
+  "outputs": {
+    "glb": "public/assets/canary-v1/lowpass-readability-canary-v1.runtime.glb",
+    "manifest": "public/assets/canary-v1/lowpass-readability-canary-v1.manifest.json",
+    "sourceReadback": "public/assets/canary-v1/lowpass-readability-canary-v1.readback.json"
+  },
+  "validation": {
+    "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+    "glbBytes": 70892,
+    "assetCount": 5,
+    "stableNodeCount": 50,
+    "anchorCount": 9,
+    "collisionProxyCount": 5,
+    "requiredAssetKeys": true,
+    "requiredAnchorKinds": true,
+    "referencedNodesResolved": true,
+    "localPathFree": true
+  }
+}

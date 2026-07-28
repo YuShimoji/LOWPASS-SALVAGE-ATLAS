@@ -1,0 +1,96 @@
+{
+  "schemaVersion": "lowpass-phase-g-ab-proof-1.0.0",
+  "generatedAt": "2026-07-28",
+  "scenario": {
+    "id": "phase-g-guided-qa-18-step-v1",
+    "seed": "phase-g-guided-audit-v1",
+    "securityPosture": "routine",
+    "controlledAgent": "player",
+    "cameraStart": {
+      "yaw": 0.14601225771127538,
+      "pitch": 0.5857741761521881,
+      "desiredDistance": 4.1
+    },
+    "captureDelayAfterScenarioMs": 2000
+  },
+  "variants": [
+    {
+      "assetMode": "primitive",
+      "ps1": "off",
+      "guidedStepsPassed": 18,
+      "screenshot": "output/playwright/phase-g-guided-qa/ab-primitive-ps1-off.png",
+      "render": {
+        "drawCalls": 49,
+        "triangles": 786,
+        "renderWidth": 1440,
+        "renderHeight": 900,
+        "sceneObjects": 89,
+        "geometries": 61,
+        "textures": 3,
+        "programs": 3
+      },
+      "assetLoadDurationMs": 0
+    },
+    {
+      "assetMode": "primitive",
+      "ps1": "on",
+      "guidedStepsPassed": 18,
+      "screenshot": "output/playwright/phase-g-guided-qa/ab-primitive-ps1-on.png",
+      "render": {
+        "drawCalls": 49,
+        "triangles": 786,
+        "renderWidth": 892,
+        "renderHeight": 558,
+        "sceneObjects": 89,
+        "geometries": 62,
+        "textures": 3,
+        "programs": 3
+      },
+      "assetLoadDurationMs": 0
+    },
+    {
+      "assetMode": "canary-v1",
+      "ps1": "off",
+      "guidedStepsPassed": 18,
+      "screenshot": "output/playwright/phase-g-guided-qa/ab-canary-v1-ps1-off.png",
+      "render": {
+        "drawCalls": 57,
+        "triangles": 882,
+        "renderWidth": 1440,
+        "renderHeight": 900,
+        "sceneObjects": 110,
+        "geometries": 69,
+        "textures": 3,
+        "programs": 3
+      },
+      "assetLoadDurationMs": 5.9
+    },
+    {
+      "assetMode": "canary-v1",
+      "ps1": "on",
+      "guidedStepsPassed": 18,
+      "screenshot": "output/playwright/phase-g-guided-qa/ab-canary-v1-ps1-on.png",
+      "render": {
+        "drawCalls": 57,
+        "triangles": 882,
+        "renderWidth": 892,
+        "renderHeight": 558,
+        "sceneObjects": 110,
+        "geometries": 69,
+        "textures": 3,
+        "programs": 3
+      },
+      "assetLoadDurationMs": 8.6
+    }
+  ],
+  "comparison": {
+    "canaryDrawCallDelta": 8,
+    "canaryTriangleDelta": 96,
+    "canarySceneObjectDelta": 21,
+    "canaryGeometryDelta": 7,
+    "textureDelta": 0,
+    "programDelta": 0,
+    "ps1GeometryInvariant": true,
+    "externalRequests": 0
+  }
+}

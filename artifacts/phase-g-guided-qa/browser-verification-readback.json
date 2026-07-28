@@ -1,0 +1,100 @@
+{
+  "schemaVersion": "lowpass-phase-g-browser-verification-1.0.0",
+  "generatedAt": "2026-07-28",
+  "browser": "Chromium via Playwright CLI",
+  "guidedAudit": {
+    "scenarioId": "phase-g-guided-qa-18-step-v1",
+    "steps": 18,
+    "passed": 18,
+    "json": "output/playwright/phase-g-guided-qa/phase-g-guided-audit.json",
+    "html": "output/playwright/phase-g-guided-qa/phase-g-guided-audit.html"
+  },
+  "cameraAndMovement": {
+    "rightDrag": {
+      "pointerLockFallbackExercised": true,
+      "yawBefore": 0.14601225771127538,
+      "yawAfter": -0.16598774228872465,
+      "pitchBefore": 0.5857741761521881,
+      "pitchAfter": 0.7117741761521884
+    },
+    "forwardMovement": {
+      "playerBefore": {
+        "x": 3.450000286102295,
+        "z": -4.650000095367432
+      },
+      "playerAfter": {
+        "x": 3.7941291332244873,
+        "z": -6.370129108428955
+      }
+    },
+    "wheelZoom": {
+      "desiredDistanceBefore": 4.1,
+      "desiredDistanceAfter": 2.8199999999999994
+    },
+    "pitchClampUnitTest": true,
+    "occlusionUnitTest": true
+  },
+  "cart": {
+    "interactionTargetResolved": true,
+    "attachedThroughNormalInteraction": true,
+    "positionBefore": {
+      "x": 2.2,
+      "z": -1.4
+    },
+    "positionAfter": {
+      "x": 2.2,
+      "z": -1.5200009577478826
+    },
+    "collisionBlockedReadback": true,
+    "authority": "MissionSession and Rapier kinematic pair"
+  },
+  "audio": {
+    "cueCount": 17,
+    "contextState": "running",
+    "captioned": true,
+    "played": 17,
+    "mutedAuditCovered": true,
+    "rateLimitUnitTest": true
+  },
+  "assetSelection": {
+    "canaryStatus": "CANARY_LOADED",
+    "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+    "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+    "fallbackStatus": "FALLBACK_TO_PRIMITIVE",
+    "fallbackReason": "UNKNOWN_ASSET_MODE:broken-pack"
+  },
+  "threeCycleReadback": [
+    {
+      "cycle": 1,
+      "geometries": 59,
+      "textures": 3,
+      "programs": 3,
+      "sceneObjects": 110,
+      "domNodes": 297
+    },
+    {
+      "cycle": 2,
+      "geometries": 59,
+      "textures": 3,
+      "programs": 3,
+      "sceneObjects": 110,
+      "domNodes": 297
+    },
+    {
+      "cycle": 3,
+      "geometries": 59,
+      "textures": 3,
+      "programs": 3,
+      "sceneObjects": 110,
+      "domNodes": 297
+    }
+  ],
+  "quality": {
+    "consoleErrors": 0,
+    "unhandledErrors": 0,
+    "duplicateDomGrowth": false,
+    "resourceGrowthAcrossCycles": false,
+    "externalRequests": 0,
+    "viteDevelopmentWarningExcluded": "Vite client deprecation warning is development-server-owned and absent from the production build."
+  }
+}

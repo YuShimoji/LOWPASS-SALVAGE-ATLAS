@@ -1,6 +1,6 @@
 # Project Context
 
-更新日: 2026-07-26
+更新日: 2026-07-28
 
 ## North star
 
@@ -12,16 +12,23 @@
 | --- | --- |
 | 軸 | 状態所有、限定知識、プレイヤー判断の整合性 |
 | レーン | 固定世界を反復訪問する非致死的探索垂直スライス |
-| 完了スライス | Phase G technical implementation。human sensory acceptanceは未完了 |
-| 作業ブランチ | `fix/phase-g-playability-recovery` |
+| 完了スライス | Phase G automated Guided QAとCanary consumer integration |
+| 作業ブランチ | `feat/phase-g-guided-qa-canary-v1` |
 | Phase F保全 | tag `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a` |
 | Phase G分岐元 | `4e3cdc66d357e8054d45e0a42c4f41f166087b20` |
 | Phase G実装 | `6df8ba0621baf8976fc56373863cf57565cc12ba`、件名 `feat: coordinate hostile machine security cells` |
 | recovery分岐元 | `756e54b0e54a7b4b6fee7da2a0d5bed47f01a5a3` |
-| recovery実装 | 件名 `fix: restore playable movement camera and cart controls` |
-| remote状態 | fix branchはlocal-only。push、PR、merge、deploy未実施 |
-| 次のゲート | `GATE_G_A_RETEST_REQUIRED`。Phase Gミュートなし人間受入を最初から再実施 |
+| recovery実装 | `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`、件名 `fix: restore playable movement camera and cart controls` |
+| canonical ref | `origin/project/frontier` |
+| remote状態 | Authority Guard PR #3はready / 未merge。製品branchとfrontierは最終push後に同一化 |
+| 現在の分類 | `PHASE_G_AUTOMATED_ACCEPTANCE_GREEN` / `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING` / `CANARY_CONSUMER_INTEGRATION_READY` |
 | 受入の正本 | `README.md` のPhase G検証結果、`PROJECT_HANDOFF.md`、`docs/supervising-ai-report.md` |
+
+## 2026-07-28 development frontier
+
+mainはPhase B baselineであり、開発frontierではありません。Phase C〜Gの正しい祖先を持つ `project/frontier` が製品開発の正本です。重複PR #2のunique commitは、faviconとQA位置が現行実装でsupersedeされ、Phase C READMEがstale、`.playwright-cli/` ignoreだけがstill usefulと分類されました。
+
+Guided QAとCanaryは既存state ownerを置換しません。`ExpeditionManifest`とgate evaluatorは出撃契約、`ItemLocation`は物品所有、MissionSessionとRapierはcart / salvage / extraction、Security CellとPorter controllerは機械状態の唯一のauthorityです。GLB node、anchor、collision proxyはvisual/readability境界で参照し、simulation stateを生成しません。
 
 ## 現行アーキテクチャ
 

@@ -1,0 +1,3925 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>LOWPASS Guided Phase G Audit</title>
+<style>body{font:14px/1.45 system-ui;background:#091114;color:#d7e2da;padding:24px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #486057;padding:8px;vertical-align:top;text-align:left}pre{white-space:pre-wrap;max-width:52rem}</style>
+</head>
+<body><h1>LOWPASS Guided Phase G Audit</h1><p>2026-07-28T07:30:56.179Z · 18/18 steps</p>
+<table><thead><tr><th>#</th><th>Category</th><th>Step</th><th>Status</th><th>Readback</th></tr></thead><tbody>
+    <tr>
+      <td>1</td>
+      <td>Setup</td>
+      <td>Configure the 28U review loadout</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;phase-d-loadout&quot;,
+  &quot;world&quot;: &quot;ship&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;QA PHASE D LOADOUT // 28U READY&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0,
+    &quot;pitch&quot;: 0.28,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 3.771432625694294,
+    &quot;occlusionActive&quot;: true
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: null,
+  &quot;threat&quot;: null,
+  &quot;relay&quot;: null,
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: null,
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: []
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;primitive&quot;,
+    &quot;status&quot;: &quot;PRIMITIVE_SELECTED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: null,
+    &quot;assetPackId&quot;: null,
+    &quot;glbSha256&quot;: null,
+    &quot;loadDurationMs&quot;: 0
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Setup</td>
+      <td>Launch the fixed mission</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;guided-launch&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;降下完了 // STABLE · TEAM 3 · GEAR 6&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 4.492248065219665,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;dormant&quot;,
+    &quot;targetAgentId&quot;: null,
+    &quot;lastKnownTargetPosition&quot;: null,
+    &quot;observerAgentIds&quot;: [],
+    &quot;transitionReason&quot;: &quot;encounter registered&quot;,
+    &quot;transitionRevision&quot;: 0,
+    &quot;controlledContact&quot;: null,
+    &quot;pendingReportCount&quot;: 0,
+    &quot;presence&quot;: null,
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 0,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 1.9833333333333312,
+          &quot;minimumUntilSeconds&quot;: 3.233333333333331,
+          &quot;reassignAfterSeconds&quot;: 3.733333333333331
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 0,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: -1,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 2.1833333333333305
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 1.9833333333333312,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [],
+    &quot;disabled&quot;: []
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;dormant&quot;,
+    &quot;authenticated&quot;: false,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: []
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Contact sequence</td>
+      <td>Stage an isolated contact</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;isolate-contact&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;QA // ISOLATED CONTACT CONFIGURED&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 5.229629377524937,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;stalk&quot;,
+    &quot;targetAgentId&quot;: &quot;player&quot;,
+    &quot;lastKnownTargetPosition&quot;: {
+      &quot;x&quot;: 3.449998378753662,
+      &quot;y&quot;: 0.9300498366355896,
+      &quot;z&quot;: -3.500000476837158
+    },
+    &quot;observerAgentIds&quot;: [
+      &quot;player&quot;
+    ],
+    &quot;transitionReason&quot;: &quot;visual maintained&quot;,
+    &quot;transitionRevision&quot;: 2,
+    &quot;controlledContact&quot;: {
+      &quot;droneId&quot;: &quot;machine:security:needle-01&quot;,
+      &quot;position&quot;: {
+        &quot;x&quot;: 3.4499998645505494,
+        &quot;y&quot;: 1.55,
+        &quot;z&quot;: -4.416666666666709
+      },
+      &quot;observedByAgentId&quot;: &quot;player&quot;,
+      &quot;observedAtSeconds&quot;: 2.3833333333333298,
+      &quot;receivedAtSeconds&quot;: 2.3833333333333298,
+      &quot;freshness&quot;: &quot;live&quot;,
+      &quot;route&quot;: &quot;direct&quot;,
+      &quot;reportId&quot;: &quot;threat-report:machine:security:needle-01:player:1&quot;
+    },
+    &quot;pendingReportCount&quot;: 2,
+    &quot;presence&quot;: {
+      &quot;targetAgentId&quot;: &quot;player&quot;,
+      &quot;alliedPresence&quot;: 1,
+      &quot;hostilePresence&quot;: 1,
+      &quot;margin&quot;: 0,
+      &quot;band&quot;: &quot;predatory&quot;,
+      &quot;contributingEntityIds&quot;: [
+        &quot;machine:security:needle-01&quot;,
+        &quot;player&quot;
+      ],
+      &quot;evaluatedAtSeconds&quot;: 2.2333333333333303
+    },
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 1,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 1.9833333333333312,
+          &quot;minimumUntilSeconds&quot;: 3.233333333333331,
+          &quot;reassignAfterSeconds&quot;: 3.733333333333331
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 1,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: 0,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;,
+          &quot;player&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 2.3833333333333298
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 1.9833333333333312,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [],
+    &quot;disabled&quot;: []
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;dormant&quot;,
+    &quot;authenticated&quot;: false,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: [
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 2442.399999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      }
+    ]
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Contact sequence</td>
+      <td>Read contact transition state</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;results-threat&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;QA // ISOLATED CONTACT CONFIGURED&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 5.229629377524937,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;stalk&quot;,
+    &quot;targetAgentId&quot;: &quot;player&quot;,
+    &quot;lastKnownTargetPosition&quot;: {
+      &quot;x&quot;: 3.449998378753662,
+      &quot;y&quot;: 0.9300498366355896,
+      &quot;z&quot;: -3.500000476837158
+    },
+    &quot;observerAgentIds&quot;: [
+      &quot;player&quot;
+    ],
+    &quot;transitionReason&quot;: &quot;visual maintained&quot;,
+    &quot;transitionRevision&quot;: 2,
+    &quot;controlledContact&quot;: {
+      &quot;droneId&quot;: &quot;machine:security:needle-01&quot;,
+      &quot;position&quot;: {
+        &quot;x&quot;: 3.4499998645505494,
+        &quot;y&quot;: 1.55,
+        &quot;z&quot;: -4.416666666666709
+      },
+      &quot;observedByAgentId&quot;: &quot;player&quot;,
+      &quot;observedAtSeconds&quot;: 2.3833333333333298,
+      &quot;receivedAtSeconds&quot;: 2.3833333333333298,
+      &quot;freshness&quot;: &quot;live&quot;,
+      &quot;route&quot;: &quot;direct&quot;,
+      &quot;reportId&quot;: &quot;threat-report:machine:security:needle-01:player:1&quot;
+    },
+    &quot;pendingReportCount&quot;: 2,
+    &quot;presence&quot;: {
+      &quot;targetAgentId&quot;: &quot;player&quot;,
+      &quot;alliedPresence&quot;: 1,
+      &quot;hostilePresence&quot;: 1,
+      &quot;margin&quot;: 0,
+      &quot;band&quot;: &quot;predatory&quot;,
+      &quot;contributingEntityIds&quot;: [
+        &quot;machine:security:needle-01&quot;,
+        &quot;player&quot;
+      ],
+      &quot;evaluatedAtSeconds&quot;: 2.2333333333333303
+    },
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 1,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 1.9833333333333312,
+          &quot;minimumUntilSeconds&quot;: 3.233333333333331,
+          &quot;reassignAfterSeconds&quot;: 3.733333333333331
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 1,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: 0,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;,
+          &quot;player&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 2.3833333333333298
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 1.9833333333333312,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [],
+    &quot;disabled&quot;: []
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;dormant&quot;,
+    &quot;authenticated&quot;: false,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: [
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 2442.399999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      }
+    ]
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Contact sequence</td>
+      <td>Bring allied support into range</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;reinforce-contact&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;FIELD TERMINAL // LOCAL PRESENCE 2.00 &gt; 1.00 // DRONE RETREAT&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 4.5652593425050725,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;observe&quot;,
+    &quot;targetAgentId&quot;: &quot;player&quot;,
+    &quot;lastKnownTargetPosition&quot;: {
+      &quot;x&quot;: 3.449998378753662,
+      &quot;y&quot;: 0.9300498366355896,
+      &quot;z&quot;: -3.500000476837158
+    },
+    &quot;observerAgentIds&quot;: [
+      &quot;mara&quot;,
+      &quot;player&quot;
+    ],
+    &quot;transitionReason&quot;: &quot;retreat point reached; rescanning&quot;,
+    &quot;transitionRevision&quot;: 4,
+    &quot;controlledContact&quot;: {
+      &quot;droneId&quot;: &quot;machine:security:needle-01&quot;,
+      &quot;position&quot;: {
+        &quot;x&quot;: 3.449999847619368,
+        &quot;y&quot;: 1.55,
+        &quot;z&quot;: -4.387500000000047
+      },
+      &quot;observedByAgentId&quot;: &quot;player&quot;,
+      &quot;observedAtSeconds&quot;: 2.583333333333329,
+      &quot;receivedAtSeconds&quot;: 2.583333333333329,
+      &quot;freshness&quot;: &quot;live&quot;,
+      &quot;route&quot;: &quot;direct&quot;,
+      &quot;reportId&quot;: &quot;threat-report:machine:security:needle-01:player:1&quot;
+    },
+    &quot;pendingReportCount&quot;: 3,
+    &quot;presence&quot;: {
+      &quot;targetAgentId&quot;: &quot;player&quot;,
+      &quot;alliedPresence&quot;: 2,
+      &quot;hostilePresence&quot;: 1,
+      &quot;margin&quot;: 1,
+      &quot;band&quot;: &quot;outnumbered&quot;,
+      &quot;contributingEntityIds&quot;: [
+        &quot;machine:security:needle-01&quot;,
+        &quot;mara&quot;,
+        &quot;player&quot;
+      ],
+      &quot;evaluatedAtSeconds&quot;: 2.4833333333333294
+    },
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 1,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 1.9833333333333312,
+          &quot;minimumUntilSeconds&quot;: 3.233333333333331,
+          &quot;reassignAfterSeconds&quot;: 3.733333333333331
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 0,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: -1,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 2.583333333333329
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 1.9833333333333312,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [],
+    &quot;disabled&quot;: []
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;dormant&quot;,
+    &quot;authenticated&quot;: false,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: [
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 2442.399999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 2692.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      }
+    ]
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>Contact sequence</td>
+      <td>Withdraw allied support</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;withdraw-contact&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;QA // ALLIED REINFORCEMENT WITHDREW&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 4.498729960176998,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;observe&quot;,
+    &quot;targetAgentId&quot;: &quot;player&quot;,
+    &quot;lastKnownTargetPosition&quot;: {
+      &quot;x&quot;: 3.449998378753662,
+      &quot;y&quot;: 0.9300498366355896,
+      &quot;z&quot;: -3.500000476837158
+    },
+    &quot;observerAgentIds&quot;: [
+      &quot;mara&quot;,
+      &quot;player&quot;
+    ],
+    &quot;transitionReason&quot;: &quot;retreat point reached; rescanning&quot;,
+    &quot;transitionRevision&quot;: 4,
+    &quot;controlledContact&quot;: {
+      &quot;droneId&quot;: &quot;machine:security:needle-01&quot;,
+      &quot;position&quot;: {
+        &quot;x&quot;: 3.4499998645505494,
+        &quot;y&quot;: 1.55,
+        &quot;z&quot;: -4.416666666666709
+      },
+      &quot;observedByAgentId&quot;: &quot;player&quot;,
+      &quot;observedAtSeconds&quot;: 2.7833333333333283,
+      &quot;receivedAtSeconds&quot;: 2.7833333333333283,
+      &quot;freshness&quot;: &quot;live&quot;,
+      &quot;route&quot;: &quot;direct&quot;,
+      &quot;reportId&quot;: &quot;threat-report:machine:security:needle-01:player:3&quot;
+    },
+    &quot;pendingReportCount&quot;: 2,
+    &quot;presence&quot;: {
+      &quot;targetAgentId&quot;: &quot;player&quot;,
+      &quot;alliedPresence&quot;: 2,
+      &quot;hostilePresence&quot;: 1,
+      &quot;margin&quot;: 1,
+      &quot;band&quot;: &quot;outnumbered&quot;,
+      &quot;contributingEntityIds&quot;: [
+        &quot;machine:security:needle-01&quot;,
+        &quot;mara&quot;,
+        &quot;player&quot;
+      ],
+      &quot;evaluatedAtSeconds&quot;: 2.4833333333333294
+    },
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 1,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 1.9833333333333312,
+          &quot;minimumUntilSeconds&quot;: 3.233333333333331,
+          &quot;reassignAfterSeconds&quot;: 3.733333333333331
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 0,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: -1,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 2.7833333333333283
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 1.9833333333333312,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [],
+    &quot;disabled&quot;: []
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;dormant&quot;,
+    &quot;authenticated&quot;: false,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: [
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 2442.399999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 2692.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      }
+    ]
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>Relay</td>
+      <td>Deploy the portable relay</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;deploy-relay&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;RELAY_DEPLOYED // 携帯リレーを設置しました&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 4.492957481610835,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;observe&quot;,
+    &quot;targetAgentId&quot;: &quot;player&quot;,
+    &quot;lastKnownTargetPosition&quot;: {
+      &quot;x&quot;: 3.449998378753662,
+      &quot;y&quot;: 0.9300498366355896,
+      &quot;z&quot;: -3.500000476837158
+    },
+    &quot;observerAgentIds&quot;: [
+      &quot;player&quot;
+    ],
+    &quot;transitionReason&quot;: &quot;retreat point reached; rescanning&quot;,
+    &quot;transitionRevision&quot;: 4,
+    &quot;controlledContact&quot;: {
+      &quot;droneId&quot;: &quot;machine:security:needle-01&quot;,
+      &quot;position&quot;: {
+        &quot;x&quot;: 3.4499998645505494,
+        &quot;y&quot;: 1.55,
+        &quot;z&quot;: -4.416666666666709
+      },
+      &quot;observedByAgentId&quot;: &quot;player&quot;,
+      &quot;observedAtSeconds&quot;: 3.183333333333327,
+      &quot;receivedAtSeconds&quot;: 3.183333333333327,
+      &quot;freshness&quot;: &quot;live&quot;,
+      &quot;route&quot;: &quot;direct&quot;,
+      &quot;reportId&quot;: &quot;threat-report:machine:security:needle-01:player:3&quot;
+    },
+    &quot;pendingReportCount&quot;: 1,
+    &quot;presence&quot;: {
+      &quot;targetAgentId&quot;: &quot;player&quot;,
+      &quot;alliedPresence&quot;: 2,
+      &quot;hostilePresence&quot;: 1,
+      &quot;margin&quot;: 1,
+      &quot;band&quot;: &quot;outnumbered&quot;,
+      &quot;contributingEntityIds&quot;: [
+        &quot;machine:security:needle-01&quot;,
+        &quot;mara&quot;,
+        &quot;player&quot;
+      ],
+      &quot;evaluatedAtSeconds&quot;: 2.4833333333333294
+    },
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 1,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 1.9833333333333312,
+          &quot;minimumUntilSeconds&quot;: 3.233333333333331,
+          &quot;reassignAfterSeconds&quot;: 3.733333333333331
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 0,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: -1,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 3.183333333333327
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 1.9833333333333312,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [
+      &quot;relay-01&quot;
+    ],
+    &quot;disabled&quot;: []
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;dormant&quot;,
+    &quot;authenticated&quot;: false,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: [
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 2442.399999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 2692.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      }
+    ]
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>Relay</td>
+      <td>Disable the deployed relay</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;disable-relay&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;RELAY_DISABLED // 携帯リレーを一時停止しました&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 4.492177263798206,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;patrol&quot;,
+    &quot;targetAgentId&quot;: &quot;player&quot;,
+    &quot;lastKnownTargetPosition&quot;: {
+      &quot;x&quot;: 3.449998378753662,
+      &quot;y&quot;: 0.9300498366355896,
+      &quot;z&quot;: -3.500000476837158
+    },
+    &quot;observerAgentIds&quot;: [
+      &quot;player&quot;
+    ],
+    &quot;transitionReason&quot;: &quot;patrol route resumed&quot;,
+    &quot;transitionRevision&quot;: 6,
+    &quot;controlledContact&quot;: {
+      &quot;droneId&quot;: &quot;machine:security:needle-01&quot;,
+      &quot;position&quot;: {
+        &quot;x&quot;: 3.4499998645505494,
+        &quot;y&quot;: 1.55,
+        &quot;z&quot;: -4.416666666666709
+      },
+      &quot;observedByAgentId&quot;: &quot;player&quot;,
+      &quot;observedAtSeconds&quot;: 3.383333333333326,
+      &quot;receivedAtSeconds&quot;: 3.383333333333326,
+      &quot;freshness&quot;: &quot;live&quot;,
+      &quot;route&quot;: &quot;direct&quot;,
+      &quot;reportId&quot;: &quot;threat-report:machine:security:needle-01:player:3&quot;
+    },
+    &quot;pendingReportCount&quot;: 1,
+    &quot;presence&quot;: {
+      &quot;targetAgentId&quot;: &quot;player&quot;,
+      &quot;alliedPresence&quot;: 2,
+      &quot;hostilePresence&quot;: 1,
+      &quot;margin&quot;: 1,
+      &quot;band&quot;: &quot;outnumbered&quot;,
+      &quot;contributingEntityIds&quot;: [
+        &quot;machine:security:needle-01&quot;,
+        &quot;mara&quot;,
+        &quot;player&quot;
+      ],
+      &quot;evaluatedAtSeconds&quot;: 2.4833333333333294
+    },
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 1,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 1.9833333333333312,
+          &quot;minimumUntilSeconds&quot;: 3.233333333333331,
+          &quot;reassignAfterSeconds&quot;: 3.733333333333331
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 0,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: -1,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 3.383333333333326
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 1.9833333333333312,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [
+      &quot;relay-01&quot;
+    ],
+    &quot;disabled&quot;: [
+      &quot;relay-01&quot;
+    ]
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;dormant&quot;,
+    &quot;authenticated&quot;: false,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: [
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 2442.399999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 2692.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      }
+    ]
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>Relay</td>
+      <td>Start relay recovery</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;restart-relay&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;RELAY_RESTARTING // 再起動シーケンスを開始しました&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 4.492160588384544,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;patrol&quot;,
+    &quot;targetAgentId&quot;: &quot;player&quot;,
+    &quot;lastKnownTargetPosition&quot;: {
+      &quot;x&quot;: 3.449998378753662,
+      &quot;y&quot;: 0.9299498200416565,
+      &quot;z&quot;: -3.500000476837158
+    },
+    &quot;observerAgentIds&quot;: [
+      &quot;player&quot;
+    ],
+    &quot;transitionReason&quot;: &quot;visual maintained&quot;,
+    &quot;transitionRevision&quot;: 6,
+    &quot;controlledContact&quot;: {
+      &quot;droneId&quot;: &quot;machine:security:needle-01&quot;,
+      &quot;position&quot;: {
+        &quot;x&quot;: 3.4482144174330345,
+        &quot;y&quot;: 1.55,
+        &quot;z&quot;: -4.312515302666831
+      },
+      &quot;observedByAgentId&quot;: &quot;player&quot;,
+      &quot;observedAtSeconds&quot;: 3.5833333333333255,
+      &quot;receivedAtSeconds&quot;: 3.5833333333333255,
+      &quot;freshness&quot;: &quot;live&quot;,
+      &quot;route&quot;: &quot;direct&quot;,
+      &quot;reportId&quot;: &quot;threat-report:machine:security:needle-01:player:3&quot;
+    },
+    &quot;pendingReportCount&quot;: 1,
+    &quot;presence&quot;: {
+      &quot;targetAgentId&quot;: &quot;player&quot;,
+      &quot;alliedPresence&quot;: 2,
+      &quot;hostilePresence&quot;: 1,
+      &quot;margin&quot;: 1,
+      &quot;band&quot;: &quot;outnumbered&quot;,
+      &quot;contributingEntityIds&quot;: [
+        &quot;machine:security:needle-01&quot;,
+        &quot;mara&quot;,
+        &quot;player&quot;
+      ],
+      &quot;evaluatedAtSeconds&quot;: 2.4833333333333294
+    },
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 1,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 1.9833333333333312,
+          &quot;minimumUntilSeconds&quot;: 3.233333333333331,
+          &quot;reassignAfterSeconds&quot;: 3.733333333333331
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 1,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: 0,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;,
+          &quot;player&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 3.5833333333333255
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 1.9833333333333312,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [
+      &quot;relay-01&quot;
+    ],
+    &quot;disabled&quot;: [
+      &quot;relay-01&quot;
+    ]
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;dormant&quot;,
+    &quot;authenticated&quot;: false,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: [
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 2442.399999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 2692.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      }
+    ]
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>Flare</td>
+      <td>Deploy a signal flare</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;deploy-flare&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;NO_FLARE_AVAILABLE // 使用可能なフレアパックがありません&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 4.492152745882258,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;patrol&quot;,
+    &quot;targetAgentId&quot;: &quot;player&quot;,
+    &quot;lastKnownTargetPosition&quot;: {
+      &quot;x&quot;: 3.449998378753662,
+      &quot;y&quot;: 0.9299498200416565,
+      &quot;z&quot;: -3.500000476837158
+    },
+    &quot;observerAgentIds&quot;: [
+      &quot;player&quot;
+    ],
+    &quot;transitionReason&quot;: &quot;visual maintained&quot;,
+    &quot;transitionRevision&quot;: 6,
+    &quot;controlledContact&quot;: {
+      &quot;droneId&quot;: &quot;machine:security:needle-01&quot;,
+      &quot;position&quot;: {
+        &quot;x&quot;: 3.4439293443510013,
+        &quot;y&quot;: 1.55,
+        &quot;z&quot;: -4.062552029067123
+      },
+      &quot;observedByAgentId&quot;: &quot;player&quot;,
+      &quot;observedAtSeconds&quot;: 3.7833333333333248,
+      &quot;receivedAtSeconds&quot;: 3.7833333333333248,
+      &quot;freshness&quot;: &quot;live&quot;,
+      &quot;route&quot;: &quot;direct&quot;,
+      &quot;reportId&quot;: &quot;threat-report:machine:security:needle-01:player:3&quot;
+    },
+    &quot;pendingReportCount&quot;: 1,
+    &quot;presence&quot;: {
+      &quot;targetAgentId&quot;: &quot;player&quot;,
+      &quot;alliedPresence&quot;: 2,
+      &quot;hostilePresence&quot;: 1,
+      &quot;margin&quot;: 1,
+      &quot;band&quot;: &quot;outnumbered&quot;,
+      &quot;contributingEntityIds&quot;: [
+        &quot;machine:security:needle-01&quot;,
+        &quot;mara&quot;,
+        &quot;player&quot;
+      ],
+      &quot;evaluatedAtSeconds&quot;: 2.4833333333333294
+    },
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 1,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 1.9833333333333312,
+          &quot;minimumUntilSeconds&quot;: 3.233333333333331,
+          &quot;reassignAfterSeconds&quot;: 3.733333333333331
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 1,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: 0,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;,
+          &quot;player&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 3.7833333333333248
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 1.9833333333333312,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [
+      &quot;relay-01&quot;
+    ],
+    &quot;disabled&quot;: [
+      &quot;relay-01&quot;
+    ]
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;dormant&quot;,
+    &quot;authenticated&quot;: false,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: [
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 2442.399999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 2692.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.rejected&quot;,
+        &quot;caption&quot;: &quot;Squad command rejected&quot;,
+        &quot;requestedAtMs&quot;: 3893.5,
+        &quot;outcome&quot;: &quot;muted&quot;
+      }
+    ]
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>Contact sequence</td>
+      <td>Stage and authenticate the Porter</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;porter-auth&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;PORTER AUTHORIZED // SHORT-RANGE VOICE NODE ONLINE&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 4.4921222004661265,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;patrol&quot;,
+    &quot;targetAgentId&quot;: &quot;player&quot;,
+    &quot;lastKnownTargetPosition&quot;: {
+      &quot;x&quot;: 3.449998378753662,
+      &quot;y&quot;: 0.9299498200416565,
+      &quot;z&quot;: -3.500000476837158
+    },
+    &quot;observerAgentIds&quot;: [
+      &quot;player&quot;
+    ],
+    &quot;transitionReason&quot;: &quot;visual maintained&quot;,
+    &quot;transitionRevision&quot;: 6,
+    &quot;controlledContact&quot;: {
+      &quot;droneId&quot;: &quot;machine:security:needle-01&quot;,
+      &quot;position&quot;: {
+        &quot;x&quot;: 2.8231057247149116,
+        &quot;y&quot;: 1.55,
+        &quot;z&quot;: -0.03465545585551234
+      },
+      &quot;observedByAgentId&quot;: &quot;player&quot;,
+      &quot;observedAtSeconds&quot;: 7.183333333333313,
+      &quot;receivedAtSeconds&quot;: 7.183333333333313,
+      &quot;freshness&quot;: &quot;live&quot;,
+      &quot;route&quot;: &quot;direct&quot;,
+      &quot;reportId&quot;: &quot;threat-report:machine:security:needle-01:player:6&quot;
+    },
+    &quot;pendingReportCount&quot;: 1,
+    &quot;presence&quot;: {
+      &quot;targetAgentId&quot;: &quot;player&quot;,
+      &quot;alliedPresence&quot;: 2,
+      &quot;hostilePresence&quot;: 1,
+      &quot;margin&quot;: 1,
+      &quot;band&quot;: &quot;outnumbered&quot;,
+      &quot;contributingEntityIds&quot;: [
+        &quot;machine:security:needle-01&quot;,
+        &quot;mara&quot;,
+        &quot;player&quot;
+      ],
+      &quot;evaluatedAtSeconds&quot;: 2.4833333333333294
+    },
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 1,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 5.983333333333317,
+          &quot;minimumUntilSeconds&quot;: 7.233333333333317,
+          &quot;reassignAfterSeconds&quot;: 7.733333333333317
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 0,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: -1,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 7.183333333333313
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 5.983333333333317,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [
+      &quot;relay-01&quot;
+    ],
+    &quot;disabled&quot;: []
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;friendly-idle&quot;,
+    &quot;authenticated&quot;: true,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: [
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 2442.399999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 2692.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.rejected&quot;,
+        &quot;caption&quot;: &quot;Squad command rejected&quot;,
+        &quot;requestedAtMs&quot;: 3893.5,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 4136.899999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.authenticated&quot;,
+        &quot;caption&quot;: &quot;Porter authenticated&quot;,
+        &quot;requestedAtMs&quot;: 7142.099999904633,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.operational-pulse&quot;,
+        &quot;caption&quot;: &quot;Friendly porter operational&quot;,
+        &quot;requestedAtMs&quot;: 7142.099999904633,
+        &quot;outcome&quot;: &quot;muted&quot;
+      }
+    ]
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>Contact sequence</td>
+      <td>Read Porter authentication</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;results-porter&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;PORTER AUTHORIZED // SHORT-RANGE VOICE NODE ONLINE&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 4.492122235335975,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;patrol&quot;,
+    &quot;targetAgentId&quot;: &quot;player&quot;,
+    &quot;lastKnownTargetPosition&quot;: {
+      &quot;x&quot;: 3.449998378753662,
+      &quot;y&quot;: 0.9299498200416565,
+      &quot;z&quot;: -3.500000476837158
+    },
+    &quot;observerAgentIds&quot;: [
+      &quot;player&quot;
+    ],
+    &quot;transitionReason&quot;: &quot;visual maintained&quot;,
+    &quot;transitionRevision&quot;: 6,
+    &quot;controlledContact&quot;: {
+      &quot;droneId&quot;: &quot;machine:security:needle-01&quot;,
+      &quot;position&quot;: {
+        &quot;x&quot;: 2.8231057247149116,
+        &quot;y&quot;: 1.55,
+        &quot;z&quot;: -0.03465545585551234
+      },
+      &quot;observedByAgentId&quot;: &quot;player&quot;,
+      &quot;observedAtSeconds&quot;: 7.183333333333313,
+      &quot;receivedAtSeconds&quot;: 7.183333333333313,
+      &quot;freshness&quot;: &quot;live&quot;,
+      &quot;route&quot;: &quot;direct&quot;,
+      &quot;reportId&quot;: &quot;threat-report:machine:security:needle-01:player:6&quot;
+    },
+    &quot;pendingReportCount&quot;: 1,
+    &quot;presence&quot;: {
+      &quot;targetAgentId&quot;: &quot;player&quot;,
+      &quot;alliedPresence&quot;: 2,
+      &quot;hostilePresence&quot;: 1,
+      &quot;margin&quot;: 1,
+      &quot;band&quot;: &quot;outnumbered&quot;,
+      &quot;contributingEntityIds&quot;: [
+        &quot;machine:security:needle-01&quot;,
+        &quot;mara&quot;,
+        &quot;player&quot;
+      ],
+      &quot;evaluatedAtSeconds&quot;: 2.4833333333333294
+    },
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 1,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 5.983333333333317,
+          &quot;minimumUntilSeconds&quot;: 7.233333333333317,
+          &quot;reassignAfterSeconds&quot;: 7.733333333333317
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 0,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: -1,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 7.183333333333313
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 5.983333333333317,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [
+      &quot;relay-01&quot;
+    ],
+    &quot;disabled&quot;: []
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;friendly-idle&quot;,
+    &quot;authenticated&quot;: true,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: [
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 2442.399999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 2692.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.rejected&quot;,
+        &quot;caption&quot;: &quot;Squad command rejected&quot;,
+        &quot;requestedAtMs&quot;: 3893.5,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 4136.899999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.authenticated&quot;,
+        &quot;caption&quot;: &quot;Porter authenticated&quot;,
+        &quot;requestedAtMs&quot;: 7142.099999904633,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.operational-pulse&quot;,
+        &quot;caption&quot;: &quot;Friendly porter operational&quot;,
+        &quot;requestedAtMs&quot;: 7142.099999904633,
+        &quot;outcome&quot;: &quot;muted&quot;
+      }
+    ]
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>Contact sequence</td>
+      <td>Issue the Porter carry command</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;porter-carry&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;PORTER_CARRY_TO // 冷却コイルを抽出台へ搬送します&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 4.492122200565364,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;patrol&quot;,
+    &quot;targetAgentId&quot;: &quot;player&quot;,
+    &quot;lastKnownTargetPosition&quot;: {
+      &quot;x&quot;: 3.449998378753662,
+      &quot;y&quot;: 0.9299498200416565,
+      &quot;z&quot;: -3.500000476837158
+    },
+    &quot;observerAgentIds&quot;: [
+      &quot;player&quot;
+    ],
+    &quot;transitionReason&quot;: &quot;visual maintained&quot;,
+    &quot;transitionRevision&quot;: 6,
+    &quot;controlledContact&quot;: {
+      &quot;droneId&quot;: &quot;machine:security:needle-01&quot;,
+      &quot;position&quot;: {
+        &quot;x&quot;: 2.7420597334306636,
+        &quot;y&quot;: 1.55,
+        &quot;z&quot;: 0.20184305850927936
+      },
+      &quot;observedByAgentId&quot;: &quot;player&quot;,
+      &quot;observedAtSeconds&quot;: 7.383333333333312,
+      &quot;receivedAtSeconds&quot;: 7.383333333333312,
+      &quot;freshness&quot;: &quot;live&quot;,
+      &quot;route&quot;: &quot;direct&quot;,
+      &quot;reportId&quot;: &quot;threat-report:machine:security:needle-01:player:7&quot;
+    },
+    &quot;pendingReportCount&quot;: 1,
+    &quot;presence&quot;: {
+      &quot;targetAgentId&quot;: &quot;player&quot;,
+      &quot;alliedPresence&quot;: 2,
+      &quot;hostilePresence&quot;: 1,
+      &quot;margin&quot;: 1,
+      &quot;band&quot;: &quot;outnumbered&quot;,
+      &quot;contributingEntityIds&quot;: [
+        &quot;machine:security:needle-01&quot;,
+        &quot;mara&quot;,
+        &quot;player&quot;
+      ],
+      &quot;evaluatedAtSeconds&quot;: 2.4833333333333294
+    },
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 1,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 5.983333333333317,
+          &quot;minimumUntilSeconds&quot;: 7.233333333333317,
+          &quot;reassignAfterSeconds&quot;: 7.733333333333317
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 0,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: -1,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 7.383333333333312
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 5.983333333333317,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [
+      &quot;relay-01&quot;
+    ],
+    &quot;disabled&quot;: []
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;moving-to-item&quot;,
+    &quot;authenticated&quot;: true,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: [
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 2442.399999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 2692.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.rejected&quot;,
+        &quot;caption&quot;: &quot;Squad command rejected&quot;,
+        &quot;requestedAtMs&quot;: 3893.5,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 4136.899999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.authenticated&quot;,
+        &quot;caption&quot;: &quot;Porter authenticated&quot;,
+        &quot;requestedAtMs&quot;: 7142.099999904633,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.operational-pulse&quot;,
+        &quot;caption&quot;: &quot;Friendly porter operational&quot;,
+        &quot;requestedAtMs&quot;: 7142.099999904633,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 7459.899999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      }
+    ]
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>Audio test</td>
+      <td>Audit all 17 semantic cues</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;audio-suite&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;PORTER_CARRY_TO // 冷却コイルを抽出台へ搬送します&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 4.49212223539142,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;patrol&quot;,
+    &quot;targetAgentId&quot;: &quot;player&quot;,
+    &quot;lastKnownTargetPosition&quot;: {
+      &quot;x&quot;: 3.449998378753662,
+      &quot;y&quot;: 0.9299498200416565,
+      &quot;z&quot;: -3.500000476837158
+    },
+    &quot;observerAgentIds&quot;: [
+      &quot;player&quot;
+    ],
+    &quot;transitionReason&quot;: &quot;visual maintained&quot;,
+    &quot;transitionRevision&quot;: 6,
+    &quot;controlledContact&quot;: {
+      &quot;droneId&quot;: &quot;machine:security:needle-01&quot;,
+      &quot;position&quot;: {
+        &quot;x&quot;: 2.6610137421464155,
+        &quot;y&quot;: 1.55,
+        &quot;z&quot;: 0.4383415728740711
+      },
+      &quot;observedByAgentId&quot;: &quot;player&quot;,
+      &quot;observedAtSeconds&quot;: 7.583333333333312,
+      &quot;receivedAtSeconds&quot;: 7.583333333333312,
+      &quot;freshness&quot;: &quot;live&quot;,
+      &quot;route&quot;: &quot;direct&quot;,
+      &quot;reportId&quot;: &quot;threat-report:machine:security:needle-01:player:7&quot;
+    },
+    &quot;pendingReportCount&quot;: 1,
+    &quot;presence&quot;: {
+      &quot;targetAgentId&quot;: &quot;player&quot;,
+      &quot;alliedPresence&quot;: 2,
+      &quot;hostilePresence&quot;: 1,
+      &quot;margin&quot;: 1,
+      &quot;band&quot;: &quot;outnumbered&quot;,
+      &quot;contributingEntityIds&quot;: [
+        &quot;machine:security:needle-01&quot;,
+        &quot;mara&quot;,
+        &quot;player&quot;
+      ],
+      &quot;evaluatedAtSeconds&quot;: 2.4833333333333294
+    },
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 1,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 5.983333333333317,
+          &quot;minimumUntilSeconds&quot;: 7.233333333333317,
+          &quot;reassignAfterSeconds&quot;: 7.733333333333317
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 0,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: -1,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 7.583333333333312
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 5.983333333333317,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [
+      &quot;relay-01&quot;
+    ],
+    &quot;disabled&quot;: []
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;moving-to-item&quot;,
+    &quot;authenticated&quot;: true,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: [
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 2442.399999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 2692.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.rejected&quot;,
+        &quot;caption&quot;: &quot;Squad command rejected&quot;,
+        &quot;requestedAtMs&quot;: 3893.5,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 4136.899999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.authenticated&quot;,
+        &quot;caption&quot;: &quot;Porter authenticated&quot;,
+        &quot;requestedAtMs&quot;: 7142.099999904633,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.operational-pulse&quot;,
+        &quot;caption&quot;: &quot;Friendly porter operational&quot;,
+        &quot;requestedAtMs&quot;: 7142.099999904633,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 7459.899999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;gate.accepted&quot;,
+        &quot;caption&quot;: &quot;Gate accepted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;gate.rejected&quot;,
+        &quot;caption&quot;: &quot;Gate rejected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.rejected&quot;,
+        &quot;caption&quot;: &quot;Squad command rejected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.lock-pulse&quot;,
+        &quot;caption&quot;: &quot;Hostile lock tightening&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.interdicted&quot;,
+        &quot;caption&quot;: &quot;Agent interdicted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;hostile.share-transmit&quot;,
+        &quot;caption&quot;: &quot;Hostile contact transmitted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;hostile.share-receive&quot;,
+        &quot;caption&quot;: &quot;Hostile contact received&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.disabled&quot;,
+        &quot;caption&quot;: &quot;Relay disabled&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.restarted&quot;,
+        &quot;caption&quot;: &quot;Relay restart initiated&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;flare.deployed&quot;,
+        &quot;caption&quot;: &quot;Signal flare deployed&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.authenticated&quot;,
+        &quot;caption&quot;: &quot;Porter authenticated&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.operational-pulse&quot;,
+        &quot;caption&quot;: &quot;Friendly porter operational&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.rejected&quot;,
+        &quot;caption&quot;: &quot;Porter command rejected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      }
+    ]
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>Results</td>
+      <td>Read camera orbit and occlusion</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;results-camera&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;PORTER_CARRY_TO // 冷却コイルを抽出台へ搬送します&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 4.492122200386419,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;patrol&quot;,
+    &quot;targetAgentId&quot;: &quot;player&quot;,
+    &quot;lastKnownTargetPosition&quot;: {
+      &quot;x&quot;: 3.449998378753662,
+      &quot;y&quot;: 0.9299498200416565,
+      &quot;z&quot;: -3.500000476837158
+    },
+    &quot;observerAgentIds&quot;: [
+      &quot;player&quot;
+    ],
+    &quot;transitionReason&quot;: &quot;visual maintained&quot;,
+    &quot;transitionRevision&quot;: 6,
+    &quot;controlledContact&quot;: {
+      &quot;droneId&quot;: &quot;machine:security:needle-01&quot;,
+      &quot;position&quot;: {
+        &quot;x&quot;: 2.6610137421464155,
+        &quot;y&quot;: 1.55,
+        &quot;z&quot;: 0.4383415728740711
+      },
+      &quot;observedByAgentId&quot;: &quot;player&quot;,
+      &quot;observedAtSeconds&quot;: 7.583333333333312,
+      &quot;receivedAtSeconds&quot;: 7.583333333333312,
+      &quot;freshness&quot;: &quot;live&quot;,
+      &quot;route&quot;: &quot;direct&quot;,
+      &quot;reportId&quot;: &quot;threat-report:machine:security:needle-01:player:7&quot;
+    },
+    &quot;pendingReportCount&quot;: 1,
+    &quot;presence&quot;: {
+      &quot;targetAgentId&quot;: &quot;player&quot;,
+      &quot;alliedPresence&quot;: 2,
+      &quot;hostilePresence&quot;: 1,
+      &quot;margin&quot;: 1,
+      &quot;band&quot;: &quot;outnumbered&quot;,
+      &quot;contributingEntityIds&quot;: [
+        &quot;machine:security:needle-01&quot;,
+        &quot;mara&quot;,
+        &quot;player&quot;
+      ],
+      &quot;evaluatedAtSeconds&quot;: 2.4833333333333294
+    },
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 1,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 5.983333333333317,
+          &quot;minimumUntilSeconds&quot;: 7.233333333333317,
+          &quot;reassignAfterSeconds&quot;: 7.733333333333317
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 0,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: -1,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 7.583333333333312
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 5.983333333333317,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [
+      &quot;relay-01&quot;
+    ],
+    &quot;disabled&quot;: []
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;moving-to-item&quot;,
+    &quot;authenticated&quot;: true,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: [
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 2442.399999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 2692.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.rejected&quot;,
+        &quot;caption&quot;: &quot;Squad command rejected&quot;,
+        &quot;requestedAtMs&quot;: 3893.5,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 4136.899999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.authenticated&quot;,
+        &quot;caption&quot;: &quot;Porter authenticated&quot;,
+        &quot;requestedAtMs&quot;: 7142.099999904633,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.operational-pulse&quot;,
+        &quot;caption&quot;: &quot;Friendly porter operational&quot;,
+        &quot;requestedAtMs&quot;: 7142.099999904633,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 7459.899999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;gate.accepted&quot;,
+        &quot;caption&quot;: &quot;Gate accepted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;gate.rejected&quot;,
+        &quot;caption&quot;: &quot;Gate rejected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.rejected&quot;,
+        &quot;caption&quot;: &quot;Squad command rejected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.lock-pulse&quot;,
+        &quot;caption&quot;: &quot;Hostile lock tightening&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.interdicted&quot;,
+        &quot;caption&quot;: &quot;Agent interdicted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;hostile.share-transmit&quot;,
+        &quot;caption&quot;: &quot;Hostile contact transmitted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;hostile.share-receive&quot;,
+        &quot;caption&quot;: &quot;Hostile contact received&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.disabled&quot;,
+        &quot;caption&quot;: &quot;Relay disabled&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.restarted&quot;,
+        &quot;caption&quot;: &quot;Relay restart initiated&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;flare.deployed&quot;,
+        &quot;caption&quot;: &quot;Signal flare deployed&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.authenticated&quot;,
+        &quot;caption&quot;: &quot;Porter authenticated&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.operational-pulse&quot;,
+        &quot;caption&quot;: &quot;Friendly porter operational&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.rejected&quot;,
+        &quot;caption&quot;: &quot;Porter command rejected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      }
+    ]
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>Results</td>
+      <td>Read cart authority state</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;results-cart&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;PORTER_CARRY_TO // 冷却コイルを抽出台へ搬送します&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 4.492122200386419,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;patrol&quot;,
+    &quot;targetAgentId&quot;: &quot;player&quot;,
+    &quot;lastKnownTargetPosition&quot;: {
+      &quot;x&quot;: 3.449998378753662,
+      &quot;y&quot;: 0.9299498200416565,
+      &quot;z&quot;: -3.500000476837158
+    },
+    &quot;observerAgentIds&quot;: [
+      &quot;player&quot;
+    ],
+    &quot;transitionReason&quot;: &quot;visual maintained&quot;,
+    &quot;transitionRevision&quot;: 6,
+    &quot;controlledContact&quot;: {
+      &quot;droneId&quot;: &quot;machine:security:needle-01&quot;,
+      &quot;position&quot;: {
+        &quot;x&quot;: 2.6610137421464155,
+        &quot;y&quot;: 1.55,
+        &quot;z&quot;: 0.4383415728740711
+      },
+      &quot;observedByAgentId&quot;: &quot;player&quot;,
+      &quot;observedAtSeconds&quot;: 7.583333333333312,
+      &quot;receivedAtSeconds&quot;: 7.583333333333312,
+      &quot;freshness&quot;: &quot;live&quot;,
+      &quot;route&quot;: &quot;direct&quot;,
+      &quot;reportId&quot;: &quot;threat-report:machine:security:needle-01:player:7&quot;
+    },
+    &quot;pendingReportCount&quot;: 1,
+    &quot;presence&quot;: {
+      &quot;targetAgentId&quot;: &quot;player&quot;,
+      &quot;alliedPresence&quot;: 2,
+      &quot;hostilePresence&quot;: 1,
+      &quot;margin&quot;: 1,
+      &quot;band&quot;: &quot;outnumbered&quot;,
+      &quot;contributingEntityIds&quot;: [
+        &quot;machine:security:needle-01&quot;,
+        &quot;mara&quot;,
+        &quot;player&quot;
+      ],
+      &quot;evaluatedAtSeconds&quot;: 2.4833333333333294
+    },
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 1,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 5.983333333333317,
+          &quot;minimumUntilSeconds&quot;: 7.233333333333317,
+          &quot;reassignAfterSeconds&quot;: 7.733333333333317
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 0,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: -1,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 7.583333333333312
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 5.983333333333317,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [
+      &quot;relay-01&quot;
+    ],
+    &quot;disabled&quot;: []
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;moving-to-item&quot;,
+    &quot;authenticated&quot;: true,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: [
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 2442.399999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 2692.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.rejected&quot;,
+        &quot;caption&quot;: &quot;Squad command rejected&quot;,
+        &quot;requestedAtMs&quot;: 3893.5,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 4136.899999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.authenticated&quot;,
+        &quot;caption&quot;: &quot;Porter authenticated&quot;,
+        &quot;requestedAtMs&quot;: 7142.099999904633,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.operational-pulse&quot;,
+        &quot;caption&quot;: &quot;Friendly porter operational&quot;,
+        &quot;requestedAtMs&quot;: 7142.099999904633,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 7459.899999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;gate.accepted&quot;,
+        &quot;caption&quot;: &quot;Gate accepted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;gate.rejected&quot;,
+        &quot;caption&quot;: &quot;Gate rejected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.rejected&quot;,
+        &quot;caption&quot;: &quot;Squad command rejected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.lock-pulse&quot;,
+        &quot;caption&quot;: &quot;Hostile lock tightening&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.interdicted&quot;,
+        &quot;caption&quot;: &quot;Agent interdicted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;hostile.share-transmit&quot;,
+        &quot;caption&quot;: &quot;Hostile contact transmitted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;hostile.share-receive&quot;,
+        &quot;caption&quot;: &quot;Hostile contact received&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.disabled&quot;,
+        &quot;caption&quot;: &quot;Relay disabled&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.restarted&quot;,
+        &quot;caption&quot;: &quot;Relay restart initiated&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;flare.deployed&quot;,
+        &quot;caption&quot;: &quot;Signal flare deployed&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.authenticated&quot;,
+        &quot;caption&quot;: &quot;Porter authenticated&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.operational-pulse&quot;,
+        &quot;caption&quot;: &quot;Friendly porter operational&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.rejected&quot;,
+        &quot;caption&quot;: &quot;Porter command rejected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      }
+    ]
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>Results</td>
+      <td>Read active asset mode</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;results-assets&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;PORTER_CARRY_TO // 冷却コイルを抽出台へ搬送します&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 4.492122235349668,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;patrol&quot;,
+    &quot;targetAgentId&quot;: &quot;player&quot;,
+    &quot;lastKnownTargetPosition&quot;: {
+      &quot;x&quot;: 3.449998378753662,
+      &quot;y&quot;: 0.9299498200416565,
+      &quot;z&quot;: -3.500000476837158
+    },
+    &quot;observerAgentIds&quot;: [
+      &quot;player&quot;
+    ],
+    &quot;transitionReason&quot;: &quot;visual maintained&quot;,
+    &quot;transitionRevision&quot;: 6,
+    &quot;controlledContact&quot;: {
+      &quot;droneId&quot;: &quot;machine:security:needle-01&quot;,
+      &quot;position&quot;: {
+        &quot;x&quot;: 2.5799677508621675,
+        &quot;y&quot;: 1.55,
+        &quot;z&quot;: 0.6748400872388628
+      },
+      &quot;observedByAgentId&quot;: &quot;player&quot;,
+      &quot;observedAtSeconds&quot;: 7.783333333333311,
+      &quot;receivedAtSeconds&quot;: 7.783333333333311,
+      &quot;freshness&quot;: &quot;live&quot;,
+      &quot;route&quot;: &quot;direct&quot;,
+      &quot;reportId&quot;: &quot;threat-report:machine:security:needle-01:player:7&quot;
+    },
+    &quot;pendingReportCount&quot;: 1,
+    &quot;presence&quot;: {
+      &quot;targetAgentId&quot;: &quot;player&quot;,
+      &quot;alliedPresence&quot;: 2,
+      &quot;hostilePresence&quot;: 1,
+      &quot;margin&quot;: 1,
+      &quot;band&quot;: &quot;outnumbered&quot;,
+      &quot;contributingEntityIds&quot;: [
+        &quot;machine:security:needle-01&quot;,
+        &quot;mara&quot;,
+        &quot;player&quot;
+      ],
+      &quot;evaluatedAtSeconds&quot;: 2.4833333333333294
+    },
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 1,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 5.983333333333317,
+          &quot;minimumUntilSeconds&quot;: 7.233333333333317,
+          &quot;reassignAfterSeconds&quot;: 7.733333333333317
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 0,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: -1,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 7.783333333333311
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 5.983333333333317,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [
+      &quot;relay-01&quot;
+    ],
+    &quot;disabled&quot;: []
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;moving-to-item&quot;,
+    &quot;authenticated&quot;: true,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: [
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 2442.399999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 2692.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.rejected&quot;,
+        &quot;caption&quot;: &quot;Squad command rejected&quot;,
+        &quot;requestedAtMs&quot;: 3893.5,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 4136.899999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.authenticated&quot;,
+        &quot;caption&quot;: &quot;Porter authenticated&quot;,
+        &quot;requestedAtMs&quot;: 7142.099999904633,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.operational-pulse&quot;,
+        &quot;caption&quot;: &quot;Friendly porter operational&quot;,
+        &quot;requestedAtMs&quot;: 7142.099999904633,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 7459.899999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;gate.accepted&quot;,
+        &quot;caption&quot;: &quot;Gate accepted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;gate.rejected&quot;,
+        &quot;caption&quot;: &quot;Gate rejected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.rejected&quot;,
+        &quot;caption&quot;: &quot;Squad command rejected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.lock-pulse&quot;,
+        &quot;caption&quot;: &quot;Hostile lock tightening&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.interdicted&quot;,
+        &quot;caption&quot;: &quot;Agent interdicted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;hostile.share-transmit&quot;,
+        &quot;caption&quot;: &quot;Hostile contact transmitted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;hostile.share-receive&quot;,
+        &quot;caption&quot;: &quot;Hostile contact received&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.disabled&quot;,
+        &quot;caption&quot;: &quot;Relay disabled&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.restarted&quot;,
+        &quot;caption&quot;: &quot;Relay restart initiated&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;flare.deployed&quot;,
+        &quot;caption&quot;: &quot;Signal flare deployed&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.authenticated&quot;,
+        &quot;caption&quot;: &quot;Porter authenticated&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.operational-pulse&quot;,
+        &quot;caption&quot;: &quot;Friendly porter operational&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.rejected&quot;,
+        &quot;caption&quot;: &quot;Porter command rejected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      }
+    ]
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td>Results</td>
+      <td>Capture final Phase G readback</td>
+      <td>PASS</td>
+      <td><pre>{
+  &quot;action&quot;: &quot;results-final&quot;,
+  &quot;world&quot;: &quot;mission&quot;,
+  &quot;runtime&quot;: &quot;playing&quot;,
+  &quot;notice&quot;: &quot;PORTER_CARRY_TO // 冷却コイルを抽出台へ搬送します&quot;,
+  &quot;modal&quot;: &quot;none&quot;,
+  &quot;camera&quot;: {
+    &quot;yaw&quot;: 0.14601225771127538,
+    &quot;pitch&quot;: 0.5857741761521881,
+    &quot;desiredDistance&quot;: 4.1,
+    &quot;effectiveDistance&quot;: 4.49212220048369,
+    &quot;occlusionActive&quot;: false
+  },
+  &quot;input&quot;: {
+    &quot;heldCodes&quot;: [],
+    &quot;resolvedActions&quot;: [],
+    &quot;rawX&quot;: 0,
+    &quot;rawY&quot;: 0,
+    &quot;worldX&quot;: 0,
+    &quot;worldZ&quot;: 0,
+    &quot;focusedElement&quot;: &quot;body&quot;,
+    &quot;modalState&quot;: &quot;none&quot;,
+    &quot;pointerLocked&quot;: false,
+    &quot;actualDisplacementX&quot;: 0,
+    &quot;actualDisplacementZ&quot;: 0,
+    &quot;actualDisplacement&quot;: 0,
+    &quot;activeDevice&quot;: &quot;none&quot;,
+    &quot;connectedGamepads&quot;: [],
+    &quot;orbitDragActive&quot;: false,
+    &quot;pointerLockFallback&quot;: false
+  },
+  &quot;cart&quot;: {
+    &quot;attached&quot;: false,
+    &quot;position&quot;: {
+      &quot;x&quot;: 2.2,
+      &quot;y&quot;: 0.48,
+      &quot;z&quot;: -1.4
+    },
+    &quot;facingYaw&quot;: 0,
+    &quot;speed&quot;: 0,
+    &quot;collisionBlocked&quot;: false
+  },
+  &quot;threat&quot;: {
+    &quot;mode&quot;: &quot;patrol&quot;,
+    &quot;targetAgentId&quot;: &quot;player&quot;,
+    &quot;lastKnownTargetPosition&quot;: {
+      &quot;x&quot;: 3.449998378753662,
+      &quot;y&quot;: 0.9299498200416565,
+      &quot;z&quot;: -3.500000476837158
+    },
+    &quot;observerAgentIds&quot;: [
+      &quot;player&quot;
+    ],
+    &quot;transitionReason&quot;: &quot;visual maintained&quot;,
+    &quot;transitionRevision&quot;: 6,
+    &quot;controlledContact&quot;: {
+      &quot;droneId&quot;: &quot;machine:security:needle-01&quot;,
+      &quot;position&quot;: {
+        &quot;x&quot;: 2.5799677508621675,
+        &quot;y&quot;: 1.55,
+        &quot;z&quot;: 0.6748400872388628
+      },
+      &quot;observedByAgentId&quot;: &quot;player&quot;,
+      &quot;observedAtSeconds&quot;: 7.783333333333311,
+      &quot;receivedAtSeconds&quot;: 7.783333333333311,
+      &quot;freshness&quot;: &quot;live&quot;,
+      &quot;route&quot;: &quot;direct&quot;,
+      &quot;reportId&quot;: &quot;threat-report:machine:security:needle-01:player:7&quot;
+    },
+    &quot;pendingReportCount&quot;: 1,
+    &quot;presence&quot;: {
+      &quot;targetAgentId&quot;: &quot;player&quot;,
+      &quot;alliedPresence&quot;: 2,
+      &quot;hostilePresence&quot;: 1,
+      &quot;margin&quot;: 1,
+      &quot;band&quot;: &quot;outnumbered&quot;,
+      &quot;contributingEntityIds&quot;: [
+        &quot;machine:security:needle-01&quot;,
+        &quot;mara&quot;,
+        &quot;player&quot;
+      ],
+      &quot;evaluatedAtSeconds&quot;: 2.4833333333333294
+    },
+    &quot;lockOnProgress&quot;: 0,
+    &quot;security&quot;: {
+      &quot;posture&quot;: &quot;routine&quot;,
+      &quot;cellId&quot;: &quot;security-cell:flooded-market-01&quot;,
+      &quot;linkQuality&quot;: 0,
+      &quot;linkConnected&quot;: false,
+      &quot;sharedFactCount&quot;: 0,
+      &quot;sharedFacts&quot;: [],
+      &quot;localFactCountByMachine&quot;: {
+        &quot;machine:security:needle-01&quot;: 1,
+        &quot;machine:security:watcher-01&quot;: 0
+      },
+      &quot;assignments&quot;: {
+        &quot;machine:security:needle-01&quot;: {
+          &quot;machineId&quot;: &quot;machine:security:needle-01&quot;,
+          &quot;task&quot;: &quot;patrol&quot;,
+          &quot;targetId&quot;: null,
+          &quot;factId&quot;: null,
+          &quot;assignedAtSeconds&quot;: 5.983333333333317,
+          &quot;minimumUntilSeconds&quot;: 7.233333333333317,
+          &quot;reassignAfterSeconds&quot;: 7.733333333333317
+        }
+      },
+      &quot;reservationIds&quot;: [],
+      &quot;pressureTokens&quot;: {
+        &quot;lockOnByAgentId&quot;: {},
+        &quot;activeInterdictionMachineId&quot;: null,
+        &quot;relaySabotageByRelayId&quot;: {},
+        &quot;graceUntilByAgentId&quot;: {}
+      },
+      &quot;presence&quot;: {
+        &quot;targetAgentId&quot;: &quot;player&quot;,
+        &quot;alliedPresence&quot;: 0,
+        &quot;hostilePresence&quot;: 1,
+        &quot;margin&quot;: -1,
+        &quot;band&quot;: &quot;predatory&quot;,
+        &quot;contributingEntityIds&quot;: [
+          &quot;machine:security:needle-01&quot;
+        ],
+        &quot;evaluatedAtSeconds&quot;: 7.783333333333311
+      },
+      &quot;lastAssignmentAtSeconds&quot;: 5.983333333333317,
+      &quot;confirmedContact&quot;: false,
+      &quot;sharedContactRevision&quot;: 0
+    }
+  },
+  &quot;relay&quot;: {
+    &quot;deployed&quot;: [
+      &quot;relay-01&quot;
+    ],
+    &quot;disabled&quot;: []
+  },
+  &quot;beacons&quot;: [],
+  &quot;porter&quot;: {
+    &quot;mode&quot;: &quot;moving-to-item&quot;,
+    &quot;authenticated&quot;: true,
+    &quot;carriedItemId&quot;: null
+  },
+  &quot;audio&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;muted&quot;: true,
+    &quot;contextState&quot;: &quot;not-created&quot;,
+    &quot;cueCount&quot;: 17,
+    &quot;events&quot;: [
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 2442.399999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 2692.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 3160.2999999523163,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.rejected&quot;,
+        &quot;caption&quot;: &quot;Squad command rejected&quot;,
+        &quot;requestedAtMs&quot;: 3893.5,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 4136.899999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.authenticated&quot;,
+        &quot;caption&quot;: &quot;Porter authenticated&quot;,
+        &quot;requestedAtMs&quot;: 7142.099999904633,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.operational-pulse&quot;,
+        &quot;caption&quot;: &quot;Friendly porter operational&quot;,
+        &quot;requestedAtMs&quot;: 7142.099999904633,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 7459.899999976158,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;gate.accepted&quot;,
+        &quot;caption&quot;: &quot;Gate accepted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;gate.rejected&quot;,
+        &quot;caption&quot;: &quot;Gate rejected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.accepted&quot;,
+        &quot;caption&quot;: &quot;Squad command accepted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;squad.rejected&quot;,
+        &quot;caption&quot;: &quot;Squad command rejected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.detected&quot;,
+        &quot;caption&quot;: &quot;Hostile contact detected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.lock-pulse&quot;,
+        &quot;caption&quot;: &quot;Hostile lock tightening&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.disengaged&quot;,
+        &quot;caption&quot;: &quot;Hostile contact disengaged&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;contact.interdicted&quot;,
+        &quot;caption&quot;: &quot;Agent interdicted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;hostile.share-transmit&quot;,
+        &quot;caption&quot;: &quot;Hostile contact transmitted&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;hostile.share-receive&quot;,
+        &quot;caption&quot;: &quot;Hostile contact received&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.deployed&quot;,
+        &quot;caption&quot;: &quot;Relay deployed&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.disabled&quot;,
+        &quot;caption&quot;: &quot;Relay disabled&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;relay.restarted&quot;,
+        &quot;caption&quot;: &quot;Relay restart initiated&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;flare.deployed&quot;,
+        &quot;caption&quot;: &quot;Signal flare deployed&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.authenticated&quot;,
+        &quot;caption&quot;: &quot;Porter authenticated&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.operational-pulse&quot;,
+        &quot;caption&quot;: &quot;Friendly porter operational&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      },
+      {
+        &quot;cueId&quot;: &quot;porter.rejected&quot;,
+        &quot;caption&quot;: &quot;Porter command rejected&quot;,
+        &quot;requestedAtMs&quot;: 7709.699999928474,
+        &quot;outcome&quot;: &quot;muted&quot;
+      }
+    ]
+  },
+  &quot;assets&quot;: {
+    &quot;requestedMode&quot;: &quot;canary-v1&quot;,
+    &quot;activeMode&quot;: &quot;canary-v1&quot;,
+    &quot;status&quot;: &quot;CANARY_LOADED&quot;,
+    &quot;fallbackReason&quot;: null,
+    &quot;sourceCommit&quot;: &quot;c893374ab0edd7329bd1482dbd6b99960acbbb68&quot;,
+    &quot;assetPackId&quot;: &quot;lowpass-readability-canary-v1&quot;,
+    &quot;glbSha256&quot;: &quot;sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102&quot;,
+    &quot;loadDurationMs&quot;: 7.199999928474426
+  }
+}</pre></td>
+    </tr></tbody></table></body></html>

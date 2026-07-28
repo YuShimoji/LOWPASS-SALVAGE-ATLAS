@@ -1,8 +1,53 @@
 # LOWPASS: SALVAGE ATLAS — 再開引き継ぎ
 
-更新日: 2026-07-26
+更新日: 2026-07-28
 
-## 現在地
+## 現在地 — 2026-07-28 正本
+
+- canonical remote ref: `origin/project/frontier`
+- 製品branch: `feat/phase-g-guided-qa-canary-v1`
+- 実装起点: `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`
+- Authority Guard: ready PR #3 `docs: prevent stale-main development restarts`。baseはmain、未merge
+- 重複Phase C PR #2: CLOSED / 未merge。unique commitを機械監査し、`.playwright-cli/` ignoreだけを正しい製品branchへ再実装。remote branchは保持
+- PR #1: 未変更
+- Phase G Guided QA: 18/18 automated PASS。JSON / HTML / screenshots / contact sheetを保存
+- local gate: 31 test files / 187 tests、typecheck、production build、diff check PASS
+- semantic audio: generated Web Audio cue 17種、caption、mute、resume、rate limit、audit readback
+- CGAW Canary: exact source commit `c893374ab0edd7329bd1482dbd6b99960acbbb68`、GLB SHA-256 `54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102`
+- asset modes: `primitive` / `canary-v1`。unknown / invalid / load failureはstructured primitive fallback
+- authority: `ExpeditionManifest`、gate evaluator、`ItemLocation`、MissionSession、Rapier、Security Cellを変更せず、Canaryはvisual consumerに限定
+- rights: `NOASSERTION`、internal review only。配布・公開判断は行っていない
+- Phase H: 未開始
+
+現在の技術分類は `PHASE_G_AUTOMATED_ACCEPTANCE_GREEN` と `CANARY_CONSUMER_INTEGRATION_READY` です。音量・可読性・tempoの人間判断は `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING` として分離し、自動gateを巻き戻しません。
+
+## 再現と証拠
+
+```powershell
+npm ci
+npm ls --depth=0
+npm run typecheck
+npm test -- --run
+npm run build
+git diff --check
+npm run dev -- --host 127.0.0.1
+```
+
+QA URLは `http://127.0.0.1:5173/?qa=1&audio=muted&asset-mode=canary-v1&ps1=on&security-posture=routine` です。パネルの `Run all 18` 後、JSON / HTMLをダウンロードできます。音の確認だけは `audio=muted` を外します。
+
+| 証拠 | 内容 | 判定に使う値 |
+| --- | --- | --- |
+| `artifacts/reconciliation/pr2-unique-diff-readback.json` | PR #2 unique commitの分類 | `DO_NOT_CHERRY_PICK`、ignoreのみ再実装 |
+| `artifacts/canary-v1/import-readback.json` | exact CGAW source / hash / semantic contract | 5 assets、50 nodes、9 anchors、5 collision proxies |
+| `output/playwright/phase-g-guided-qa/phase-g-guided-audit.json` | 18-step controller readback | 18 / 18 PASS |
+| `artifacts/phase-g-guided-qa/browser-verification-readback.json` | drag、move、wheel、cart、audio、fallback、3 cycles | console/unhandled/external 0、resource増加なし |
+| `output/playwright/phase-g-guided-qa/contact-sheet.png` | primitive/canary × PS1 off/on | Canary +8 calls / +96 tris、texture/program delta 0 |
+
+## 残る人間判断
+
+Canaryはgeometry / flat material / semantic anchorのinternal canaryで、production UV / texture / LOD / distribution rightsを主張しません。音ありdesktopでの役割識別、音量、tempo、watchful時の圧力は人間が任意に確認できますが、技術greenを阻害しません。Phase Hへ進む場合も、この判断を捏造せず、未評価のまま明記します。
+
+## 2026-07-26以前の履歴
 
 - 現行branch: `fix/phase-g-playability-recovery`
 - 分岐元: `756e54b0e54a7b4b6fee7da2a0d5bed47f01a5a3`

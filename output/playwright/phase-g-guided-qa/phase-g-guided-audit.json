@@ -1,0 +1,4034 @@
+{
+  "schemaVersion": "lowpass-guided-phase-g-audit-1.0.0",
+  "generatedAtIso": "2026-07-28T07:30:54.097Z",
+  "scenarioId": "phase-g-guided-qa-18-step-v1",
+  "fixedSeed": "phase-g-guided-audit-v1",
+  "results": [
+    {
+      "index": 0,
+      "id": "setup-loadout",
+      "category": "Setup",
+      "label": "Configure the 28U review loadout",
+      "action": "phase-d-loadout",
+      "expectation": "Draft remains gate-valid.",
+      "startedAtIso": "2026-07-28T07:30:32.245Z",
+      "completedAtIso": "2026-07-28T07:30:32.487Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "phase-d-loadout",
+        "world": "ship",
+        "runtime": "playing",
+        "notice": "QA PHASE D LOADOUT // 28U READY",
+        "modal": "none",
+        "camera": {
+          "yaw": 0,
+          "pitch": 0.28,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 3.771432625694294,
+          "occlusionActive": true
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": null,
+        "threat": null,
+        "relay": null,
+        "beacons": [],
+        "porter": null,
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": []
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "primitive",
+          "status": "PRIMITIVE_SELECTED",
+          "fallbackReason": null,
+          "sourceCommit": null,
+          "assetPackId": null,
+          "glbSha256": null,
+          "loadDurationMs": 0
+        }
+      }
+    },
+    {
+      "index": 1,
+      "id": "setup-launch",
+      "category": "Setup",
+      "label": "Launch the fixed mission",
+      "action": "guided-launch",
+      "expectation": "Mission loads through the manifest and reservation path.",
+      "startedAtIso": "2026-07-28T07:30:32.487Z",
+      "completedAtIso": "2026-07-28T07:30:32.758Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "guided-launch",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "降下完了 // STABLE · TEAM 3 · GEAR 6",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 4.492248065219665,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "dormant",
+          "targetAgentId": null,
+          "lastKnownTargetPosition": null,
+          "observerAgentIds": [],
+          "transitionReason": "encounter registered",
+          "transitionRevision": 0,
+          "controlledContact": null,
+          "pendingReportCount": 0,
+          "presence": null,
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 0,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 1.9833333333333312,
+                "minimumUntilSeconds": 3.233333333333331,
+                "reassignAfterSeconds": 3.733333333333331
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 0,
+              "hostilePresence": 1,
+              "margin": -1,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01"
+              ],
+              "evaluatedAtSeconds": 2.1833333333333305
+            },
+            "lastAssignmentAtSeconds": 1.9833333333333312,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [],
+          "disabled": []
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "dormant",
+          "authenticated": false,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": []
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    },
+    {
+      "index": 2,
+      "id": "contact-isolate",
+      "category": "Contact sequence",
+      "label": "Stage an isolated contact",
+      "action": "isolate-contact",
+      "expectation": "Needle receives a controller-owned contact setup.",
+      "startedAtIso": "2026-07-28T07:30:32.758Z",
+      "completedAtIso": "2026-07-28T07:30:33.002Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "isolate-contact",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "QA // ISOLATED CONTACT CONFIGURED",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 5.229629377524937,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "stalk",
+          "targetAgentId": "player",
+          "lastKnownTargetPosition": {
+            "x": 3.449998378753662,
+            "y": 0.9300498366355896,
+            "z": -3.500000476837158
+          },
+          "observerAgentIds": [
+            "player"
+          ],
+          "transitionReason": "visual maintained",
+          "transitionRevision": 2,
+          "controlledContact": {
+            "droneId": "machine:security:needle-01",
+            "position": {
+              "x": 3.4499998645505494,
+              "y": 1.55,
+              "z": -4.416666666666709
+            },
+            "observedByAgentId": "player",
+            "observedAtSeconds": 2.3833333333333298,
+            "receivedAtSeconds": 2.3833333333333298,
+            "freshness": "live",
+            "route": "direct",
+            "reportId": "threat-report:machine:security:needle-01:player:1"
+          },
+          "pendingReportCount": 2,
+          "presence": {
+            "targetAgentId": "player",
+            "alliedPresence": 1,
+            "hostilePresence": 1,
+            "margin": 0,
+            "band": "predatory",
+            "contributingEntityIds": [
+              "machine:security:needle-01",
+              "player"
+            ],
+            "evaluatedAtSeconds": 2.2333333333333303
+          },
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 1,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 1.9833333333333312,
+                "minimumUntilSeconds": 3.233333333333331,
+                "reassignAfterSeconds": 3.733333333333331
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 1,
+              "hostilePresence": 1,
+              "margin": 0,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01",
+                "player"
+              ],
+              "evaluatedAtSeconds": 2.3833333333333298
+            },
+            "lastAssignmentAtSeconds": 1.9833333333333312,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [],
+          "disabled": []
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "dormant",
+          "authenticated": false,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": [
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 2442.399999976158,
+              "outcome": "muted"
+            }
+          ]
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    },
+    {
+      "index": 3,
+      "id": "contact-observe",
+      "category": "Contact sequence",
+      "label": "Read contact transition state",
+      "action": "results-threat",
+      "expectation": "Threat transition and report revisions are readable.",
+      "startedAtIso": "2026-07-28T07:30:33.002Z",
+      "completedAtIso": "2026-07-28T07:30:33.002Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "results-threat",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "QA // ISOLATED CONTACT CONFIGURED",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 5.229629377524937,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "stalk",
+          "targetAgentId": "player",
+          "lastKnownTargetPosition": {
+            "x": 3.449998378753662,
+            "y": 0.9300498366355896,
+            "z": -3.500000476837158
+          },
+          "observerAgentIds": [
+            "player"
+          ],
+          "transitionReason": "visual maintained",
+          "transitionRevision": 2,
+          "controlledContact": {
+            "droneId": "machine:security:needle-01",
+            "position": {
+              "x": 3.4499998645505494,
+              "y": 1.55,
+              "z": -4.416666666666709
+            },
+            "observedByAgentId": "player",
+            "observedAtSeconds": 2.3833333333333298,
+            "receivedAtSeconds": 2.3833333333333298,
+            "freshness": "live",
+            "route": "direct",
+            "reportId": "threat-report:machine:security:needle-01:player:1"
+          },
+          "pendingReportCount": 2,
+          "presence": {
+            "targetAgentId": "player",
+            "alliedPresence": 1,
+            "hostilePresence": 1,
+            "margin": 0,
+            "band": "predatory",
+            "contributingEntityIds": [
+              "machine:security:needle-01",
+              "player"
+            ],
+            "evaluatedAtSeconds": 2.2333333333333303
+          },
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 1,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 1.9833333333333312,
+                "minimumUntilSeconds": 3.233333333333331,
+                "reassignAfterSeconds": 3.733333333333331
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 1,
+              "hostilePresence": 1,
+              "margin": 0,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01",
+                "player"
+              ],
+              "evaluatedAtSeconds": 2.3833333333333298
+            },
+            "lastAssignmentAtSeconds": 1.9833333333333312,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [],
+          "disabled": []
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "dormant",
+          "authenticated": false,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": [
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 2442.399999976158,
+              "outcome": "muted"
+            }
+          ]
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    },
+    {
+      "index": 4,
+      "id": "contact-reinforce",
+      "category": "Contact sequence",
+      "label": "Bring allied support into range",
+      "action": "reinforce-contact",
+      "expectation": "Presence is updated through squad positions.",
+      "startedAtIso": "2026-07-28T07:30:33.002Z",
+      "completedAtIso": "2026-07-28T07:30:33.255Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "reinforce-contact",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "FIELD TERMINAL // LOCAL PRESENCE 2.00 > 1.00 // DRONE RETREAT",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 4.5652593425050725,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "observe",
+          "targetAgentId": "player",
+          "lastKnownTargetPosition": {
+            "x": 3.449998378753662,
+            "y": 0.9300498366355896,
+            "z": -3.500000476837158
+          },
+          "observerAgentIds": [
+            "mara",
+            "player"
+          ],
+          "transitionReason": "retreat point reached; rescanning",
+          "transitionRevision": 4,
+          "controlledContact": {
+            "droneId": "machine:security:needle-01",
+            "position": {
+              "x": 3.449999847619368,
+              "y": 1.55,
+              "z": -4.387500000000047
+            },
+            "observedByAgentId": "player",
+            "observedAtSeconds": 2.583333333333329,
+            "receivedAtSeconds": 2.583333333333329,
+            "freshness": "live",
+            "route": "direct",
+            "reportId": "threat-report:machine:security:needle-01:player:1"
+          },
+          "pendingReportCount": 3,
+          "presence": {
+            "targetAgentId": "player",
+            "alliedPresence": 2,
+            "hostilePresence": 1,
+            "margin": 1,
+            "band": "outnumbered",
+            "contributingEntityIds": [
+              "machine:security:needle-01",
+              "mara",
+              "player"
+            ],
+            "evaluatedAtSeconds": 2.4833333333333294
+          },
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 1,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 1.9833333333333312,
+                "minimumUntilSeconds": 3.233333333333331,
+                "reassignAfterSeconds": 3.733333333333331
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 0,
+              "hostilePresence": 1,
+              "margin": -1,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01"
+              ],
+              "evaluatedAtSeconds": 2.583333333333329
+            },
+            "lastAssignmentAtSeconds": 1.9833333333333312,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [],
+          "disabled": []
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "dormant",
+          "authenticated": false,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": [
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 2442.399999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 2692.2999999523163,
+              "outcome": "muted"
+            }
+          ]
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    },
+    {
+      "index": 5,
+      "id": "contact-withdraw",
+      "category": "Contact sequence",
+      "label": "Withdraw allied support",
+      "action": "withdraw-contact",
+      "expectation": "The supporting agent leaves contact range.",
+      "startedAtIso": "2026-07-28T07:30:33.255Z",
+      "completedAtIso": "2026-07-28T07:30:33.508Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "withdraw-contact",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "QA // ALLIED REINFORCEMENT WITHDREW",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 4.498729960176998,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "observe",
+          "targetAgentId": "player",
+          "lastKnownTargetPosition": {
+            "x": 3.449998378753662,
+            "y": 0.9300498366355896,
+            "z": -3.500000476837158
+          },
+          "observerAgentIds": [
+            "mara",
+            "player"
+          ],
+          "transitionReason": "retreat point reached; rescanning",
+          "transitionRevision": 4,
+          "controlledContact": {
+            "droneId": "machine:security:needle-01",
+            "position": {
+              "x": 3.4499998645505494,
+              "y": 1.55,
+              "z": -4.416666666666709
+            },
+            "observedByAgentId": "player",
+            "observedAtSeconds": 2.7833333333333283,
+            "receivedAtSeconds": 2.7833333333333283,
+            "freshness": "live",
+            "route": "direct",
+            "reportId": "threat-report:machine:security:needle-01:player:3"
+          },
+          "pendingReportCount": 2,
+          "presence": {
+            "targetAgentId": "player",
+            "alliedPresence": 2,
+            "hostilePresence": 1,
+            "margin": 1,
+            "band": "outnumbered",
+            "contributingEntityIds": [
+              "machine:security:needle-01",
+              "mara",
+              "player"
+            ],
+            "evaluatedAtSeconds": 2.4833333333333294
+          },
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 1,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 1.9833333333333312,
+                "minimumUntilSeconds": 3.233333333333331,
+                "reassignAfterSeconds": 3.733333333333331
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 0,
+              "hostilePresence": 1,
+              "margin": -1,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01"
+              ],
+              "evaluatedAtSeconds": 2.7833333333333283
+            },
+            "lastAssignmentAtSeconds": 1.9833333333333312,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [],
+          "disabled": []
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "dormant",
+          "authenticated": false,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": [
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 2442.399999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 2692.2999999523163,
+              "outcome": "muted"
+            }
+          ]
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    },
+    {
+      "index": 6,
+      "id": "relay-deploy",
+      "category": "Relay",
+      "label": "Deploy the portable relay",
+      "action": "deploy-relay",
+      "expectation": "ItemLocation becomes mission-ground through squad control.",
+      "startedAtIso": "2026-07-28T07:30:33.508Z",
+      "completedAtIso": "2026-07-28T07:30:33.753Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "deploy-relay",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "RELAY_DEPLOYED // 携帯リレーを設置しました",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 4.492957481610835,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "observe",
+          "targetAgentId": "player",
+          "lastKnownTargetPosition": {
+            "x": 3.449998378753662,
+            "y": 0.9300498366355896,
+            "z": -3.500000476837158
+          },
+          "observerAgentIds": [
+            "player"
+          ],
+          "transitionReason": "retreat point reached; rescanning",
+          "transitionRevision": 4,
+          "controlledContact": {
+            "droneId": "machine:security:needle-01",
+            "position": {
+              "x": 3.4499998645505494,
+              "y": 1.55,
+              "z": -4.416666666666709
+            },
+            "observedByAgentId": "player",
+            "observedAtSeconds": 3.183333333333327,
+            "receivedAtSeconds": 3.183333333333327,
+            "freshness": "live",
+            "route": "direct",
+            "reportId": "threat-report:machine:security:needle-01:player:3"
+          },
+          "pendingReportCount": 1,
+          "presence": {
+            "targetAgentId": "player",
+            "alliedPresence": 2,
+            "hostilePresence": 1,
+            "margin": 1,
+            "band": "outnumbered",
+            "contributingEntityIds": [
+              "machine:security:needle-01",
+              "mara",
+              "player"
+            ],
+            "evaluatedAtSeconds": 2.4833333333333294
+          },
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 1,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 1.9833333333333312,
+                "minimumUntilSeconds": 3.233333333333331,
+                "reassignAfterSeconds": 3.733333333333331
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 0,
+              "hostilePresence": 1,
+              "margin": -1,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01"
+              ],
+              "evaluatedAtSeconds": 3.183333333333327
+            },
+            "lastAssignmentAtSeconds": 1.9833333333333312,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [
+            "relay-01"
+          ],
+          "disabled": []
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "dormant",
+          "authenticated": false,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": [
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 2442.399999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 2692.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            }
+          ]
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    },
+    {
+      "index": 7,
+      "id": "relay-disable",
+      "category": "Relay",
+      "label": "Disable the deployed relay",
+      "action": "disable-relay",
+      "expectation": "Relay operational state is disabled.",
+      "startedAtIso": "2026-07-28T07:30:33.754Z",
+      "completedAtIso": "2026-07-28T07:30:34.001Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "disable-relay",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "RELAY_DISABLED // 携帯リレーを一時停止しました",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 4.492177263798206,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "patrol",
+          "targetAgentId": "player",
+          "lastKnownTargetPosition": {
+            "x": 3.449998378753662,
+            "y": 0.9300498366355896,
+            "z": -3.500000476837158
+          },
+          "observerAgentIds": [
+            "player"
+          ],
+          "transitionReason": "patrol route resumed",
+          "transitionRevision": 6,
+          "controlledContact": {
+            "droneId": "machine:security:needle-01",
+            "position": {
+              "x": 3.4499998645505494,
+              "y": 1.55,
+              "z": -4.416666666666709
+            },
+            "observedByAgentId": "player",
+            "observedAtSeconds": 3.383333333333326,
+            "receivedAtSeconds": 3.383333333333326,
+            "freshness": "live",
+            "route": "direct",
+            "reportId": "threat-report:machine:security:needle-01:player:3"
+          },
+          "pendingReportCount": 1,
+          "presence": {
+            "targetAgentId": "player",
+            "alliedPresence": 2,
+            "hostilePresence": 1,
+            "margin": 1,
+            "band": "outnumbered",
+            "contributingEntityIds": [
+              "machine:security:needle-01",
+              "mara",
+              "player"
+            ],
+            "evaluatedAtSeconds": 2.4833333333333294
+          },
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 1,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 1.9833333333333312,
+                "minimumUntilSeconds": 3.233333333333331,
+                "reassignAfterSeconds": 3.733333333333331
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 0,
+              "hostilePresence": 1,
+              "margin": -1,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01"
+              ],
+              "evaluatedAtSeconds": 3.383333333333326
+            },
+            "lastAssignmentAtSeconds": 1.9833333333333312,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [
+            "relay-01"
+          ],
+          "disabled": [
+            "relay-01"
+          ]
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "dormant",
+          "authenticated": false,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": [
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 2442.399999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 2692.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            }
+          ]
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    },
+    {
+      "index": 8,
+      "id": "relay-restart",
+      "category": "Relay",
+      "label": "Start relay recovery",
+      "action": "restart-relay",
+      "expectation": "Relay restart uses the normal squad controller path.",
+      "startedAtIso": "2026-07-28T07:30:34.001Z",
+      "completedAtIso": "2026-07-28T07:30:34.241Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "restart-relay",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "RELAY_RESTARTING // 再起動シーケンスを開始しました",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 4.492160588384544,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "patrol",
+          "targetAgentId": "player",
+          "lastKnownTargetPosition": {
+            "x": 3.449998378753662,
+            "y": 0.9299498200416565,
+            "z": -3.500000476837158
+          },
+          "observerAgentIds": [
+            "player"
+          ],
+          "transitionReason": "visual maintained",
+          "transitionRevision": 6,
+          "controlledContact": {
+            "droneId": "machine:security:needle-01",
+            "position": {
+              "x": 3.4482144174330345,
+              "y": 1.55,
+              "z": -4.312515302666831
+            },
+            "observedByAgentId": "player",
+            "observedAtSeconds": 3.5833333333333255,
+            "receivedAtSeconds": 3.5833333333333255,
+            "freshness": "live",
+            "route": "direct",
+            "reportId": "threat-report:machine:security:needle-01:player:3"
+          },
+          "pendingReportCount": 1,
+          "presence": {
+            "targetAgentId": "player",
+            "alliedPresence": 2,
+            "hostilePresence": 1,
+            "margin": 1,
+            "band": "outnumbered",
+            "contributingEntityIds": [
+              "machine:security:needle-01",
+              "mara",
+              "player"
+            ],
+            "evaluatedAtSeconds": 2.4833333333333294
+          },
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 1,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 1.9833333333333312,
+                "minimumUntilSeconds": 3.233333333333331,
+                "reassignAfterSeconds": 3.733333333333331
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 1,
+              "hostilePresence": 1,
+              "margin": 0,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01",
+                "player"
+              ],
+              "evaluatedAtSeconds": 3.5833333333333255
+            },
+            "lastAssignmentAtSeconds": 1.9833333333333312,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [
+            "relay-01"
+          ],
+          "disabled": [
+            "relay-01"
+          ]
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "dormant",
+          "authenticated": false,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": [
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 2442.399999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 2692.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            }
+          ]
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    },
+    {
+      "index": 9,
+      "id": "flare-deploy",
+      "category": "Flare",
+      "label": "Deploy a signal flare",
+      "action": "deploy-flare",
+      "expectation": "Signal beacon state is created by the squad controller.",
+      "startedAtIso": "2026-07-28T07:30:34.242Z",
+      "completedAtIso": "2026-07-28T07:30:34.485Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "deploy-flare",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "NO_FLARE_AVAILABLE // 使用可能なフレアパックがありません",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 4.492152745882258,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "patrol",
+          "targetAgentId": "player",
+          "lastKnownTargetPosition": {
+            "x": 3.449998378753662,
+            "y": 0.9299498200416565,
+            "z": -3.500000476837158
+          },
+          "observerAgentIds": [
+            "player"
+          ],
+          "transitionReason": "visual maintained",
+          "transitionRevision": 6,
+          "controlledContact": {
+            "droneId": "machine:security:needle-01",
+            "position": {
+              "x": 3.4439293443510013,
+              "y": 1.55,
+              "z": -4.062552029067123
+            },
+            "observedByAgentId": "player",
+            "observedAtSeconds": 3.7833333333333248,
+            "receivedAtSeconds": 3.7833333333333248,
+            "freshness": "live",
+            "route": "direct",
+            "reportId": "threat-report:machine:security:needle-01:player:3"
+          },
+          "pendingReportCount": 1,
+          "presence": {
+            "targetAgentId": "player",
+            "alliedPresence": 2,
+            "hostilePresence": 1,
+            "margin": 1,
+            "band": "outnumbered",
+            "contributingEntityIds": [
+              "machine:security:needle-01",
+              "mara",
+              "player"
+            ],
+            "evaluatedAtSeconds": 2.4833333333333294
+          },
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 1,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 1.9833333333333312,
+                "minimumUntilSeconds": 3.233333333333331,
+                "reassignAfterSeconds": 3.733333333333331
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 1,
+              "hostilePresence": 1,
+              "margin": 0,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01",
+                "player"
+              ],
+              "evaluatedAtSeconds": 3.7833333333333248
+            },
+            "lastAssignmentAtSeconds": 1.9833333333333312,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [
+            "relay-01"
+          ],
+          "disabled": [
+            "relay-01"
+          ]
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "dormant",
+          "authenticated": false,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": [
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 2442.399999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 2692.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.rejected",
+              "caption": "Squad command rejected",
+              "requestedAtMs": 3893.5,
+              "outcome": "muted"
+            }
+          ]
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    },
+    {
+      "index": 10,
+      "id": "contact-porter-auth",
+      "category": "Contact sequence",
+      "label": "Stage and authenticate the Porter",
+      "action": "porter-auth",
+      "expectation": "Authentication stays inside the Porter controller and gate context.",
+      "startedAtIso": "2026-07-28T07:30:34.485Z",
+      "completedAtIso": "2026-07-28T07:30:37.792Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "porter-auth",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "PORTER AUTHORIZED // SHORT-RANGE VOICE NODE ONLINE",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 4.4921222004661265,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "patrol",
+          "targetAgentId": "player",
+          "lastKnownTargetPosition": {
+            "x": 3.449998378753662,
+            "y": 0.9299498200416565,
+            "z": -3.500000476837158
+          },
+          "observerAgentIds": [
+            "player"
+          ],
+          "transitionReason": "visual maintained",
+          "transitionRevision": 6,
+          "controlledContact": {
+            "droneId": "machine:security:needle-01",
+            "position": {
+              "x": 2.8231057247149116,
+              "y": 1.55,
+              "z": -0.03465545585551234
+            },
+            "observedByAgentId": "player",
+            "observedAtSeconds": 7.183333333333313,
+            "receivedAtSeconds": 7.183333333333313,
+            "freshness": "live",
+            "route": "direct",
+            "reportId": "threat-report:machine:security:needle-01:player:6"
+          },
+          "pendingReportCount": 1,
+          "presence": {
+            "targetAgentId": "player",
+            "alliedPresence": 2,
+            "hostilePresence": 1,
+            "margin": 1,
+            "band": "outnumbered",
+            "contributingEntityIds": [
+              "machine:security:needle-01",
+              "mara",
+              "player"
+            ],
+            "evaluatedAtSeconds": 2.4833333333333294
+          },
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 1,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 5.983333333333317,
+                "minimumUntilSeconds": 7.233333333333317,
+                "reassignAfterSeconds": 7.733333333333317
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 0,
+              "hostilePresence": 1,
+              "margin": -1,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01"
+              ],
+              "evaluatedAtSeconds": 7.183333333333313
+            },
+            "lastAssignmentAtSeconds": 5.983333333333317,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [
+            "relay-01"
+          ],
+          "disabled": []
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "friendly-idle",
+          "authenticated": true,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": [
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 2442.399999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 2692.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.rejected",
+              "caption": "Squad command rejected",
+              "requestedAtMs": 3893.5,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 4136.899999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.authenticated",
+              "caption": "Porter authenticated",
+              "requestedAtMs": 7142.099999904633,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.operational-pulse",
+              "caption": "Friendly porter operational",
+              "requestedAtMs": 7142.099999904633,
+              "outcome": "muted"
+            }
+          ]
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    },
+    {
+      "index": 11,
+      "id": "contact-porter-readback",
+      "category": "Contact sequence",
+      "label": "Read Porter authentication",
+      "action": "results-porter",
+      "expectation": "The controller has time to complete its handshake.",
+      "startedAtIso": "2026-07-28T07:30:37.792Z",
+      "completedAtIso": "2026-07-28T07:30:37.808Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "results-porter",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "PORTER AUTHORIZED // SHORT-RANGE VOICE NODE ONLINE",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 4.492122235335975,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "patrol",
+          "targetAgentId": "player",
+          "lastKnownTargetPosition": {
+            "x": 3.449998378753662,
+            "y": 0.9299498200416565,
+            "z": -3.500000476837158
+          },
+          "observerAgentIds": [
+            "player"
+          ],
+          "transitionReason": "visual maintained",
+          "transitionRevision": 6,
+          "controlledContact": {
+            "droneId": "machine:security:needle-01",
+            "position": {
+              "x": 2.8231057247149116,
+              "y": 1.55,
+              "z": -0.03465545585551234
+            },
+            "observedByAgentId": "player",
+            "observedAtSeconds": 7.183333333333313,
+            "receivedAtSeconds": 7.183333333333313,
+            "freshness": "live",
+            "route": "direct",
+            "reportId": "threat-report:machine:security:needle-01:player:6"
+          },
+          "pendingReportCount": 1,
+          "presence": {
+            "targetAgentId": "player",
+            "alliedPresence": 2,
+            "hostilePresence": 1,
+            "margin": 1,
+            "band": "outnumbered",
+            "contributingEntityIds": [
+              "machine:security:needle-01",
+              "mara",
+              "player"
+            ],
+            "evaluatedAtSeconds": 2.4833333333333294
+          },
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 1,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 5.983333333333317,
+                "minimumUntilSeconds": 7.233333333333317,
+                "reassignAfterSeconds": 7.733333333333317
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 0,
+              "hostilePresence": 1,
+              "margin": -1,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01"
+              ],
+              "evaluatedAtSeconds": 7.183333333333313
+            },
+            "lastAssignmentAtSeconds": 5.983333333333317,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [
+            "relay-01"
+          ],
+          "disabled": []
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "friendly-idle",
+          "authenticated": true,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": [
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 2442.399999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 2692.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.rejected",
+              "caption": "Squad command rejected",
+              "requestedAtMs": 3893.5,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 4136.899999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.authenticated",
+              "caption": "Porter authenticated",
+              "requestedAtMs": 7142.099999904633,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.operational-pulse",
+              "caption": "Friendly porter operational",
+              "requestedAtMs": 7142.099999904633,
+              "outcome": "muted"
+            }
+          ]
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    },
+    {
+      "index": 12,
+      "id": "contact-porter-carry",
+      "category": "Contact sequence",
+      "label": "Issue the Porter carry command",
+      "action": "porter-carry",
+      "expectation": "Carry ownership remains ItemLocation and Porter-controller state.",
+      "startedAtIso": "2026-07-28T07:30:37.808Z",
+      "completedAtIso": "2026-07-28T07:30:38.058Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "porter-carry",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "PORTER_CARRY_TO // 冷却コイルを抽出台へ搬送します",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 4.492122200565364,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "patrol",
+          "targetAgentId": "player",
+          "lastKnownTargetPosition": {
+            "x": 3.449998378753662,
+            "y": 0.9299498200416565,
+            "z": -3.500000476837158
+          },
+          "observerAgentIds": [
+            "player"
+          ],
+          "transitionReason": "visual maintained",
+          "transitionRevision": 6,
+          "controlledContact": {
+            "droneId": "machine:security:needle-01",
+            "position": {
+              "x": 2.7420597334306636,
+              "y": 1.55,
+              "z": 0.20184305850927936
+            },
+            "observedByAgentId": "player",
+            "observedAtSeconds": 7.383333333333312,
+            "receivedAtSeconds": 7.383333333333312,
+            "freshness": "live",
+            "route": "direct",
+            "reportId": "threat-report:machine:security:needle-01:player:7"
+          },
+          "pendingReportCount": 1,
+          "presence": {
+            "targetAgentId": "player",
+            "alliedPresence": 2,
+            "hostilePresence": 1,
+            "margin": 1,
+            "band": "outnumbered",
+            "contributingEntityIds": [
+              "machine:security:needle-01",
+              "mara",
+              "player"
+            ],
+            "evaluatedAtSeconds": 2.4833333333333294
+          },
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 1,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 5.983333333333317,
+                "minimumUntilSeconds": 7.233333333333317,
+                "reassignAfterSeconds": 7.733333333333317
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 0,
+              "hostilePresence": 1,
+              "margin": -1,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01"
+              ],
+              "evaluatedAtSeconds": 7.383333333333312
+            },
+            "lastAssignmentAtSeconds": 5.983333333333317,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [
+            "relay-01"
+          ],
+          "disabled": []
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "moving-to-item",
+          "authenticated": true,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": [
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 2442.399999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 2692.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.rejected",
+              "caption": "Squad command rejected",
+              "requestedAtMs": 3893.5,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 4136.899999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.authenticated",
+              "caption": "Porter authenticated",
+              "requestedAtMs": 7142.099999904633,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.operational-pulse",
+              "caption": "Friendly porter operational",
+              "requestedAtMs": 7142.099999904633,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 7459.899999976158,
+              "outcome": "muted"
+            }
+          ]
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    },
+    {
+      "index": 13,
+      "id": "audio-suite",
+      "category": "Audio test",
+      "label": "Audit all 17 semantic cues",
+      "action": "audio-suite",
+      "expectation": "Every cue records played, muted, or rate-limited status with a caption.",
+      "startedAtIso": "2026-07-28T07:30:38.058Z",
+      "completedAtIso": "2026-07-28T07:30:38.308Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "audio-suite",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "PORTER_CARRY_TO // 冷却コイルを抽出台へ搬送します",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 4.49212223539142,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "patrol",
+          "targetAgentId": "player",
+          "lastKnownTargetPosition": {
+            "x": 3.449998378753662,
+            "y": 0.9299498200416565,
+            "z": -3.500000476837158
+          },
+          "observerAgentIds": [
+            "player"
+          ],
+          "transitionReason": "visual maintained",
+          "transitionRevision": 6,
+          "controlledContact": {
+            "droneId": "machine:security:needle-01",
+            "position": {
+              "x": 2.6610137421464155,
+              "y": 1.55,
+              "z": 0.4383415728740711
+            },
+            "observedByAgentId": "player",
+            "observedAtSeconds": 7.583333333333312,
+            "receivedAtSeconds": 7.583333333333312,
+            "freshness": "live",
+            "route": "direct",
+            "reportId": "threat-report:machine:security:needle-01:player:7"
+          },
+          "pendingReportCount": 1,
+          "presence": {
+            "targetAgentId": "player",
+            "alliedPresence": 2,
+            "hostilePresence": 1,
+            "margin": 1,
+            "band": "outnumbered",
+            "contributingEntityIds": [
+              "machine:security:needle-01",
+              "mara",
+              "player"
+            ],
+            "evaluatedAtSeconds": 2.4833333333333294
+          },
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 1,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 5.983333333333317,
+                "minimumUntilSeconds": 7.233333333333317,
+                "reassignAfterSeconds": 7.733333333333317
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 0,
+              "hostilePresence": 1,
+              "margin": -1,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01"
+              ],
+              "evaluatedAtSeconds": 7.583333333333312
+            },
+            "lastAssignmentAtSeconds": 5.983333333333317,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [
+            "relay-01"
+          ],
+          "disabled": []
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "moving-to-item",
+          "authenticated": true,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": [
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 2442.399999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 2692.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.rejected",
+              "caption": "Squad command rejected",
+              "requestedAtMs": 3893.5,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 4136.899999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.authenticated",
+              "caption": "Porter authenticated",
+              "requestedAtMs": 7142.099999904633,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.operational-pulse",
+              "caption": "Friendly porter operational",
+              "requestedAtMs": 7142.099999904633,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 7459.899999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "gate.accepted",
+              "caption": "Gate accepted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "gate.rejected",
+              "caption": "Gate rejected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.rejected",
+              "caption": "Squad command rejected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.lock-pulse",
+              "caption": "Hostile lock tightening",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.interdicted",
+              "caption": "Agent interdicted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "hostile.share-transmit",
+              "caption": "Hostile contact transmitted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "hostile.share-receive",
+              "caption": "Hostile contact received",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.disabled",
+              "caption": "Relay disabled",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.restarted",
+              "caption": "Relay restart initiated",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "flare.deployed",
+              "caption": "Signal flare deployed",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.authenticated",
+              "caption": "Porter authenticated",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.operational-pulse",
+              "caption": "Friendly porter operational",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.rejected",
+              "caption": "Porter command rejected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            }
+          ]
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    },
+    {
+      "index": 14,
+      "id": "results-camera",
+      "category": "Results",
+      "label": "Read camera orbit and occlusion",
+      "action": "results-camera",
+      "expectation": "Pitch, distance, and occlusion state are structured.",
+      "startedAtIso": "2026-07-28T07:30:38.308Z",
+      "completedAtIso": "2026-07-28T07:30:38.325Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "results-camera",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "PORTER_CARRY_TO // 冷却コイルを抽出台へ搬送します",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 4.492122200386419,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "patrol",
+          "targetAgentId": "player",
+          "lastKnownTargetPosition": {
+            "x": 3.449998378753662,
+            "y": 0.9299498200416565,
+            "z": -3.500000476837158
+          },
+          "observerAgentIds": [
+            "player"
+          ],
+          "transitionReason": "visual maintained",
+          "transitionRevision": 6,
+          "controlledContact": {
+            "droneId": "machine:security:needle-01",
+            "position": {
+              "x": 2.6610137421464155,
+              "y": 1.55,
+              "z": 0.4383415728740711
+            },
+            "observedByAgentId": "player",
+            "observedAtSeconds": 7.583333333333312,
+            "receivedAtSeconds": 7.583333333333312,
+            "freshness": "live",
+            "route": "direct",
+            "reportId": "threat-report:machine:security:needle-01:player:7"
+          },
+          "pendingReportCount": 1,
+          "presence": {
+            "targetAgentId": "player",
+            "alliedPresence": 2,
+            "hostilePresence": 1,
+            "margin": 1,
+            "band": "outnumbered",
+            "contributingEntityIds": [
+              "machine:security:needle-01",
+              "mara",
+              "player"
+            ],
+            "evaluatedAtSeconds": 2.4833333333333294
+          },
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 1,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 5.983333333333317,
+                "minimumUntilSeconds": 7.233333333333317,
+                "reassignAfterSeconds": 7.733333333333317
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 0,
+              "hostilePresence": 1,
+              "margin": -1,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01"
+              ],
+              "evaluatedAtSeconds": 7.583333333333312
+            },
+            "lastAssignmentAtSeconds": 5.983333333333317,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [
+            "relay-01"
+          ],
+          "disabled": []
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "moving-to-item",
+          "authenticated": true,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": [
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 2442.399999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 2692.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.rejected",
+              "caption": "Squad command rejected",
+              "requestedAtMs": 3893.5,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 4136.899999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.authenticated",
+              "caption": "Porter authenticated",
+              "requestedAtMs": 7142.099999904633,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.operational-pulse",
+              "caption": "Friendly porter operational",
+              "requestedAtMs": 7142.099999904633,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 7459.899999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "gate.accepted",
+              "caption": "Gate accepted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "gate.rejected",
+              "caption": "Gate rejected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.rejected",
+              "caption": "Squad command rejected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.lock-pulse",
+              "caption": "Hostile lock tightening",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.interdicted",
+              "caption": "Agent interdicted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "hostile.share-transmit",
+              "caption": "Hostile contact transmitted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "hostile.share-receive",
+              "caption": "Hostile contact received",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.disabled",
+              "caption": "Relay disabled",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.restarted",
+              "caption": "Relay restart initiated",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "flare.deployed",
+              "caption": "Signal flare deployed",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.authenticated",
+              "caption": "Porter authenticated",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.operational-pulse",
+              "caption": "Friendly porter operational",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.rejected",
+              "caption": "Porter command rejected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            }
+          ]
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    },
+    {
+      "index": 15,
+      "id": "results-cart",
+      "category": "Results",
+      "label": "Read cart authority state",
+      "action": "results-cart",
+      "expectation": "Cart pose and attachment remain MissionSession-owned.",
+      "startedAtIso": "2026-07-28T07:30:38.326Z",
+      "completedAtIso": "2026-07-28T07:30:38.338Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "results-cart",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "PORTER_CARRY_TO // 冷却コイルを抽出台へ搬送します",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 4.492122200386419,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "patrol",
+          "targetAgentId": "player",
+          "lastKnownTargetPosition": {
+            "x": 3.449998378753662,
+            "y": 0.9299498200416565,
+            "z": -3.500000476837158
+          },
+          "observerAgentIds": [
+            "player"
+          ],
+          "transitionReason": "visual maintained",
+          "transitionRevision": 6,
+          "controlledContact": {
+            "droneId": "machine:security:needle-01",
+            "position": {
+              "x": 2.6610137421464155,
+              "y": 1.55,
+              "z": 0.4383415728740711
+            },
+            "observedByAgentId": "player",
+            "observedAtSeconds": 7.583333333333312,
+            "receivedAtSeconds": 7.583333333333312,
+            "freshness": "live",
+            "route": "direct",
+            "reportId": "threat-report:machine:security:needle-01:player:7"
+          },
+          "pendingReportCount": 1,
+          "presence": {
+            "targetAgentId": "player",
+            "alliedPresence": 2,
+            "hostilePresence": 1,
+            "margin": 1,
+            "band": "outnumbered",
+            "contributingEntityIds": [
+              "machine:security:needle-01",
+              "mara",
+              "player"
+            ],
+            "evaluatedAtSeconds": 2.4833333333333294
+          },
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 1,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 5.983333333333317,
+                "minimumUntilSeconds": 7.233333333333317,
+                "reassignAfterSeconds": 7.733333333333317
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 0,
+              "hostilePresence": 1,
+              "margin": -1,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01"
+              ],
+              "evaluatedAtSeconds": 7.583333333333312
+            },
+            "lastAssignmentAtSeconds": 5.983333333333317,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [
+            "relay-01"
+          ],
+          "disabled": []
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "moving-to-item",
+          "authenticated": true,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": [
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 2442.399999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 2692.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.rejected",
+              "caption": "Squad command rejected",
+              "requestedAtMs": 3893.5,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 4136.899999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.authenticated",
+              "caption": "Porter authenticated",
+              "requestedAtMs": 7142.099999904633,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.operational-pulse",
+              "caption": "Friendly porter operational",
+              "requestedAtMs": 7142.099999904633,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 7459.899999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "gate.accepted",
+              "caption": "Gate accepted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "gate.rejected",
+              "caption": "Gate rejected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.rejected",
+              "caption": "Squad command rejected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.lock-pulse",
+              "caption": "Hostile lock tightening",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.interdicted",
+              "caption": "Agent interdicted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "hostile.share-transmit",
+              "caption": "Hostile contact transmitted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "hostile.share-receive",
+              "caption": "Hostile contact received",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.disabled",
+              "caption": "Relay disabled",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.restarted",
+              "caption": "Relay restart initiated",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "flare.deployed",
+              "caption": "Signal flare deployed",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.authenticated",
+              "caption": "Porter authenticated",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.operational-pulse",
+              "caption": "Friendly porter operational",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.rejected",
+              "caption": "Porter command rejected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            }
+          ]
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    },
+    {
+      "index": 16,
+      "id": "results-assets",
+      "category": "Results",
+      "label": "Read active asset mode",
+      "action": "results-assets",
+      "expectation": "Primitive/canary selection and fallback are structured.",
+      "startedAtIso": "2026-07-28T07:30:38.339Z",
+      "completedAtIso": "2026-07-28T07:30:38.354Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "results-assets",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "PORTER_CARRY_TO // 冷却コイルを抽出台へ搬送します",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 4.492122235349668,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "patrol",
+          "targetAgentId": "player",
+          "lastKnownTargetPosition": {
+            "x": 3.449998378753662,
+            "y": 0.9299498200416565,
+            "z": -3.500000476837158
+          },
+          "observerAgentIds": [
+            "player"
+          ],
+          "transitionReason": "visual maintained",
+          "transitionRevision": 6,
+          "controlledContact": {
+            "droneId": "machine:security:needle-01",
+            "position": {
+              "x": 2.5799677508621675,
+              "y": 1.55,
+              "z": 0.6748400872388628
+            },
+            "observedByAgentId": "player",
+            "observedAtSeconds": 7.783333333333311,
+            "receivedAtSeconds": 7.783333333333311,
+            "freshness": "live",
+            "route": "direct",
+            "reportId": "threat-report:machine:security:needle-01:player:7"
+          },
+          "pendingReportCount": 1,
+          "presence": {
+            "targetAgentId": "player",
+            "alliedPresence": 2,
+            "hostilePresence": 1,
+            "margin": 1,
+            "band": "outnumbered",
+            "contributingEntityIds": [
+              "machine:security:needle-01",
+              "mara",
+              "player"
+            ],
+            "evaluatedAtSeconds": 2.4833333333333294
+          },
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 1,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 5.983333333333317,
+                "minimumUntilSeconds": 7.233333333333317,
+                "reassignAfterSeconds": 7.733333333333317
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 0,
+              "hostilePresence": 1,
+              "margin": -1,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01"
+              ],
+              "evaluatedAtSeconds": 7.783333333333311
+            },
+            "lastAssignmentAtSeconds": 5.983333333333317,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [
+            "relay-01"
+          ],
+          "disabled": []
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "moving-to-item",
+          "authenticated": true,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": [
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 2442.399999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 2692.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.rejected",
+              "caption": "Squad command rejected",
+              "requestedAtMs": 3893.5,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 4136.899999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.authenticated",
+              "caption": "Porter authenticated",
+              "requestedAtMs": 7142.099999904633,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.operational-pulse",
+              "caption": "Friendly porter operational",
+              "requestedAtMs": 7142.099999904633,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 7459.899999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "gate.accepted",
+              "caption": "Gate accepted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "gate.rejected",
+              "caption": "Gate rejected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.rejected",
+              "caption": "Squad command rejected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.lock-pulse",
+              "caption": "Hostile lock tightening",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.interdicted",
+              "caption": "Agent interdicted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "hostile.share-transmit",
+              "caption": "Hostile contact transmitted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "hostile.share-receive",
+              "caption": "Hostile contact received",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.disabled",
+              "caption": "Relay disabled",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.restarted",
+              "caption": "Relay restart initiated",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "flare.deployed",
+              "caption": "Signal flare deployed",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.authenticated",
+              "caption": "Porter authenticated",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.operational-pulse",
+              "caption": "Friendly porter operational",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.rejected",
+              "caption": "Porter command rejected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            }
+          ]
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    },
+    {
+      "index": 17,
+      "id": "results-final",
+      "category": "Results",
+      "label": "Capture final Phase G readback",
+      "action": "results-final",
+      "expectation": "The full controller-owned state is ready for export.",
+      "startedAtIso": "2026-07-28T07:30:38.354Z",
+      "completedAtIso": "2026-07-28T07:30:38.359Z",
+      "status": "PASS",
+      "message": "Action completed and readback captured.",
+      "readback": {
+        "action": "results-final",
+        "world": "mission",
+        "runtime": "playing",
+        "notice": "PORTER_CARRY_TO // 冷却コイルを抽出台へ搬送します",
+        "modal": "none",
+        "camera": {
+          "yaw": 0.14601225771127538,
+          "pitch": 0.5857741761521881,
+          "desiredDistance": 4.1,
+          "effectiveDistance": 4.49212220048369,
+          "occlusionActive": false
+        },
+        "input": {
+          "heldCodes": [],
+          "resolvedActions": [],
+          "rawX": 0,
+          "rawY": 0,
+          "worldX": 0,
+          "worldZ": 0,
+          "focusedElement": "body",
+          "modalState": "none",
+          "pointerLocked": false,
+          "actualDisplacementX": 0,
+          "actualDisplacementZ": 0,
+          "actualDisplacement": 0,
+          "activeDevice": "none",
+          "connectedGamepads": [],
+          "orbitDragActive": false,
+          "pointerLockFallback": false
+        },
+        "cart": {
+          "attached": false,
+          "position": {
+            "x": 2.2,
+            "y": 0.48,
+            "z": -1.4
+          },
+          "facingYaw": 0,
+          "speed": 0,
+          "collisionBlocked": false
+        },
+        "threat": {
+          "mode": "patrol",
+          "targetAgentId": "player",
+          "lastKnownTargetPosition": {
+            "x": 3.449998378753662,
+            "y": 0.9299498200416565,
+            "z": -3.500000476837158
+          },
+          "observerAgentIds": [
+            "player"
+          ],
+          "transitionReason": "visual maintained",
+          "transitionRevision": 6,
+          "controlledContact": {
+            "droneId": "machine:security:needle-01",
+            "position": {
+              "x": 2.5799677508621675,
+              "y": 1.55,
+              "z": 0.6748400872388628
+            },
+            "observedByAgentId": "player",
+            "observedAtSeconds": 7.783333333333311,
+            "receivedAtSeconds": 7.783333333333311,
+            "freshness": "live",
+            "route": "direct",
+            "reportId": "threat-report:machine:security:needle-01:player:7"
+          },
+          "pendingReportCount": 1,
+          "presence": {
+            "targetAgentId": "player",
+            "alliedPresence": 2,
+            "hostilePresence": 1,
+            "margin": 1,
+            "band": "outnumbered",
+            "contributingEntityIds": [
+              "machine:security:needle-01",
+              "mara",
+              "player"
+            ],
+            "evaluatedAtSeconds": 2.4833333333333294
+          },
+          "lockOnProgress": 0,
+          "security": {
+            "posture": "routine",
+            "cellId": "security-cell:flooded-market-01",
+            "linkQuality": 0,
+            "linkConnected": false,
+            "sharedFactCount": 0,
+            "sharedFacts": [],
+            "localFactCountByMachine": {
+              "machine:security:needle-01": 1,
+              "machine:security:watcher-01": 0
+            },
+            "assignments": {
+              "machine:security:needle-01": {
+                "machineId": "machine:security:needle-01",
+                "task": "patrol",
+                "targetId": null,
+                "factId": null,
+                "assignedAtSeconds": 5.983333333333317,
+                "minimumUntilSeconds": 7.233333333333317,
+                "reassignAfterSeconds": 7.733333333333317
+              }
+            },
+            "reservationIds": [],
+            "pressureTokens": {
+              "lockOnByAgentId": {},
+              "activeInterdictionMachineId": null,
+              "relaySabotageByRelayId": {},
+              "graceUntilByAgentId": {}
+            },
+            "presence": {
+              "targetAgentId": "player",
+              "alliedPresence": 0,
+              "hostilePresence": 1,
+              "margin": -1,
+              "band": "predatory",
+              "contributingEntityIds": [
+                "machine:security:needle-01"
+              ],
+              "evaluatedAtSeconds": 7.783333333333311
+            },
+            "lastAssignmentAtSeconds": 5.983333333333317,
+            "confirmedContact": false,
+            "sharedContactRevision": 0
+          }
+        },
+        "relay": {
+          "deployed": [
+            "relay-01"
+          ],
+          "disabled": []
+        },
+        "beacons": [],
+        "porter": {
+          "mode": "moving-to-item",
+          "authenticated": true,
+          "carriedItemId": null
+        },
+        "audio": {
+          "enabled": false,
+          "muted": true,
+          "contextState": "not-created",
+          "cueCount": 17,
+          "events": [
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 2442.399999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 2692.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 3160.2999999523163,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.rejected",
+              "caption": "Squad command rejected",
+              "requestedAtMs": 3893.5,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 4136.899999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.authenticated",
+              "caption": "Porter authenticated",
+              "requestedAtMs": 7142.099999904633,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.operational-pulse",
+              "caption": "Friendly porter operational",
+              "requestedAtMs": 7142.099999904633,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 7459.899999976158,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "gate.accepted",
+              "caption": "Gate accepted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "gate.rejected",
+              "caption": "Gate rejected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.accepted",
+              "caption": "Squad command accepted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "squad.rejected",
+              "caption": "Squad command rejected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.detected",
+              "caption": "Hostile contact detected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.lock-pulse",
+              "caption": "Hostile lock tightening",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.disengaged",
+              "caption": "Hostile contact disengaged",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "contact.interdicted",
+              "caption": "Agent interdicted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "hostile.share-transmit",
+              "caption": "Hostile contact transmitted",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "hostile.share-receive",
+              "caption": "Hostile contact received",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.deployed",
+              "caption": "Relay deployed",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.disabled",
+              "caption": "Relay disabled",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "relay.restarted",
+              "caption": "Relay restart initiated",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "flare.deployed",
+              "caption": "Signal flare deployed",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.authenticated",
+              "caption": "Porter authenticated",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.operational-pulse",
+              "caption": "Friendly porter operational",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            },
+            {
+              "cueId": "porter.rejected",
+              "caption": "Porter command rejected",
+              "requestedAtMs": 7709.699999928474,
+              "outcome": "muted"
+            }
+          ]
+        },
+        "assets": {
+          "requestedMode": "canary-v1",
+          "activeMode": "canary-v1",
+          "status": "CANARY_LOADED",
+          "fallbackReason": null,
+          "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+          "assetPackId": "lowpass-readability-canary-v1",
+          "glbSha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+          "loadDurationMs": 7.199999928474426
+        }
+      }
+    }
+  ]
+}
