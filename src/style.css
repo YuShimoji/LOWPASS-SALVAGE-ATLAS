@@ -1212,27 +1212,151 @@ input:focus-visible {
   margin-top: 14px;
 }
 
-.qa-navigation {
+.guided-qa {
   position: fixed;
   left: 12px;
-  bottom: 42px;
+  bottom: 18px;
   z-index: 20;
-  display: flex;
-  max-width: min(680px, calc(100vw - 24px));
-  flex-wrap: wrap;
-  gap: 4px;
-  padding: 5px;
+  width: min(760px, calc(100vw - 24px));
+  max-height: min(84vh, 760px);
+  overflow: auto;
   border: 1px solid #486057;
   background: rgba(5, 12, 13, 0.92);
+  color: #c8d8cf;
+  font: 14px/1.45 "Courier New", monospace;
 }
 
-.qa-navigation button {
-  border: 1px solid #40584f;
-  padding: 4px 6px;
+.guided-qa > summary {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 12px;
   color: #91aaa0;
-  background: #111d1c;
-  font-size: 8px;
   cursor: pointer;
+  list-style: none;
+}
+
+.guided-qa > summary strong {
+  color: var(--ui-amber);
+}
+
+.guided-qa-status {
+  margin: 0;
+  border-top: 1px solid #30463e;
+  border-bottom: 1px solid #30463e;
+  padding: 8px 12px;
+  color: #8fc8b1;
+}
+
+.guided-qa:not([open]) > .guided-qa-status,
+.guided-qa:not([open]) > .guided-qa-body {
+  display: none;
+}
+
+.guided-qa-body {
+  padding: 10px;
+}
+
+.guided-qa-toolbar,
+.guided-qa-advanced-actions,
+.guided-qa-audio-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.guided-qa button {
+  min-height: 40px;
+  border: 1px solid #40584f;
+  padding: 8px 10px;
+  color: #b6c9c0;
+  background: #111d1c;
+  font: inherit;
+  cursor: pointer;
+}
+
+.guided-qa button:focus-visible,
+.guided-qa summary:focus-visible {
+  outline: 2px solid var(--ui-amber);
+  outline-offset: 2px;
+}
+
+.guided-qa-scenarios {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.guided-qa-scenarios section {
+  border: 1px solid #30463e;
+  padding: 10px;
+}
+
+.guided-qa-scenarios h3 {
+  margin: 0 0 8px;
+  color: var(--ui-warm);
+  font-size: 14px;
+}
+
+.guided-qa-scenarios ol {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guided-qa-scenarios li {
+  display: grid;
+  gap: 4px;
+}
+
+.guided-qa-scenarios li span {
+  color: #82958c;
+  font-size: 12px;
+}
+
+.guided-qa-advanced {
+  margin-top: 12px;
+  border: 1px solid #30463e;
+  padding: 8px;
+}
+
+.guided-qa-advanced > summary {
+  min-height: 40px;
+  color: #82958c;
+  cursor: pointer;
+}
+
+.guided-qa-audio-actions {
+  margin-top: 8px;
+}
+
+.camera-orbit-hint,
+.semantic-audio-caption {
+  position: fixed;
+  z-index: 19;
+  left: 50%;
+  bottom: 28px;
+  translate: -50% 0;
+  border: 1px solid #486057;
+  padding: 10px 14px;
+  color: #c7d8ce;
+  background: rgba(5, 12, 13, 0.94);
+  font: 14px/1.45 "Courier New", monospace;
+  pointer-events: none;
+}
+
+.semantic-audio-caption {
+  bottom: 76px;
+}
+
+.camera-orbit-hint.is-hidden,
+.semantic-audio-caption:empty {
+  display: none;
 }
 
 .world-status-panel {

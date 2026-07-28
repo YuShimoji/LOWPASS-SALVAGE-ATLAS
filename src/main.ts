@@ -41,7 +41,10 @@ import {
 } from "./game/simulation/GameState";
 import { PhysicsWorld } from "./physics/PhysicsWorld";
 import { RenderSystem } from "./render/app/RenderSystem";
+import { SEMANTIC_AUDIO_CUES, SemanticAudio } from "./render/audio/SemanticAudio";
 import { SquadFeedbackAudio } from "./render/audio/SquadFeedbackAudio";
+import { AssetPackRegistry } from "./render/assets/AssetPackRegistry";
+import { GuidedQaPanel, isSemanticAudioAction } from "./qa/GuidedQaPanel";
 import { ExpeditionPanel } from "./ui/ExpeditionPanel";
 import { Hud } from "./ui/Hud";
 import { MissionResultPanel } from "./ui/MissionResultPanel";
@@ -67,6 +70,8 @@ declare global {
         input: ReturnType<InputController["getDiagnostics"]> | null;
         camera: ReturnType<RenderSystem["cameraRig"]["getDiagnostics"]> | null;
         cart: ReturnType<MissionSessionController["getCartDiagnostics"]> | null;
+        assets: ReturnType<AssetPackRegistry["getReadback"]>;
+        audio: ReturnType<SemanticAudio["getReadback"]>;
         dom: DomDiagnostics;
         communicationRevision: number;
         threat: {
@@ -143,6 +148,17 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   state.world.completedExpeditions = persistedWorldState.visitCount;
   const query = new URLSearchParams(window.location.search);
   const audioEnabled = query.get("audio") !== "muted";
+  const requestedPs1Mode = query.get("ps1");
+  if (requestedPs1Mode === "off") {
+    state.settings.lowResolution = false;
+    state.settings.vertexSnap = false;
+    state.settings.dithering = false;
+  } else if (requestedPs1Mode === "on") {
+    state.settings.lowResolution = true;
+    state.settings.vertexSnap = true;
+    state.settings.dithering = true;
+  }
+  const assetRegistry = new AssetPackRegistry(query.get("asset-mode"));
   const simulation = new GameSimulation(state);
   const gateContext = createGateEvaluationContext(
     CREW_DEFINITIONS,
@@ -165,7 +181,8 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   let transitionInFlight = false;
   let appDisposed = false;
   let frameHandle = 0;
-  let qaPanel: HTMLElement | null = null;
+  let qaPanel: GuidedQaPanel | null = null;
+  let qaPanelOpen = false;
   let ecologyRefreshAccumulator = 0;
   let cachedEcologyContext: ThreatEcologyContext | null = null;
   let porterWasAuthenticated = false;
@@ -212,7 +229,13 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     onPauseToggle: () => setModal(state.ui.activeModal === "settings" ? "none" : "settings"),
     onVisualSetting: updateVisualSetting,
   });
-  const squadAudio = new SquadFeedbackAudio(audioEnabled);
+  const audioCaption = createTransientReadback(root, "semantic-audio-caption");
+  const semanticAudio = new SemanticAudio({
+    enabled: audioEnabled,
+    onCaption: (caption) => audioCaption.show(caption),
+  });
+  const squadAudio = new SquadFeedbackAudio(semanticAudio);
+  const cameraOrbitHint = createCameraOrbitHint(root);
   resultPanel = new MissionResultPanel(root, () => void returnToShip());
 
   const refreshMissionInteractions = (): void => {
@@ -274,6 +297,8 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         ? squadController.recoverRelay()
         : squadController.deployFlare(state.runtime.elapsedSeconds);
     squadAudio.play(result.accepted);
+    if (result.accepted && action === "deploy-relay") semanticAudio.play("relay.deployed");
+    if (result.accepted && action === "flare") semanticAudio.play("flare.deployed");
     setSquadNotice(`${result.code} // ${result.reason}`);
     return result.code;
   };
@@ -441,14 +466,16 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   );
 
   try {
-    renderSystem = new RenderSystem(root, (message) => simulation.setNotice(message), audioEnabled);
+    renderSystem = new RenderSystem(root, (message) => simulation.setNotice(message), semanticAudio);
     physics = await PhysicsWorld.create();
     input = new InputController(renderSystem.canvas, {
       onLook: (x, y) => renderSystem?.applyLookDelta(x, y),
       onWheelZoom: (deltaY) => renderSystem?.applyWheelZoom(deltaY),
+      onOrbitHint: () => cameraOrbitHint.show(),
       isWorldInputAllowed: () =>
         state.runtime.mode === "playing"
         && state.ui.activeModal === "none"
+        && !qaPanelOpen
         && !transitionInFlight,
       getModalState: () => state.ui.activeModal,
     });
@@ -470,7 +497,34 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   let gateScanRevision = 0;
 
   if (query.has("qa")) {
-    qaPanel = createQaNavigation(root, (target) => {
+    qaPanel = createQaNavigation(root, async (target) => {
+      if (target === "guided-launch") {
+        configureQaPhaseDLoadout();
+        let manifest = state.expedition.confirmedManifest;
+        if (!manifest) {
+          manifest = planner.confirm({
+            manifestId: "phase-g-guided-audit-manifest",
+            createdAtIso: new Date().toISOString(),
+          });
+          state.expedition.draft = planner.getDraftSnapshot();
+          state.expedition.confirmedManifest = manifest;
+        }
+        await startFixedMission(manifest, {
+          insertionMode: "stable",
+          insertionSeed: "phase-g-guided-audit-v1",
+        });
+        if (state.world.mode !== "mission") throw new Error("Guided QA mission launch did not reach mission state.");
+        return;
+      }
+      if (isSemanticAudioAction(target)) {
+        semanticAudio.play(target.slice(6) as Parameters<SemanticAudio["play"]>[0]);
+        return;
+      }
+      if (target === "audio-suite") {
+        for (const cue of SEMANTIC_AUDIO_CUES) semanticAudio.play(cue.id);
+        return;
+      }
+      if (target.startsWith("results-")) return;
       if (target === "phase-d-loadout") {
         configureQaPhaseDLoadout();
         return;
@@ -505,13 +559,19 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         runEquipmentAction("deploy-relay");
         return;
       }
+      if (target === "deploy-flare") {
+        runEquipmentAction("flare");
+        return;
+      }
       if (target === "disable-relay" && squadController) {
         const result = squadController.disableRelay("relay-01", state.runtime.elapsedSeconds);
+        if (result.accepted) semanticAudio.play("relay.disabled");
         setSquadNotice(`${result.code} // ${result.reason}`);
         return;
       }
       if (target === "restart-relay" && squadController) {
         const result = squadController.beginRelayRestart("relay-01", state.runtime.elapsedSeconds);
+        if (result.accepted) semanticAudio.play("relay.restarted");
         setSquadNotice(`${result.code} // ${result.reason}`);
         return;
       }
@@ -567,6 +627,33 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       physics?.teleportCharacter(playerPosition);
       simulation.teleportPlayer(playerPosition);
       refreshMissionInteractions();
+    }, (target) => ({
+      action: target,
+      world: state.world.mode,
+      runtime: state.runtime.mode,
+      notice: state.interaction.notice,
+      modal: state.ui.activeModal,
+      camera: activeRenderSystem.cameraRig.getDiagnostics(),
+      input: activeInput.getDiagnostics(),
+      cart: missionController?.getCartDiagnostics() ?? null,
+      threat: threatController?.getDebugReadback(
+        squadController?.state.control.controlledAgentId ?? "player",
+      ) ?? null,
+      relay: squadController ? {
+        deployed: [...squadController.state.deployedRelayItemIds],
+        disabled: [...squadController.state.disabledRelayItemIds],
+      } : null,
+      beacons: squadController ? Object.keys(squadController.state.signals.beacons) : [],
+      porter: porterController ? {
+        mode: porterController.state.mode,
+        authenticated: porterController.state.authenticated,
+        carriedItemId: porterController.state.carriedItemId,
+      } : null,
+      audio: semanticAudio.getReadback(),
+      assets: assetRegistry.getReadback(),
+    }), (open) => {
+      qaPanelOpen = open;
+      if (open) releaseWorldInput();
     });
   }
 
@@ -581,6 +668,8 @@ async function bootstrap(root: HTMLElement): Promise<void> {
 
     const reservationId = crypto.randomUUID();
     let reservationCommit: ReturnType<typeof reserveExpeditionItems>;
+    let pendingAssetPack: Awaited<ReturnType<AssetPackRegistry["loadMissionPack"]>>["pack"] = null;
+    let assetPackHandedToWorld = false;
     try {
       reservationCommit = reserveExpeditionItems(
         manifest,
@@ -717,6 +806,8 @@ async function bootstrap(root: HTMLElement): Promise<void> {
           : undefined,
       );
 
+      const assetSelection = await assetRegistry.loadMissionPack();
+      pendingAssetPack = assetSelection.pack;
       activeRenderSystem.enterMission(
         (materials) => createFloodedMarket(
           materials,
@@ -726,11 +817,13 @@ async function bootstrap(root: HTMLElement): Promise<void> {
           nextSquadController.state,
           nextThreatController.state,
           nextPorterController.state,
+          pendingAssetPack,
         ),
         controlledPlacement
           ? { playerPosition: controlledPlacement.position, cameraPosition: controlledPlacement.cameraPosition }
           : undefined,
       );
+      assetPackHandedToWorld = true;
       physics?.dispose();
       physics = nextPhysics;
       missionController = nextMissionController;
@@ -738,7 +831,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       threatController = nextThreatController;
       porterController = nextPorterController;
       machineAudio?.dispose();
-      machineAudio = new DynamicMachineFeedbackAudio(audioEnabled);
+      machineAudio = new DynamicMachineFeedbackAudio(semanticAudio);
       activeReservation = reservationCommit.reservation;
       activeWorldVisitBase = persistedWorldState;
       state.inventory.itemLocations = nextMissionController.state.itemLocations;
@@ -763,6 +856,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       );
       for (const diagnostic of worldVisit.diagnostics) console.warn(diagnostic);
     } catch (error) {
+      if (!assetPackHandedToWorld) pendingAssetPack?.dispose();
       state.inventory.itemLocations = rollbackExpeditionReservation(reservationCommit.reservation);
       activeWorldVisitBase = null;
       state.world.mode = "ship";
@@ -884,6 +978,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       }
       if (action.type === "mission-relay-restart" && squadController) {
         const resolution = squadController.beginRelayRestart(action.itemInstanceId, state.runtime.elapsedSeconds);
+        if (resolution.accepted) semanticAudio.play("relay.restarted");
         setSquadNotice(`${resolution.code} // ${resolution.reason}`);
         return;
       }
@@ -1171,6 +1266,8 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       input: input?.getDiagnostics() ?? null,
       camera: renderSystem?.cameraRig.getDiagnostics() ?? null,
       cart: missionController?.getCartDiagnostics() ?? null,
+      assets: assetRegistry.getReadback(),
+      audio: semanticAudio.getReadback(),
       dom: measureDomDiagnostics(),
       communicationRevision: squadController?.state.communicationRevision ?? 0,
       threat: {
@@ -1287,7 +1384,10 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     squadPanel.dispose();
     worldStatusPanel.dispose();
     squadAudio.dispose();
-    qaPanel?.remove();
+    qaPanel?.dispose();
+    semanticAudio.dispose();
+    audioCaption.dispose();
+    cameraOrbitHint.dispose();
     delete window.__LOWPASS_DEBUG__;
     document.removeEventListener("visibilitychange", handleVisibilityChange);
   };
@@ -1297,46 +1397,61 @@ async function bootstrap(root: HTMLElement): Promise<void> {
 
 function createQaNavigation(
   root: HTMLElement,
-  onNavigate: (target: string) => void,
-): HTMLElement {
-  const panel = document.createElement("aside");
-  panel.className = "qa-navigation";
-  panel.setAttribute("aria-label", "Phase G QA navigation");
-  for (const [target, label] of [
-    ["phase-d-loadout", "QA Phase D 28U"],
-    ["console", "QA 出撃コンソール"],
-    ["filter-01", "QA フィルター01"],
-    ["filter-02", "QA フィルター02"],
-    ["filter-03", "QA フィルター03"],
-    ["cooling-coil", "QA 冷却コイル"],
-    ["relay-core-01", "QA リレーコア01"],
-    ["relay-core-02", "QA リレーコア02"],
-    ["relay-core-03", "QA リレーコア03"],
-    ["cart", "QA カート"],
-    ["cart-coil", "QA CART→COIL"],
-    ["cart-extract", "QA CART→EXTRACT"],
-    ["sales", "QA 売場"],
-    ["cooling", "QA 冷却室"],
-    ["underground", "QA 地下"],
-    ["cooling-gate", "QA 短縮ゲート"],
-    ["drone", "QA SCOUT DRONE"],
-    ["porter", "QA PORTER"],
-    ["isolate-contact", "QA ISOLATE"],
-    ["reinforce-contact", "QA REINFORCE"],
-    ["withdraw-contact", "QA WITHDRAW"],
-    ["deploy-relay", "QA RELAY DEPLOY"],
-    ["disable-relay", "QA RELAY DISABLE"],
-    ["restart-relay", "QA RELAY RESTART"],
-    ["porter-auth", "QA PORTER AUTH"],
-    ["porter-carry", "QA PORTER CARRY"],
-    ["extract", "QA 抽出地点"],
-  ] as const) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = label;
-    button.addEventListener("click", () => onNavigate(target));
-    panel.append(button);
-  }
-  root.append(panel);
-  return panel;
+  onNavigate: (target: string) => void | Promise<void>,
+  getReadback: (target: string) => unknown,
+  onOpenChange: (open: boolean) => void,
+): GuidedQaPanel {
+  return new GuidedQaPanel(root, {
+    runAction: onNavigate,
+    getReadback,
+    onOpenChange,
+  });
+}
+
+function createTransientReadback(root: HTMLElement, className: string): {
+  show(message: string): void;
+  dispose(): void;
+} {
+  const element = document.createElement("div");
+  element.className = className;
+  element.setAttribute("role", "status");
+  element.setAttribute("aria-live", "polite");
+  let timeout = 0;
+  root.append(element);
+  return {
+    show(message) {
+      element.textContent = message;
+      window.clearTimeout(timeout);
+      timeout = window.setTimeout(() => {
+        element.textContent = "";
+      }, 1_800);
+    },
+    dispose() {
+      window.clearTimeout(timeout);
+      element.remove();
+    },
+  };
+}
+
+function createCameraOrbitHint(root: HTMLElement): {
+  show(): void;
+  dispose(): void;
+} {
+  const element = document.createElement("div");
+  element.className = "camera-orbit-hint is-hidden";
+  element.textContent = "Hold right mouse button and drag to orbit · wheel to zoom";
+  root.append(element);
+  let timeout = 0;
+  return {
+    show() {
+      if (sessionStorage.getItem("lowpass-camera-orbit-hint-seen") === "1") return;
+      sessionStorage.setItem("lowpass-camera-orbit-hint-seen", "1");
+      element.classList.remove("is-hidden");
+      timeout = window.setTimeout(() => element.classList.add("is-hidden"), 3_200);
+    },
+    dispose() {
+      window.clearTimeout(timeout);
+      element.remove();
+    },
+  };
 }

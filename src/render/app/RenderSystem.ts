@@ -20,6 +20,7 @@ import { interpolatePlayerPosition } from "../adapters/renderBridge";
 import { ThirdPersonCamera } from "./ThirdPersonCamera";
 import { Scene } from "three";
 import { GateFeedbackAudio } from "../audio/GateFeedbackAudio";
+import type { SemanticAudio } from "../audio/SemanticAudio";
 
 export interface RenderDiagnostics {
   drawCalls: number;
@@ -52,9 +53,9 @@ export class RenderSystem {
   constructor(
     private readonly mount: HTMLElement,
     private readonly onContextStatus: (message: string) => void,
-    audioEnabled = true,
+    audio: SemanticAudio,
   ) {
-    this.gateAudio = new GateFeedbackAudio(audioEnabled);
+    this.gateAudio = new GateFeedbackAudio(audio);
     this.renderer = new WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
     this.canvas = this.renderer.domElement;
     this.canvas.className = "game-canvas";
@@ -183,7 +184,6 @@ export class RenderSystem {
     this.canvas.removeEventListener("webglcontextlost", this.handleContextLost);
     this.canvas.removeEventListener("webglcontextrestored", this.handleContextRestored);
     this.renderer.dispose();
-    this.gateAudio.dispose();
     this.removeCurrentWorld();
     this.scene.remove(this.avatar);
     disposeObjectTree(this.avatar);

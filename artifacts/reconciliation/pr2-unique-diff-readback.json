@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "lowpass-reconciliation-audit-1.0.0",
+  "generatedAt": "2026-07-28",
+  "sourcePullRequest": {
+    "number": 2,
+    "headBranch": "codex/phase-c-exploration",
+    "uniqueCommit": "ceaadd96f31c691179b6c138a1085d80fef4fa58"
+  },
+  "comparisonFrontier": {
+    "ref": "origin/project/frontier",
+    "implementationCommit": "a3b5e73d60637c00b9bbb32a869bbf2763eb9b90",
+    "phase": "Phase G playability recovery"
+  },
+  "wholeCommitAction": "DO_NOT_CHERRY_PICK",
+  "entries": [
+    {
+      "paths": [
+        ".gitignore"
+      ],
+      "classification": "STILL_USEFUL",
+      "sourceChange": "Ignore Playwright CLI runtime artifacts.",
+      "frontierEvidence": "The active Phase G worktree produced an untracked .playwright-cli directory.",
+      "resolution": "REIMPLEMENTED_MINIMALLY",
+      "productPath": ".gitignore"
+    },
+    {
+      "paths": [
+        "src/main.ts"
+      ],
+      "classification": "ALREADY_SUPERSEDED",
+      "sourceChange": "Move the QA extraction staging position.",
+      "frontierEvidence": "Phase G already provides QA CART→EXTRACT staging through the MissionSession-backed cart-extract path and its tests.",
+      "resolution": "NO_REPLAY"
+    },
+    {
+      "paths": [
+        "index.html",
+        "public/favicon.svg"
+      ],
+      "classification": "HOUSEKEEPING_ONLY",
+      "sourceChange": "Replace the external favicon reference with a repository-owned SVG.",
+      "frontierEvidence": "The Phase G frontier already uses a self-contained data-URI favicon and makes no external favicon request.",
+      "resolution": "ALREADY_SUPERSEDED"
+    },
+    {
+      "paths": [
+        "README.md"
+      ],
+      "classification": "STALE_DOCUMENTATION",
+      "sourceChange": "Describe the duplicate Phase C implementation and retest handoff.",
+      "frontierEvidence": "The canonical frontier contains the completed Phase C through Phase G lineage and newer Phase G handoff documents.",
+      "resolution": "DO_NOT_REPLAY"
+    }
+  ],
+  "branchDisposition": {
+    "pullRequest": "CLOSE_WITH_EXPLANATION_AFTER_STILL_USEFUL_REIMPLEMENTATION",
+    "remoteBranch": "KEEP",
+    "mainlineMerge": "FORBIDDEN"
+  }
+}

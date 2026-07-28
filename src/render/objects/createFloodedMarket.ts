@@ -3,6 +3,7 @@ import {
   CylinderGeometry,
   Group,
   Mesh,
+  MeshStandardMaterial,
   PlaneGeometry,
   PointLight,
   TorusGeometry,
@@ -17,6 +18,10 @@ import type { PorterAndroidState } from "../../game/machines/machineTypes";
 import type { Ps1MaterialFactory } from "../materials/Ps1MaterialFactory";
 import { disposeObjectTree } from "./disposeObjectTree";
 import type { MissionWorldView } from "./missionWorldView";
+import {
+  type LoadedCanaryAssetPack,
+  type CanaryAssetInstance,
+} from "../assets/AssetPackRegistry";
 
 export function createFloodedMarket(
   materials: Ps1MaterialFactory,
@@ -26,6 +31,7 @@ export function createFloodedMarket(
   squad: DistributedSquadState,
   threat: ThreatEncounterState,
   porter: PorterAndroidState,
+  canaryAssets: LoadedCanaryAssetPack | null = null,
 ): MissionWorldView {
   const root = new Group();
   root.name = "phase-d-flooded-market";
@@ -124,8 +130,11 @@ export function createFloodedMarket(
     resourceViews.set(itemId, resourceView);
   }
 
-  const cart = createCart(materials);
+  const cartInstance = canaryAssets?.instantiate("lowpass:props/shopping-cart") ?? null;
+  if (cartInstance) adoptCanaryMaterials(materials, cartInstance.root);
+  const cart = cartInstance?.root ?? createCart(materials);
   cart.name = "mission-shopping-cart";
+  if (cartInstance) bindSemanticAnchors(cart, cartInstance);
   root.add(cart);
 
   const crewViews = new Map<string, Group>();
@@ -150,7 +159,9 @@ export function createFloodedMarket(
     relayViews.set(relayId, view);
   }
   const beaconViews = new Map<string, Group>();
-  const scoutDrone = createScoutDrone(materials);
+  const scoutDrone = canaryAssets
+    ? createCanaryDrone(materials, canaryAssets.instantiate("lowpass:security/needle-drone"), -1.55)
+    : createScoutDrone(materials);
   scoutDrone.root.name = "phase-e-hostile-scout-drone";
   root.add(scoutDrone.root);
   const additionalDroneViews = new Map<string, DroneView>();
@@ -158,8 +169,12 @@ export function createFloodedMarket(
     const existing = additionalDroneViews.get(drone.id);
     if (existing) return existing;
     const view = drone.definitionId === "hostile-observation-drone"
-      ? createObservationDrone(materials)
-      : createScoutDrone(materials);
+      ? canaryAssets
+        ? createCanaryDrone(materials, canaryAssets.instantiate("lowpass:security/watcher-drone"), -2.65, true)
+        : createObservationDrone(materials)
+      : canaryAssets
+        ? createCanaryDrone(materials, canaryAssets.instantiate("lowpass:security/needle-drone"), -1.55)
+        : createScoutDrone(materials);
     view.root.name = drone.definitionId === "hostile-observation-drone"
       ? `phase-g-hostile-observation-drone-${drone.id}`
       : `phase-e-hostile-scout-drone-${drone.id}`;
@@ -168,9 +183,19 @@ export function createFloodedMarket(
     return view;
   };
   for (const drone of threat.additionalDrones) ensureAdditionalDroneView(drone);
-  const porterView = createPorterAndroid(materials);
+  const porterView = canaryAssets
+    ? createCanaryPorter(materials, canaryAssets.instantiate("lowpass:machines/porter-android"))
+    : createPorterAndroid(materials);
   porterView.root.name = "phase-e-friendly-porter-android";
   root.add(porterView.root);
+  const terminalItemId = manifest.items.find((item) => item.definitionId === "field-terminal")?.instanceId ?? null;
+  const terminalInstance = canaryAssets?.instantiate("lowpass:equipment/field-terminal") ?? null;
+  if (terminalInstance) {
+    adoptCanaryMaterials(materials, terminalInstance.root);
+    terminalInstance.root.name = "field-terminal-canary";
+    bindSemanticAnchors(terminalInstance.root, terminalInstance);
+    root.add(terminalInstance.root);
+  }
   const lastKnownMarker = new Mesh(
     new TorusGeometry(0.7, 0.045, 5, 16),
     materials.createEmissive("#df9259", 0.58),
@@ -255,7 +280,11 @@ export function createFloodedMarket(
     }
     const drone = activeThreat.drone;
     scoutDrone.root.visible = drone.visible;
-    scoutDrone.root.position.set(drone.position.x, drone.position.y, drone.position.z);
+    scoutDrone.root.position.set(
+      drone.position.x,
+      drone.position.y + scoutDrone.positionOffsetY,
+      drone.position.z,
+    );
     scoutDrone.root.rotation.y = drone.facingYaw;
     scoutDrone.root.rotation.z = drone.mode === "disabled" ? 0.72 : 0;
     scoutDrone.root.rotation.x = drone.mode === "lock-on" ? -0.24 : 0;
@@ -278,7 +307,11 @@ export function createFloodedMarket(
     activeThreat.additionalDrones.forEach((additional) => {
       const view = ensureAdditionalDroneView(additional);
       view.root.visible = additional.visible;
-      view.root.position.set(additional.position.x, additional.position.y, additional.position.z);
+      view.root.position.set(
+        additional.position.x,
+        additional.position.y + view.positionOffsetY,
+        additional.position.z,
+      );
       view.root.rotation.y = additional.facingYaw;
       view.rotor.rotation.y = elapsedSeconds * 7.2;
       view.scanBeam.visible = false;
@@ -295,6 +328,15 @@ export function createFloodedMarket(
     porterView.statusLight.visible = activePorter.authenticated;
     porterView.loadArms.rotation.x = activePorter.carriedItemId ? -0.34 : Math.sin(elapsedSeconds * 2) * 0.03;
     porterView.root.rotation.z = activePorter.mode === "gate-rejected" ? Math.sin(elapsedSeconds * 8) * 0.025 : 0;
+    if (terminalInstance && terminalItemId) {
+      const location = activeSession.itemLocations[terminalItemId];
+      const agent = location?.kind === "crew" ? activeSquad.agents[location.crewId] : null;
+      terminalInstance.root.visible = Boolean(agent);
+      if (agent) {
+        terminalInstance.root.position.set(agent.position.x, agent.position.y - 0.93, agent.position.z);
+        terminalInstance.root.rotation.y = agent.facingYaw;
+      }
+    }
   };
 
   update(session, squad, threat, porter, 0);
@@ -304,6 +346,7 @@ export function createFloodedMarket(
     update,
     dispose(): void {
       disposeObjectTree(root);
+      canaryAssets?.dispose();
     },
   };
 }
@@ -314,6 +357,7 @@ interface DroneView {
   readonly contactHalo: Mesh;
   readonly scanBeam: Mesh;
   readonly wideScan: Mesh | null;
+  readonly positionOffsetY: number;
 }
 
 function createScoutDrone(materials: Ps1MaterialFactory): DroneView {
@@ -344,7 +388,7 @@ function createScoutDrone(materials: Ps1MaterialFactory): DroneView {
   );
   scanBeam.visible = false;
   root.add(hull, optic, rotor, contactHalo, scanBeam);
-  return { root, rotor, contactHalo, scanBeam, wideScan: null };
+  return { root, rotor, contactHalo, scanBeam, wideScan: null, positionOffsetY: 0 };
 }
 
 function createObservationDrone(materials: Ps1MaterialFactory): DroneView {
@@ -385,7 +429,48 @@ function createObservationDrone(materials: Ps1MaterialFactory): DroneView {
   );
   wideScan.position.set(0, -0.72, -2.1);
   root.add(hull, keel, optic, rotor, contactHalo, scanBeam, wideScan);
-  return { root, rotor, contactHalo, scanBeam, wideScan };
+  return { root, rotor, contactHalo, scanBeam, wideScan, positionOffsetY: 0 };
+}
+
+function createCanaryDrone(
+  materials: Ps1MaterialFactory,
+  instance: CanaryAssetInstance,
+  positionOffsetY: number,
+  wide = false,
+): DroneView {
+  const root = instance.root;
+  adoptCanaryMaterials(materials, root);
+  bindSemanticAnchors(root, instance);
+  const rotor = new Group();
+  const contactHalo = new Mesh(
+    new TorusGeometry(wide ? 0.92 : 0.62, 0.04, 5, 16),
+    materials.createEmissive("#ef745f", wide ? 0.52 : 0.86),
+  );
+  contactHalo.rotation.x = Math.PI / 2;
+  contactHalo.position.y = wide ? 2.9 : 1.9;
+  contactHalo.visible = false;
+  const scanBeam = new Mesh(
+    new BoxGeometry(0.055, 0.055, 1),
+    materials.createEmissive("#ef745f", 1.15),
+  );
+  scanBeam.visible = false;
+  const wideScan = wide
+    ? new Mesh(
+        new BoxGeometry(3.4, 0.018, 4.4),
+        materials.create({
+          color: "#d9b56f",
+          emissive: "#9b7843",
+          emissiveIntensity: 0.35,
+          transparent: true,
+          opacity: 0.1,
+          depthWrite: false,
+        }),
+      )
+    : null;
+  if (wideScan) wideScan.position.set(0, 2.05, -2.1);
+  root.add(rotor, contactHalo, scanBeam);
+  if (wideScan) root.add(wideScan);
+  return { root, rotor, contactHalo, scanBeam, wideScan, positionOffsetY };
 }
 
 function createPorterAndroid(materials: Ps1MaterialFactory): {
@@ -409,6 +494,55 @@ function createPorterAndroid(materials: Ps1MaterialFactory): {
   }
   root.add(chassis, base, statusLight, loadArms);
   return { root, loadArms, statusLight };
+}
+
+function createCanaryPorter(
+  materials: Ps1MaterialFactory,
+  instance: CanaryAssetInstance,
+): {
+  readonly root: Group;
+  readonly loadArms: Group;
+  readonly statusLight: Mesh;
+} {
+  const root = instance.root;
+  adoptCanaryMaterials(materials, root);
+  bindSemanticAnchors(root, instance);
+  const loadArms = new Group();
+  const statusLight = new Mesh(
+    new BoxGeometry(0.42, 0.12, 0.05),
+    materials.createEmissive("#70d6b3", 0.78),
+  );
+  statusLight.position.set(0, 2.28, -0.35);
+  root.add(loadArms, statusLight);
+  return { root, loadArms, statusLight };
+}
+
+function bindSemanticAnchors(root: Group, instance: CanaryAssetInstance): void {
+  root.userData.semanticAnchors = Object.fromEntries(
+    [...instance.anchors].map(([kind, anchor]) => [kind, anchor.name]),
+  );
+}
+
+function adoptCanaryMaterials(materials: Ps1MaterialFactory, root: Group): void {
+  root.traverse((object) => {
+    if (!(object instanceof Mesh)) return;
+    const sourceMaterials = Array.isArray(object.material) ? object.material : [object.material];
+    const adopted = sourceMaterials.map((source) => {
+      if (!(source instanceof MeshStandardMaterial)) return source;
+      const replacement = materials.create({
+        color: source.color.clone(),
+        emissive: source.emissive.clone(),
+        emissiveIntensity: source.emissiveIntensity,
+        metalness: source.metalness,
+        roughness: source.roughness,
+        transparent: source.transparent,
+        opacity: source.opacity,
+      });
+      source.dispose();
+      return replacement;
+    });
+    object.material = Array.isArray(object.material) ? adopted : adopted[0]!;
+  });
 }
 
 function orientScanBeam(beam: Mesh, from: { x: number; y: number; z: number }, to: { x: number; y: number; z: number }): void {

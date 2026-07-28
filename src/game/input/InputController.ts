@@ -7,6 +7,7 @@ export type ActiveInputDevice = "none" | "keyboard" | "mouse" | "gamepad";
 export interface InputControllerOptions {
   readonly onLook: LookHandler;
   readonly onWheelZoom: (deltaY: number) => void;
+  readonly onOrbitHint?: () => void;
   readonly isWorldInputAllowed: () => boolean;
   readonly getModalState: () => string;
 }
@@ -32,6 +33,8 @@ export interface InputDiagnostics {
   readonly actualDisplacement: number;
   readonly activeDevice: ActiveInputDevice;
   readonly connectedGamepads: readonly ConnectedGamepadDiagnostics[];
+  readonly orbitDragActive: boolean;
+  readonly pointerLockFallback: boolean;
 }
 
 export interface ResolvedGamepadInput {
@@ -58,6 +61,7 @@ const MOVEMENT_ACTIONS = new Set<InputAction>([
 ]);
 const GAMEPAD_DEADZONE = 0.18;
 const GAMEPAD_LOOK_PIXELS_PER_SECOND = 680;
+const ORBIT_DRAG_THRESHOLD_PX = 4;
 
 export class InputController {
   private readonly heldCodes = new Set<string>();
@@ -74,6 +78,12 @@ export class InputController {
   private actualDisplacementX = 0;
   private actualDisplacementZ = 0;
   private activeDevice: ActiveInputDevice = "none";
+  private orbitDragActive = false;
+  private orbitDragDistance = 0;
+  private orbitLastX = 0;
+  private orbitLastY = 0;
+  private suppressNextCanvasClick = false;
+  private pointerLockFallback = false;
   private disposed = false;
 
   constructor(
@@ -85,6 +95,9 @@ export class InputController {
     window.addEventListener("blur", this.handleBlur);
     document.addEventListener("visibilitychange", this.handleVisibilityChange);
     document.addEventListener("mousemove", this.handleMouseMove);
+    window.addEventListener("mouseup", this.handleMouseUp);
+    this.canvas.addEventListener("mousedown", this.handleMouseDown);
+    this.canvas.addEventListener("contextmenu", this.handleCanvasContextMenu);
     this.canvas.addEventListener("click", this.handleCanvasClick);
     this.canvas.addEventListener("wheel", this.handleWheel, { passive: false });
   }
@@ -166,6 +179,8 @@ export class InputController {
       actualDisplacement: Math.hypot(this.actualDisplacementX, this.actualDisplacementZ),
       activeDevice: this.activeDevice,
       connectedGamepads: this.connectedGamepads,
+      orbitDragActive: this.orbitDragActive,
+      pointerLockFallback: this.pointerLockFallback,
     };
   }
 
@@ -177,6 +192,9 @@ export class InputController {
     window.removeEventListener("blur", this.handleBlur);
     document.removeEventListener("visibilitychange", this.handleVisibilityChange);
     document.removeEventListener("mousemove", this.handleMouseMove);
+    window.removeEventListener("mouseup", this.handleMouseUp);
+    this.canvas.removeEventListener("mousedown", this.handleMouseDown);
+    this.canvas.removeEventListener("contextmenu", this.handleCanvasContextMenu);
     this.canvas.removeEventListener("click", this.handleCanvasClick);
     this.canvas.removeEventListener("wheel", this.handleWheel);
   }
@@ -203,27 +221,68 @@ export class InputController {
   };
 
   private readonly handleBlur = (): void => {
+    this.orbitDragActive = false;
     this.clearMovement();
   };
 
   private readonly handleMouseMove = (event: MouseEvent): void => {
-    if (document.pointerLockElement === this.canvas && this.options.isWorldInputAllowed()) {
-      this.activeDevice = "mouse";
-      this.options.onLook(event.movementX, event.movementY);
-    }
+    if (!this.orbitDragActive || !this.options.isWorldInputAllowed()) return;
+    const pointerLocked = document.pointerLockElement === this.canvas;
+    const deltaX = pointerLocked ? event.movementX : event.clientX - this.orbitLastX;
+    const deltaY = pointerLocked ? event.movementY : event.clientY - this.orbitLastY;
+    this.orbitLastX = event.clientX;
+    this.orbitLastY = event.clientY;
+    this.orbitDragDistance += Math.hypot(deltaX, deltaY);
+    if (this.orbitDragDistance >= ORBIT_DRAG_THRESHOLD_PX) this.suppressNextCanvasClick = true;
+    this.activeDevice = "mouse";
+    this.options.onLook(deltaX, deltaY);
   };
 
-  private readonly handleCanvasClick = (): void => {
-    if (document.pointerLockElement !== this.canvas && this.options.isWorldInputAllowed()) {
-      void this.canvas.requestPointerLock().catch(() => {
-        // Embedded browsers and automation may reject pointer lock. The game
-        // remains playable with keyboard input, so this is a recoverable edge.
+  private readonly handleMouseDown = (event: MouseEvent): void => {
+    if (event.button !== 2 || !this.options.isWorldInputAllowed()) return;
+    event.preventDefault();
+    this.orbitDragActive = true;
+    this.orbitDragDistance = 0;
+    this.orbitLastX = event.clientX;
+    this.orbitLastY = event.clientY;
+    this.options.onOrbitHint?.();
+    if (document.pointerLockElement !== this.canvas) {
+      Promise.resolve(this.canvas.requestPointerLock()).then(() => {
+        this.pointerLockFallback = document.pointerLockElement !== this.canvas;
+      }).catch(() => {
+        this.pointerLockFallback = true;
       });
     }
   };
 
+  private readonly handleMouseUp = (event: MouseEvent): void => {
+    if (event.button === 2) this.orbitDragActive = false;
+  };
+
+  private readonly handleCanvasClick = (event: MouseEvent): void => {
+    if (this.suppressNextCanvasClick) {
+      this.suppressNextCanvasClick = false;
+      return;
+    }
+    if (event.button !== 0) return;
+    if (document.pointerLockElement !== this.canvas && this.options.isWorldInputAllowed()) {
+      Promise.resolve(this.canvas.requestPointerLock()).catch(() => {
+        // Embedded browsers and automation may reject pointer lock. The game
+        // remains playable with keyboard input, so this is a recoverable edge.
+        this.pointerLockFallback = true;
+      });
+    }
+  };
+
+  private readonly handleCanvasContextMenu = (event: Event): void => {
+    event.preventDefault();
+  };
+
   private readonly handleVisibilityChange = (): void => {
-    if (document.visibilityState !== "visible") this.clearMovement();
+    if (document.visibilityState !== "visible") {
+      this.orbitDragActive = false;
+      this.clearMovement();
+    }
   };
 
   private readonly handleWheel = (event: WheelEvent): void => {

@@ -63,6 +63,7 @@ function createController(gamepads: ArrayLike<Gamepad | null> = []): {
   document: FakeDocument;
   canvas: FakeCanvas;
   onWheelZoom: ReturnType<typeof vi.fn>;
+  onLook: ReturnType<typeof vi.fn>;
   setWorldInputAllowed(value: boolean): void;
 } {
   const fakeWindow = new FakeWindow();
@@ -73,8 +74,9 @@ function createController(gamepads: ArrayLike<Gamepad | null> = []): {
   vi.stubGlobal("document", fakeDocument);
   vi.stubGlobal("navigator", { getGamepads: () => gamepads });
   const onWheelZoom = vi.fn();
+  const onLook = vi.fn();
   const options: InputControllerOptions = {
-    onLook: vi.fn(),
+    onLook,
     onWheelZoom,
     isWorldInputAllowed: () => worldInputAllowed,
     getModalState: () => worldInputAllowed ? "none" : "settings",
@@ -85,6 +87,7 @@ function createController(gamepads: ArrayLike<Gamepad | null> = []): {
     document: fakeDocument,
     canvas: fakeCanvas,
     onWheelZoom,
+    onLook,
     setWorldInputAllowed: (value) => {
       worldInputAllowed = value;
     },
@@ -181,6 +184,52 @@ describe("InputController keyboard physical state", () => {
     fixture.canvas.dispatchEvent(modalWheel);
     expect(modalWheel.defaultPrevented).toBe(false);
     expect(fixture.onWheelZoom).toHaveBeenCalledTimes(1);
+    fixture.controller.dispose();
+  });
+
+  it("orbits only while the right button is held and suppresses the canvas context menu", () => {
+    const fixture = createController();
+    const down = new Event("mousedown", { cancelable: true });
+    Object.defineProperties(down, {
+      button: { value: 2 },
+      clientX: { value: 30 },
+      clientY: { value: 40 },
+    });
+    fixture.canvas.dispatchEvent(down);
+    const move = new Event("mousemove");
+    Object.defineProperties(move, {
+      clientX: { value: 42 },
+      clientY: { value: 47 },
+      movementX: { value: 12 },
+      movementY: { value: 7 },
+    });
+    fixture.document.dispatchEvent(move);
+    expect(fixture.onLook).toHaveBeenCalledWith(12, 7);
+    expect(fixture.controller.getDiagnostics().orbitDragActive).toBe(true);
+
+    const up = new Event("mouseup");
+    Object.defineProperty(up, "button", { value: 2 });
+    fixture.window.dispatchEvent(up);
+    fixture.document.dispatchEvent(move);
+    expect(fixture.onLook).toHaveBeenCalledTimes(1);
+
+    const contextMenu = new Event("contextmenu", { cancelable: true });
+    fixture.canvas.dispatchEvent(contextMenu);
+    expect(contextMenu.defaultPrevented).toBe(true);
+    fixture.controller.dispose();
+  });
+
+  it("does not start an orbit while a modal owns world input", () => {
+    const fixture = createController();
+    fixture.setWorldInputAllowed(false);
+    const down = new Event("mousedown", { cancelable: true });
+    Object.defineProperties(down, {
+      button: { value: 2 },
+      clientX: { value: 0 },
+      clientY: { value: 0 },
+    });
+    fixture.canvas.dispatchEvent(down);
+    expect(fixture.controller.getDiagnostics().orbitDragActive).toBe(false);
     fixture.controller.dispose();
   });
 });
