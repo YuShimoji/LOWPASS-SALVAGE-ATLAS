@@ -23,8 +23,9 @@
 | Phase G実装 | `6df8ba0621baf8976fc56373863cf57565cc12ba`、件名 `feat: coordinate hostile machine security cells` |
 | recovery分岐元 | `756e54b0e54a7b4b6fee7da2a0d5bed47f01a5a3` |
 | recovery実装 | `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`、件名 `fix: restore playable movement camera and cart controls` |
-| remote状態 | upstream未設定。同名remote `f3ea109` と現在local 2 / remote 3で分岐。localの追加1件は本文書commit。pull / merge / rebase / push未実施 |
-| 次のゲート | local / remote正本選定、その後Phase H1 Promptのオーナー承認。Phase H未実装 |
+| remote状態 | upstream未設定。同名remote `f3ea109` と現在local 3 / remote 3で分岐。pull / merge / rebase / push未実施 |
+| canonical candidate | local `d2683ee` 系統を技術推奨。remote `f3ea109` はgreenだが受入非等価 |
+| 次のゲート | local正本確認またはremote bounded repair指示、その後Phase H1 Promptのオーナー承認。Phase H未実装 |
 | 受入の正本 | `README.md` のPhase G検証結果、`PROJECT_HANDOFF.md`、`docs/supervising-ai-report.md` |
 
 ## 現行アーキテクチャ
@@ -95,16 +96,17 @@ Gate G-Aは `GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` で中断されました�
 ## Re-entry snapshot
 
 - current branchは `feat/phase-g-guided-qa-canary-v1`、fetch時HEADは `d2683eeec43dc1befad406508f7d8b52f2a43a27`、baseは `52f0cf9db9f563963243e4954e48de9c448ec487`、upstream未設定
-- `git fetch --prune origin` 後、同名remoteは `f3ea109`。共通基点 `52f0cf9` からfetch時local unique 1 / remote unique 3へ分岐し、実装treeもlocal `f8632871` / remote `faf4d58f` で異なる。本文書commit後の現在値はlocal 2 / remote 3。behind-onlyではないためpullしていない
+- `git fetch --prune origin` 後、同名remoteは `f3ea109`。共通基点 `52f0cf9` からfetch時local unique 1 / remote unique 3へ分岐し、実装treeもlocal `f8632871` / remote `faf4d58f` で異なる。監修文書commit 2件後の現在値はlocal 3 / remote 3。behind-onlyではないためpullしていない
 - local `d2683ee` とremote `42c8b8a` / `e1207b2` はGuided QA、Canary、音、証拠を別構成で実装している。reset、restore、stash、clean、merge、rebase、pushで自動解消しない
+- candidate auditではlocal 34 files / 199 tests、remote 31 files / 187 tests、両方typecheck / build PASS。remoteは周期Porter pulse、18段階の因果coverage不足、rights fail-closed flag不足のため受入非等価。技術推奨はlocal `d2683ee`
 - 再現URLは `http://127.0.0.1:5173/?qa=1&security-posture=watchful&asset-mode=primitive` と `asset-mode=canary-v1`
 - portableな状態はsource、Canary runtime copy、registry、consumer metadata / fixture、tests、closure evidence、authority docs
 - `node_modules`、`dist`、`.serena`、browser IndexedDB、音量設定、実行中Viteは端末ローカル。browser QAのvisit 6はcommitしない
 - CGAWはread-only供給元としてcleanを維持し、LOWPASS consumer integrationのための変更・commitは作っていない
-- current bottleneckは同名branchの正本選定。local checkoutは開発可能だが、共有開発はowner / supervising AIがlocal採用、remote採用、専用reconciliationのいずれかを選ぶまで保留
+- current bottleneckは同名branchの正本確認。比較は完了しlocalを技術推奨。owner / supervising AIはlocal正本確認かremote bounded repairを選ぶ
 - Phase H1は正本選定後のowner decision。human sensory reviewはdeferred / non-blocking
 - final local gateはdependencies、typecheck、34 files / 199 tests、production build、diff checkがPASS。buildは79 modulesで、MachineFeedbackAudioとCanaryMissionAssetPackの遅延chunkを維持
-- 今回のlive minimal gateは `npm ls --depth=0`、`npm run typecheck`、`git diff --check` がPASS。Viteは現在未起動で、`127.0.0.1:5173` は接続拒否。remote unique commitsは未実行・未受入
+- 先行sync auditのlive minimal gateは `npm ls --depth=0`、`npm run typecheck`、`git diff --check` がPASS。今回さらにlocal全gateとremote一時copyの全gateを実行した。Viteは現在未起動で、`127.0.0.1:5173` は接続拒否
 
 ### 2026-07-27 snapshot（履歴）
 

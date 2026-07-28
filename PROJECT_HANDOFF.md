@@ -7,7 +7,7 @@
 - 現行branch: `feat/phase-g-guided-qa-canary-v1`
 - fetch時HEAD: `d2683eeec43dc1befad406508f7d8b52f2a43a27`
 - 作業base: `52f0cf9db9f563963243e4954e48de9c448ec487`
-- upstream: 未設定。同名remote `origin/feat/phase-g-guided-qa-canary-v1` は存在するが、現在はlocal unique 2 / remote unique 3で分岐している。local 2件は実装 `d2683ee` と本文書commit
+- upstream: 未設定。同名remote `origin/feat/phase-g-guided-qa-canary-v1` は存在するが、現在はlocal unique 3 / remote unique 3で分岐している。local 3件は実装 `d2683ee` と監修文書commit 2件
 - playability recovery実装基準: `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`、件名 `fix: restore playable movement camera and cart controls`
 - Phase G実装commit: `6df8ba0621baf8976fc56373863cf57565cc12ba`
 - Phase F保全tag: `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a`
@@ -20,7 +20,7 @@
 - 人間確認済み: movement、wheel zoom、cart、Watcher / Needle外観はPASS
 - remote Phase G branch: `origin/feat/phase-g-security-cell` としてpush済み
 - remote Phase F tag: `phase-f-world-persistence` としてpush済み
-- 次の共有開発gate: local `d2683ee` と同名remote `f3ea109` のどちらを正本または統合基準にするかをオーナーが決める。判断前にmerge / rebase / pushを行わない
+- 次の共有開発gate: candidate auditの技術推奨どおりlocal `d2683ee` 系統を正本確認するか、remote `f3ea109` のbounded repairを指示する。判断前にmerge / rebase / pushを行わない
 - 次の開発候補: 分岐解消後のPhase H1「契約・証拠・再訪判断の因果深化」。未実装で、オーナー承認前には開始しない
 - PR更新、main統合、deploy、release: 未実施
 - 保護した契約: SecurityBlackboard、HostileMachineKnowledgeと共有知識、WorldState V2 / migration、settlement冪等性、ItemLocation、Presence基本重み、共有delay、scan距離、lock、pressure budget、contract進捗
@@ -38,7 +38,7 @@
 | branch / HEAD | `feat/phase-g-guided-qa-canary-v1` / `d2683eeec43dc1befad406508f7d8b52f2a43a27` | 通常checkout、detachedではない |
 | origin | `https://github.com/YuShimoji/LOWPASS-SALVAGE-ATLAS.git` | `git fetch --prune origin` PASS |
 | upstream | 未設定 | 自動追従先なし |
-| same-name remote | `f3ea109` | fetch時local 1 / remote 3。本文書commit後の現在値はlocal 2 / remote 3 |
+| same-name remote | `f3ea109` | 初回fetch時local 1 / remote 3。監修文書commit 2件を含む現在値はlocal 3 / remote 3 |
 | merge base | `52f0cf9db9f563963243e4954e48de9c448ec487` | local / remote共通基点 |
 | tree identity | local `f8632871` / remote `faf4d58f` | 不一致。fast-forward対象ではない |
 | range comparison | local `d2683ee` に対しremote `42c8b8a`、`e1207b2`、merge `f3ea109` | Guided QA、Canary、音、証拠の別実装系統。自動統合しない |
@@ -48,9 +48,29 @@
 | minimal health | `npm ls --depth=0`、`npm run typecheck`、`git diff --check` | PASS |
 | runtime listener | `127.0.0.1:5173` | 現在は接続拒否。Vite未起動という端末ローカル状態 |
 
-behind-onlyでもfast-forward可能でもないため、pullは実施していません。reset、restore、stash、clean、rebase、merge、branch切替、upstream設定、pushも実施していません。local checkoutは依存整合と型検査が通り、既存の34 files / 199 tests、production build、ブラウザ証拠は `d2683ee` に束縛された既存証拠として利用できます。一方、remote unique 3 commitsはこのcheckoutで未実行・未受入であり、local greenやPhase G人間受入と混同しません。
+behind-onlyでもfast-forward可能でもないため、pullは実施していません。reset、restore、stash、clean、rebase、merge、branch切替、upstream設定、pushも実施していません。local checkoutは依存整合と型検査が通り、既存の34 files / 199 tests、production build、ブラウザ証拠は `d2683ee` に束縛された既存証拠として利用できます。remote unique 3 commitsはcurrent checkoutへ統合せず、下記の一時copyで独立検証しました。この技術greenをPhase G人間受入や受入等価と混同しません。
 
 共有開発の現在のbottleneckは、2系統の正本選定です。オーナーまたは監修役は `git range-diff 52f0cf9..d2683ee 52f0cf9..f3ea109` と両系統のcontract / evidenceを比較し、local採用、remote採用、または専用reconciliation sliceのいずれかを明示してください。その判断まではPhase H1、push、PR更新、merge、deploy、releaseへ進みません。
+
+## 2026-07-28 canonical candidate acceptance audit
+
+同名branch正本選定の未検証部分を減らすため、local実装基準 `d2683ee` とremote `f3ea109` を同じNode環境で独立に検証しました。remoteは `git archive` から端末一時directoryへ展開し、現在checkout、branch、Git history、tracked証拠を変更していません。
+
+| Gate / contract | local `d2683ee` | remote `f3ea109` | 判定 |
+| --- | --- | --- | --- |
+| fresh dependency install | 既存lock / `npm ls` PASS | `npm ci`、0 vulnerabilities、`npm ls` PASS | 両方green |
+| typecheck | PASS | PASS | 両方green |
+| Vitest | 34 files / 199 tests PASS | 31 files / 187 tests PASS | localの受入coverageが広い |
+| production build | 79 modules。CanaryMissionAssetPack 46.72 kBを遅延chunk化 | 75 modules。Canary専用chunkなし | 両方build green。localが現行遅延load契約を明示 |
+| Guided Audit | Security Cell因果を22 / 22、timeout 0、duplicate 0 | controller操作の18 / 18 | remoteは共有、再視認、lock、Presence、cautious / outnumbered、sabotage、flare失効を個別gate化していない |
+| semantic audio | 17 cueの非無音、非clip、duration、distinct fingerprint、rate-limit、caption | 17 cueのplay / mute / rate-limit / caption | remoteは波形受入がなく、Porter operational pulseを1.6秒周期で再導入 |
+| A/B evidence | 6状態 × 4条件 = 24 screenshots、27 PNG | 4条件 = 4 A/B screenshots、7 PNG | localが役割・状態差を状態別に証明 |
+| Canary consumer | exact hash、schema、stable node、anchor、proxy、bounds、explicit `internalOnly: true` / `distributionApproved: false`を検証 | exact hash、stable node、bounds、`NOASSERTION`を検証 | remoteは明示的なinternal-only / distribution fail-closed flagをruntime契約に持たない |
+| lifecycle | 3 cycle、帰還後scene 60 / geometry 47 / texture 3 / program 4 | 3 cycle、scene 110 / geometry 59 / texture 3 / program 3 | 両方で単調増加なし |
+
+`f3ea109` は技術的にbuild可能ですが、現在のPhase G Closureと受入等価ではありません。特に周期Porter pulseは「常時Porter pulseを使わず、意味eventだけを鳴らす」という正本契約に反します。18段階監査もSecurity Cellの因果をまとめて扱うため、22段階監査の代替にはできません。
+
+技術推奨は `TECHNICAL_CANONICAL_RECOMMENDATION_LOCAL_D2683EE` です。remote `f3ea109` は `GREEN_BUT_NOT_ACCEPTANCE_EQUIVALENT` とし、採用する場合は音契約、22段階因果coverage、rights fail-closed metadata、状態別A/B evidenceを先にbounded repairします。ownerはlocal系統を正本として確認するか、remote repairを明示してください。確認前にPhase H、merge、rebase、pushは行いません。
 
 ## 2026-07-28 Phase G Closure再現
 
@@ -181,7 +201,7 @@ QA URLは `http://127.0.0.1:5173/?qa=1&audio=muted` です。訪問限定構成�
 | 目的 | 効果 | 要件 | 状態 | 担当 | 次の一手 |
 | --- | --- | --- | --- | --- | --- |
 | Phase G人間感覚レビュー | 音量・音色・疲労感と最終game feelを製品判断する | ミュートなしdesktop、観察メモ | deferred / non-blocking | human game design / UX | 問題が見つかった場合だけG-TUNE候補を起票 |
-| 同名branch正本選定 | 2系統のPhase G Closureを破壊せず共有開発基準を1つにする | local / remote contract・証拠比較、採用方針、rollback方針 | 現在local 2 / remote 3で分岐。localの追加1件は本文書commit。自動同期不可 | owner / supervising AI | local採用、remote採用、専用reconciliationのいずれかを明示 |
+| 同名branch正本選定 | 2系統のPhase G Closureを破壊せず共有開発基準を1つにする | candidate audit、採用方針、rollback方針 | 比較完了。local推奨。現在local 3 / remote 3で分岐 | owner / supervising AI | local `d2683ee` 系統を正本確認、またはremote bounded repairを指示 |
 | Phase H1選定 | 契約・証拠・再訪判断の因果を1つのsliceへ固定する | branch正本選定後、最終報告のPrompt、目的、受入、非対象、停止条件の承認 | 未実装・正本選定待ち | owner / supervising AI | branch判断後にPhase H1 Promptを明示承認 |
 | draft PR #1 | Phase C〜Fをreview可能にする | human review、CI方針、merge / rollback | OPEN / DRAFT / mergeable | owner / reviewer | G-A後に維持・更新・分離を判断 |
 | CI | local gateをPR上で再現する | typecheck/test/build workflow | 未設定 | repo owner | merge方針時に導入判断 |
@@ -193,10 +213,10 @@ QA URLは `http://127.0.0.1:5173/?qa=1&audio=muted` です。訪問限定構成�
 ## 次のAIの開始順
 
 1. 本文書、`docs/supervising-ai-report.md` の2026-07-28節、`docs/project-context.md`、READMEのPhase G UX Closure節を読む。
-2. `feat/phase-g-guided-qa-canary-v1` のclean state、実装基準 `d2683ee`、upstream未設定、同名remote `f3ea109`、現在local 2 / remote 3の分岐を確認する。
+2. `feat/phase-g-guided-qa-canary-v1` のclean state、実装基準 `d2683ee`、upstream未設定、同名remote `f3ea109`、現在local 3 / remote 3の分岐を確認する。
 3. 証拠indexとconsumer readbackから22段階監査、音響監査、exact hash、A/B、3 cycleを確認する。
 4. Phase Gの人間感覚レビューは任意とし、観測事実なしにG-TUNEしない。
 5. branch正本を選定するまではmerge / rebase / pushとPhase H1を保留する。選定後にPhase H1を開始する場合は、最終報告の完全Promptを1つの承認済みsliceとして使い、Phase G契約を変更しない。
 6. push、PR、merge、tag、deploy、release、public visibilityはそれぞれ個別の明示権限を確認する。
 
-直近の判断質問は、「local `d2683ee` とremote `f3ea109` のどちらを正本または統合基準にするか」です。その後の設計質問は、「帰還済みの契約・証拠を、WorldState migrationなしで次訪問のrouteまたはsupport選択へどう結び付けるか」です。Phase H1は未実装です。
+直近の判断質問は、「技術推奨どおりlocal `d2683ee` 系統を正本確認するか、remote `f3ea109` のbounded repairを先に行うか」です。その後の設計質問は、「帰還済みの契約・証拠を、WorldState migrationなしで次訪問のrouteまたはsupport選択へどう結び付けるか」です。Phase H1は未実装です。

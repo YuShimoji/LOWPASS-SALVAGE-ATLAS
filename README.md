@@ -72,6 +72,8 @@ Canary consumerはCGAW `feat/lowpass-asset-canary-v1` の契約commit `c893374ab
 
 最終gateはtop-level依存整合、typecheck、34ファイル199テスト、production build、diff checkがPASSです。buildは79 modulesを処理し、MachineFeedbackAudio 3.33 kBとCanaryMissionAssetPack 46.72 kBの遅延chunkを維持しました。既知の500 kB large-chunk warningだけが残ります。
 
+同名remote `f3ea109` はfresh install、typecheck、31ファイル187テスト、production buildがPASSしましたが、現Closureと受入等価ではありません。remoteは18段階の汎用controller監査でSecurity Cell因果を個別に証明せず、1.6秒周期Porter pulseを再導入し、明示的なinternal-only / distribution fail-closed flagをruntime consumerに持ちません。技術推奨はlocal `d2683ee` 系統です。ownerがlocal正本を確認するか、remote bounded repairを指示するまでPhase Hとbranch統合を保留します。
+
 ## アーキテクチャ
 
 - `src/game/`: シリアライズ可能なゲーム状態、固定60 Hzシミュレーション、分隊・アイテム・ミッション定義と純粋ルール
@@ -446,7 +448,8 @@ Viteの500 kB警告は継続しています。警告閾値は変更していま�
 | 目的 | 影響 | 要件 | 状態 | 担当 | 次の一手 |
 | --- | --- | --- | --- | --- | --- |
 | Phase G人間感覚レビュー | cueの音量・音色・疲労感と最終game feelを製品判断できる | デスクトップ実機、ミュートなし、観察メモ | 自動受入green。製品進行を止めない任意レビュー | ゲームデザイン / UX | 問題が観測された場合だけG-TUNE候補を別slice化する |
-| Phase H1開始判断 | 契約・証拠・再訪判断の因果を次sliceへ限定する | accepted base、目的、受入、非対象、停止条件のオーナー承認 | 未実装・Prompt提案のみ | オーナー / 監修役AI | 本報告末尾のPhase H1 Promptを明示承認して開始する |
+| branch正本確認 | Phase G Closureの共有基準を1つにする | candidate audit、rollback方針、owner確認 | local推奨、remoteはbounded repair対象 | オーナー / 監修役AI | local `d2683ee` 系統を正本確認、またはremote repairを指示 |
+| Phase H1開始判断 | 契約・証拠・再訪判断の因果を次sliceへ限定する | branch正本確認、accepted base、目的、受入、非対象、停止条件のオーナー承認 | 未実装・Prompt提案のみ | オーナー / 監修役AI | branch確認後に本報告末尾のPhase H1 Promptを明示承認 |
 | 初期バンドル分割 | 初回ダウンロードが大きい | Three.js/Rapierのvendor分割、実機起動・cache・再訪計測 | warningのみ・非ブロッキング | performance | 体感問題が出た端末で3値を測り、分割効果が見込める場合だけ着手する |
 | Rapier非推奨warning | 開発consoleに既知warningが残る | 依存版と初期化APIの互換性、物理回帰 | 非ブロッキング | 依存更新 | Rapier更新スライスで解消可否を判断する |
 
