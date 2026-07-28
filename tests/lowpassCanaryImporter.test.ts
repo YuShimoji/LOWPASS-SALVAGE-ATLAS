@@ -1,12 +1,12 @@
 // Node-runtime integration test; intentionally outside the browser-only TypeScript project.
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
-const source = resolve("..", "CodexGameAssetWorkbench", "artifacts", "lowpass-canary-v1");
+const importedSource = resolve("public", "assets", "lowpass-canary-v1");
 const script = resolve("scripts/import-lowpass-canary.mjs");
 const temporaryDirectories: string[] = [];
 
@@ -16,6 +16,7 @@ afterEach(() => {
 
 describe("LOWPASS Canary importer", () => {
   it("imports deterministic consumer files with exact hash and no absolute paths", () => {
+    const source = portableSource();
     const first = temporary();
     const second = temporary();
     runImport(source, first);
@@ -40,6 +41,7 @@ describe("LOWPASS Canary importer", () => {
   });
 
   it("rejects an invalid GLB hash before producing a consumer registry", () => {
+    const source = portableSource();
     const mutatedSource = temporary();
     cpSync(source, mutatedSource, { recursive: true });
     const glbPath = join(mutatedSource, "lowpass-readability-canary-v1.runtime.glb");
@@ -49,6 +51,23 @@ describe("LOWPASS Canary importer", () => {
     expect(() => runImport(mutatedSource, temporary())).toThrow(/GLB_SHA256_MISMATCH/);
   });
 });
+
+function portableSource(): string {
+  const directory = temporary();
+  copyFileSync(
+    join(importedSource, "lowpass-readability-canary-v1.runtime.glb"),
+    join(directory, "lowpass-readability-canary-v1.runtime.glb"),
+  );
+  copyFileSync(
+    join(importedSource, "lowpass-readability-canary-v1.manifest.json"),
+    join(directory, "lowpass-readability-canary-v1.manifest.json"),
+  );
+  copyFileSync(
+    join(importedSource, "lowpass-readability-canary-v1.source-readback.json"),
+    join(directory, "lowpass-readability-canary-v1.readback.json"),
+  );
+  return directory;
+}
 
 function temporary(): string {
   const directory = mkdtempSync(join(tmpdir(), "lowpass-canary-import-"));
