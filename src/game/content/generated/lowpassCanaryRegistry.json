@@ -223,6 +223,12 @@
   "glbPath": "assets/lowpass-canary-v1/lowpass-readability-canary-v1.runtime.glb",
   "internalOnly": true,
   "manifestPath": "assets/lowpass-canary-v1/lowpass-readability-canary-v1.manifest.json",
+  "manifestRights": {
+    "distributionApproved": false,
+    "internalOnly": true,
+    "reviewLabel": "INTERNAL REVIEW ONLY",
+    "rightsStatus": "NOASSERTION"
+  },
   "manifestVersion": "lowpass-runtime-asset-pack-1.0.0",
   "materialMap": {
     "mat-allied-dark": "mat-allied-dark",

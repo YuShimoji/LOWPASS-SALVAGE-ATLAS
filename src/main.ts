@@ -34,6 +34,7 @@ import {
   LOWPASS_CANARY_ASSET_PACK,
   primitiveAssetPackSelection,
   resolveAssetPackMode,
+  type AssetDistributionContext,
   type AssetPackMode,
   type AssetPackSelection,
 } from "./game/content/AssetPackRegistry";
@@ -168,6 +169,9 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   state.world.completedExpeditions = persistedWorldState.visitCount;
   const query = new URLSearchParams(window.location.search);
   const audioEnabled = query.get("audio") !== "muted";
+  const assetDistributionContext: AssetDistributionContext = import.meta.env.MODE === "external"
+    ? "external-distribution"
+    : "internal-review";
   let selectedAssetMode: AssetPackMode = resolveAssetPackMode(window.location.search);
   let assetPackSelection: AssetPackSelection = primitiveAssetPackSelection(selectedAssetMode);
   const simulation = new GameSimulation(state);
@@ -373,6 +377,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       squadController.hasFieldTerminal(),
     );
     squadAudio.play(result.accepted);
+    if (result.accepted) machineAudio?.playPorterCommandAccepted(state.runtime.elapsedSeconds);
     setSquadNotice(`${result.code} // ${result.reason}`);
     return result.code;
   };
@@ -1017,7 +1022,9 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       if (selectedAssetMode === "canary-v1") {
         try {
           const { loadCanaryMissionAssetPack } = await import("./render/assets/CanaryMissionAssetPack");
-          loadedCanaryPack = await loadCanaryMissionAssetPack();
+          loadedCanaryPack = await loadCanaryMissionAssetPack(LOWPASS_CANARY_ASSET_PACK, {
+            distributionContext: assetDistributionContext,
+          });
           assetPackSelection = {
             requestedMode: "canary-v1",
             activeMode: "canary-v1",
@@ -1027,7 +1034,12 @@ async function bootstrap(root: HTMLElement): Promise<void> {
         } catch (error) {
           const fallbackReason = error instanceof Error ? error.message : String(error);
           assetPackSelection = primitiveAssetPackSelection("canary-v1", fallbackReason);
-          console.warn(`CANARY_ASSET_FALLBACK // ${fallbackReason}`);
+          console.warn("CANARY_ASSET_FALLBACK", {
+            requestedMode: "canary-v1",
+            activeMode: "primitive",
+            distributionContext: assetDistributionContext,
+            reason: fallbackReason,
+          });
         }
       }
       const sessionId = crypto.randomUUID();
@@ -1442,7 +1454,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
             );
             if (porterController.state.authenticated && !porterWasAuthenticated) {
               porterWasAuthenticated = true;
-              machineAudio?.playPorterAuthenticated();
+              machineAudio?.playPorterAuthenticated(state.runtime.elapsedSeconds);
               simulation.setNotice("PORTER AUTHORIZED // SHORT-RANGE VOICE NODE ONLINE");
             }
             machineAudio?.updatePorter(porterController.state.mode, state.runtime.elapsedSeconds);

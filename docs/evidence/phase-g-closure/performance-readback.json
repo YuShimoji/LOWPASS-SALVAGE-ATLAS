@@ -1,69 +1,226 @@
 {
-  "schemaVersion": "phase-g-performance-readback-1.0.0",
+  "schemaVersion": "phase-g-browser-lifecycle-2.0.0",
   "result": "PASS",
-  "assetMode": "canary-v1",
+  "accumulationDelta": {
+    "sceneObjects": 0,
+    "geometries": 0,
+    "textures": 0,
+    "programs": 0,
+    "domNodes": 0
+  },
+  "lifecycleStable": true,
   "cycles": [
     {
       "cycle": 1,
-      "mission": {
-        "sceneObjects": 149,
-        "geometries": 78,
-        "textures": 3,
-        "programs": 4
-      },
-      "shipAfterReturn": {
-        "worldRunCount": 4,
+      "world": "ship",
+      "render": {
+        "drawCalls": 66,
+        "triangles": 1468,
+        "renderWidth": 793,
+        "renderHeight": 446,
         "sceneObjects": 60,
         "geometries": 47,
         "textures": 3,
-        "programs": 4
+        "programs": 4,
+        "assetPackMode": "primitive",
+        "assetPackHash": null,
+        "assetLoadDurationMs": 0
+      },
+      "dom": {
+        "totalNodes": 238,
+        "persistentHudNodes": 41,
+        "modalNodes": 0,
+        "transientFeedbackNodes": 0,
+        "resultHistoryNodes": 0
       }
     },
     {
       "cycle": 2,
-      "mission": {
-        "loadDurationMs": 5.7,
-        "sceneObjects": 149,
-        "geometries": 78,
-        "textures": 3,
-        "programs": 4
-      },
-      "shipAfterReturn": {
-        "worldRunCount": 5,
+      "world": "ship",
+      "render": {
+        "drawCalls": 66,
+        "triangles": 1468,
+        "renderWidth": 793,
+        "renderHeight": 446,
         "sceneObjects": 60,
         "geometries": 47,
         "textures": 3,
-        "programs": 4
+        "programs": 4,
+        "assetPackMode": "primitive",
+        "assetPackHash": null,
+        "assetLoadDurationMs": 0
+      },
+      "dom": {
+        "totalNodes": 238,
+        "persistentHudNodes": 41,
+        "modalNodes": 0,
+        "transientFeedbackNodes": 0,
+        "resultHistoryNodes": 0
       }
     },
     {
       "cycle": 3,
-      "mission": {
-        "loadDurationMs": 3.7,
-        "sceneObjects": 149,
-        "geometries": 78,
-        "textures": 3,
-        "programs": 4
-      },
-      "shipAfterReturn": {
-        "worldRunCount": 6,
+      "world": "ship",
+      "render": {
+        "drawCalls": 66,
+        "triangles": 1468,
+        "renderWidth": 793,
+        "renderHeight": 446,
         "sceneObjects": 60,
         "geometries": 47,
         "textures": 3,
-        "programs": 4
+        "programs": 4,
+        "assetPackMode": "primitive",
+        "assetPackHash": null,
+        "assetLoadDurationMs": 0
+      },
+      "dom": {
+        "totalNodes": 238,
+        "persistentHudNodes": 41,
+        "modalNodes": 0,
+        "transientFeedbackNodes": 0,
+        "resultHistoryNodes": 0
       }
     }
   ],
-  "stability": {
-    "missionSceneObjectGrowth": 0,
-    "missionGeometryGrowth": 0,
-    "missionTextureGrowth": 0,
-    "missionProgramGrowth": 0,
-    "shipSceneObjectGrowth": 0,
-    "shipGeometryGrowth": 0,
-    "shipTextureGrowth": 0,
-    "shipProgramGrowth": 0,
-    "returnPath": "normal mission extract result -> ABORTED -> ship return",
-    "settlementPathExercised": true
+  "guidedDiagnostics": {
+    "asset": {
+      "requestedMode": "primitive",
+      "activeMode": "primitive",
+      "fallbackReason": null,
+      "canary": null
+    },
+    "guided": {
+      "tick": 1555,
+      "elapsedSeconds": 25.916666666666476,
+      "world": "mission",
+      "controlledAgent": "player",
+      "playerIsolationState": "isolated",
+      "alliedPresence": 1,
+      "hostilePresence": 1.5,
+      "presenceBand": "predatory",
+      "watcherTask": "patrol",
+      "needleTask": "patrol",
+      "hostileLinkState": "disconnected",
+      "relayState": "active",
+      "flareState": "active",
+      "porterState": "friendly-idle",
+      "lockState": "inactive",
+      "interferenceState": "inactive",
+      "watcherLocalFactKinds": [
+        "agent-sighting",
+        "friendly-machine-sighting"
+      ],
+      "needleLocalFactKinds": [
+        "agent-sighting"
+      ],
+      "sharedFactKinds": [],
+      "revisions": {
+        "runtimeTick": 1555,
+        "blackboard": 95,
+        "sharedContact": 75,
+        "needleTransition": 58,
+        "watcherTransition": 0,
+        "communication": 122,
+        "squadFeedback": 5,
+        "interference": 0
+      },
+      "duplicateEventCount": 0
+    },
+    "diagnostics": {
+      "world": "mission",
+      "physics": {
+        "rigidBodyCount": 2,
+        "colliderCount": 12,
+        "collisionCount": 1
+      },
+      "render": {
+        "drawCalls": 52,
+        "triangles": 1074,
+        "renderWidth": 793,
+        "renderHeight": 446,
+        "sceneObjects": 104,
+        "geometries": 66,
+        "textures": 3,
+        "programs": 3,
+        "assetPackMode": "primitive",
+        "assetPackHash": null,
+        "assetLoadDurationMs": 0
+      },
+      "input": {
+        "heldCodes": [],
+        "resolvedActions": [],
+        "rawX": 0,
+        "rawY": 0,
+        "worldX": 0,
+        "worldZ": 0,
+        "focusedElement": "body",
+        "modalState": "none",
+        "pointerLocked": false,
+        "actualDisplacementX": 0,
+        "actualDisplacementZ": 0,
+        "actualDisplacement": 0,
+        "activeDevice": "none",
+        "connectedGamepads": [],
+        "rightDragActive": false
+      },
+      "camera": {
+        "desiredDistance": 4.1,
+        "effectiveDistance": 4.492122238527085,
+        "occlusionActive": false,
+        "yaw": -0.14601225771127538,
+        "pitch": 0.5857741761521881
+      },
+      "cart": {
+        "attached": false,
+        "position": {
+          "x": 2.2,
+          "y": 0.48,
+          "z": -1.4
+        },
+        "facingYaw": 0,
+        "speed": 0,
+        "collisionBlocked": false
+      },
+      "dom": {
+        "totalNodes": 315,
+        "persistentHudNodes": 121,
+        "modalNodes": 0,
+        "transientFeedbackNodes": 0,
+        "resultHistoryNodes": 0
+      },
+      "communicationRevision": 122,
+      "threat": {
+        "activeDroneCount": 2,
+        "mode": "patrol",
+        "transitionRevision": 58,
+        "reportRevision": 54,
+        "deliveryRevision": 71,
+        "pendingReportCount": 2,
+        "firstRetreatAnalysisRevision": 1,
+        "interferenceRevision": 0,
+        "securityPosture": "watchful",
+        "securityCellId": "security-cell:flooded-market-01",
+        "hostileLinkQuality": 0,
+        "sharedFactCount": 0,
+        "reservationCount": 0
+      },
+      "porter": {
+        "mode": "friendly-idle",
+        "authenticated": true,
+        "carriedItemId": null,
+        "gateEvaluationCodes": []
+      },
+      "persistence": {
+        "revision": 0,
+        "visitCount": 0,
+        "activeContractId": "contract-water-filters",
+        "recoveredUniqueItemIds": [],
+        "leftBehindEquipmentIds": [],
+        "openedTraversalIds": [],
+        "friendlyMachineIds": [],
+        "discoveredEvidenceIds": []
+      }
+    }
   }
 }

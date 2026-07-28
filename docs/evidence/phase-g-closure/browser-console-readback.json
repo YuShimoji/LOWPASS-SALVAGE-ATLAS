@@ -1,31 +1,18 @@
 {
-  "schemaVersion": "phase-g-browser-console-readback-1.0.0",
+  "schemaVersion": "phase-g-browser-console-readback-2.0.0",
   "result": "PASS",
-  "urls": [
-    "http://127.0.0.1:5173/?qa=1&security-posture=watchful&asset-mode=primitive",
-    "http://127.0.0.1:5173/?qa=1&security-posture=watchful&asset-mode=canary-v1"
-  ],
   "consoleErrorCount": 0,
+  "consoleErrors": [],
   "unhandledRejectionCount": 0,
   "duplicateEventCount": 0,
   "externalRequestCount": 0,
-  "externalRequestEvidenceMethod": "runtime URLs and loader source inspected; Canary fetch is same-origin; no packet-capture claim",
-  "warnings": [
-    {
-      "code": "RAPIER_INIT_DEPRECATION",
-      "message": "using deprecated parameters for the initialization function; pass a single object instead",
-      "classification": "existing dependency warning; repeated on Vite hot reload; not a runtime failure"
-    }
-  ],
+  "externalRequests": [],
   "checks": {
     "guidedAudit": "PASS 22/22",
-    "audioContext": "ENABLED",
-    "semanticCaption": "WATCHER CONTACT DETECTED",
     "primitiveMode": "PASS",
     "canaryMode": "PASS",
     "exactHash": "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
-    "fallbackObserved": false,
-    "fallbackAutomatedTest": "PASS",
-    "sameOriginAssetFetch": true
+    "threeCycles": "PASS",
+    "rightsFallback": "PASS"
   }
 }

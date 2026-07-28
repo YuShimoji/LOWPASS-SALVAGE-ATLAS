@@ -9,6 +9,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import {
   LOWPASS_CANARY_ASSET_PACK,
   validateCanaryRegistry,
+  type AssetDistributionContext,
   type CanaryAssetPackRegistryEntry,
   type CanaryAssetRole,
 } from "../../game/content/AssetPackRegistry";
@@ -31,10 +32,22 @@ export interface LoadedCanaryMissionAssetPack {
 
 export async function loadCanaryMissionAssetPack(
   registry: CanaryAssetPackRegistryEntry = LOWPASS_CANARY_ASSET_PACK,
+  options: { readonly distributionContext?: AssetDistributionContext } = {},
 ): Promise<LoadedCanaryMissionAssetPack> {
   const startedAt = performance.now();
-  const failures = validateCanaryRegistry(registry);
+  const failures = validateCanaryRegistry(registry, options);
   if (failures.length > 0) throw new Error(`CANARY_REGISTRY_INVALID // ${failures.join(",")}`);
+  const manifestUrl = new URL(registry.manifestPath, document.baseURI).href;
+  const manifestResponse = await fetch(manifestUrl, { credentials: "same-origin" });
+  if (!manifestResponse.ok) throw new Error(`CANARY_MANIFEST_HTTP_${manifestResponse.status}`);
+  const manifest = await manifestResponse.json() as { readonly rights?: unknown };
+  const manifestFailures = validateCanaryRegistry(registry, {
+    ...options,
+    manifestRights: manifest.rights,
+  });
+  if (manifestFailures.length > 0) {
+    throw new Error(`CANARY_MANIFEST_RIGHTS_INVALID // ${manifestFailures.join(",")}`);
+  }
   const url = new URL(registry.glbPath, document.baseURI).href;
   const response = await fetch(url, { credentials: "same-origin" });
   if (!response.ok) throw new Error(`CANARY_GLB_HTTP_${response.status}`);

@@ -1,10 +1,10 @@
 {
   "schemaVersion": "phase-g-audio-audit-1.0.0",
   "result": "PASS",
-  "cueCount": 17,
-  "nonSilentCount": 17,
+  "cueCount": 20,
+  "nonSilentCount": 20,
   "clippedCount": 0,
-  "distinctFingerprintCount": 17,
+  "distinctFingerprintCount": 20,
   "acceptanceBoundary": "Automated event firing, non-silence, bounded peaks, distinct design fingerprints, rate limiting, mute, context resume, and caption fallback; not a human aesthetic verdict.",
   "cues": [
     {
@@ -148,6 +148,16 @@
       "fingerprint": "fnv1a-bd3cb729"
     },
     {
+      "id": "porter-command-accepted",
+      "label": "PORTER COMMAND ACCEPTED",
+      "sampleRate": 24000,
+      "durationSeconds": 0.12,
+      "peak": 0.02947746403515339,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-6bfc92a9"
+    },
+    {
       "id": "porter-carry-accepted",
       "label": "PORTER CARRY ACCEPTED",
       "sampleRate": 24000,
@@ -156,6 +166,26 @@
       "nonSilent": true,
       "clipped": false,
       "fingerprint": "fnv1a-509b7c38"
+    },
+    {
+      "id": "porter-path-failed",
+      "label": "PORTER PATH FAILED",
+      "sampleRate": 24000,
+      "durationSeconds": 0.21,
+      "peak": 0.03561659902334213,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-8af2cf32"
+    },
+    {
+      "id": "porter-gate-rejected",
+      "label": "PORTER GATE REJECTED",
+      "sampleRate": 24000,
+      "durationSeconds": 0.23,
+      "peak": 0.03799998760223389,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-8efc2b2d"
     },
     {
       "id": "flare-deployed",

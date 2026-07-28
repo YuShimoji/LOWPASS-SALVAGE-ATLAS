@@ -102,6 +102,11 @@ describe("Guided Phase G audit", () => {
     expect(report.duplicateEventCount).toBe(0);
     expect(report.steps).toHaveLength(22);
     expect(report.steps.every((entry) => entry.result === "PASS" && entry.endTick > entry.startTick)).toBe(true);
+    expect(report.steps.every((entry) =>
+      entry.expected === entry.expectedState
+      && entry.actual === entry.actualState
+      && entry.revision.blackboard === entry.relevantRevisions.blackboard
+      && entry.failureReason === null)).toBe(true);
     expect(report.steps.at(-1)?.relevantRevisions.blackboard).toBe(22);
   });
 
@@ -116,5 +121,6 @@ describe("Guided Phase G audit", () => {
     expect(report.result).toBe("FAILED");
     expect(report.timeoutCount).toBe(1);
     expect(report.steps[0]?.failureCode).toBe("TIMEOUT_WATCHFUL_MISSION");
+    expect(report.steps[0]?.failureReason).toBe("expected world=mission, posture revision available");
   });
 });

@@ -49,7 +49,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe("semantic machine audio", () => {
   it("maps every required event to a distinct non-silent, unclipped waveform", () => {
     const audits = auditSemanticCueWaveforms();
-    expect(audits).toHaveLength(17);
+    expect(audits).toHaveLength(20);
     expect(audits.every((entry) => entry.nonSilent && !entry.clipped)).toBe(true);
     expect(audits.every((entry) => entry.durationSeconds >= 0.08 && entry.durationSeconds <= 0.35)).toBe(true);
     expect(new Set(audits.map((entry) => entry.fingerprint)).size).toBe(audits.length);
@@ -68,7 +68,10 @@ describe("semantic machine audio", () => {
       "relay-disabled",
       "relay-restarted",
       "porter-authenticated",
+      "porter-command-accepted",
       "porter-carry-accepted",
+      "porter-path-failed",
+      "porter-gate-rejected",
       "flare-deployed",
       "flare-observed",
     ]));
@@ -98,7 +101,7 @@ describe("semantic machine audio", () => {
     enabled.dispose();
   });
 
-  it("announces an accepted Porter carry transition once instead of pulsing continuously", () => {
+  it("announces Porter meaning events once instead of pulsing continuously", () => {
     vi.stubGlobal("AudioContext", FakeAudioContext);
     const captions = vi.fn();
     const audio = new MachineFeedbackAudio(true, captions);
@@ -107,10 +110,32 @@ describe("semantic machine audio", () => {
     audio.updatePorter("moving-to-item", 2);
     audio.updatePorter("moving-to-item", 8);
     audio.updatePorter("carrying", 9);
+    audio.updatePorter("carrying", 15);
+    audio.updatePorter("path-failed", 16);
+    audio.updatePorter("path-failed", 22);
+    audio.updatePorter("gate-rejected", 23);
 
     expect(captions.mock.calls.map((call) => call[0])).toEqual([
       "porter-carry-accepted",
-      "porter-carry-accepted",
+      "porter-path-failed",
+      "porter-gate-rejected",
+    ]);
+    audio.dispose();
+  });
+
+  it("maps authentication and accepted commands to captioned, rate-limited events", () => {
+    vi.stubGlobal("AudioContext", FakeAudioContext);
+    const captions = vi.fn();
+    const audio = new MachineFeedbackAudio(true, captions);
+
+    audio.playPorterAuthenticated(1);
+    audio.playPorterAuthenticated(1.1);
+    audio.playPorterCommandAccepted(2);
+    audio.playPorterCommandAccepted(2.1);
+
+    expect(captions.mock.calls.map((call) => call[0])).toEqual([
+      "porter-authenticated",
+      "porter-command-accepted",
     ]);
     audio.dispose();
   });

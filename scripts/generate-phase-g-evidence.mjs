@@ -19,7 +19,7 @@ try {
   const cues = audio.auditSemanticCueWaveforms();
   const audioAudit = {
     schemaVersion: "phase-g-audio-audit-1.0.0",
-    result: cues.length === 17
+    result: cues.length === 20
       && cues.every((cue) => cue.nonSilent && !cue.clipped && cue.durationSeconds >= 0.08 && cue.durationSeconds <= 0.3)
       && new Set(cues.map((cue) => cue.fingerprint)).size === cues.length
       ? "PASS"

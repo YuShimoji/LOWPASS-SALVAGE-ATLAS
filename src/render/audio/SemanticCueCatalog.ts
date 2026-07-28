@@ -13,7 +13,10 @@ export type SemanticCueId =
   | "relay-disabled"
   | "relay-restarted"
   | "porter-authenticated"
+  | "porter-command-accepted"
   | "porter-carry-accepted"
+  | "porter-path-failed"
+  | "porter-gate-rejected"
   | "flare-deployed"
   | "flare-observed";
 
@@ -46,7 +49,10 @@ export const SEMANTIC_CUE_INVENTORY: readonly SemanticCueDefinition[] = [
   cue("relay-disabled", "RELAY DISABLED", 160, 70, 0.2, 0.045, "sawtooth"),
   cue("relay-restarted", "RELAY RESTORED", 260, 520, 0.28, 0.038, "sine", 2),
   cue("porter-authenticated", "PORTER AUTHENTICATED", 170, 290, 0.2, 0.032, "sine"),
+  cue("porter-command-accepted", "PORTER COMMAND ACCEPTED", 220, 340, 0.12, 0.03, "triangle"),
   cue("porter-carry-accepted", "PORTER CARRY ACCEPTED", 120, 190, 0.16, 0.028, "triangle"),
+  cue("porter-path-failed", "PORTER PATH FAILED", 190, 92, 0.21, 0.036, "sawtooth", 2),
+  cue("porter-gate-rejected", "PORTER GATE REJECTED", 260, 110, 0.23, 0.038, "square", 2),
   cue("flare-deployed", "FLARE DEPLOYED", 720, 1120, 0.18, 0.038, "sine"),
   cue("flare-observed", "FLARE OBSERVED", 980, 760, 0.13, 0.034, "triangle"),
 ] as const;

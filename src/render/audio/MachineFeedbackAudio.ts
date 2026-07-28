@@ -71,16 +71,19 @@ export class MachineFeedbackAudio {
   updatePorter(mode: PorterAndroidMode, elapsedSeconds: number): void {
     if (!this.enabled) return;
     if (mode !== this.lastPorterMode) {
-      if (mode === "moving-to-item" || mode === "carrying" || mode === "moving-to-destination") {
-        this.playCue("porter-carry-accepted", elapsedSeconds);
-      }
-      if (mode === "gate-rejected" || mode === "path-failed") this.playCue("interference-pulse", elapsedSeconds);
+      if (mode === "carrying") this.playCue("porter-carry-accepted", elapsedSeconds);
+      if (mode === "path-failed") this.playCue("porter-path-failed", elapsedSeconds);
+      if (mode === "gate-rejected") this.playCue("porter-gate-rejected", elapsedSeconds);
       this.lastPorterMode = mode;
     }
   }
 
-  playPorterAuthenticated(): void {
-    this.playCue("porter-authenticated");
+  playPorterAuthenticated(elapsedSeconds = performance.now() / 1000): void {
+    this.playCue("porter-authenticated", elapsedSeconds);
+  }
+
+  playPorterCommandAccepted(elapsedSeconds = performance.now() / 1000): void {
+    this.playCue("porter-command-accepted", elapsedSeconds);
   }
 
   playHostileShareTransmit(): void {

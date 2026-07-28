@@ -30,6 +30,12 @@ describe("AssetPackRegistry", () => {
       internalOnly: true,
       distributionApproved: false,
       reviewLabel: "INTERNAL REVIEW ONLY",
+      manifestRights: {
+        rightsStatus: "NOASSERTION",
+        internalOnly: true,
+        distributionApproved: false,
+        reviewLabel: "INTERNAL REVIEW ONLY",
+      },
     });
     expect(LOWPASS_CANARY_ASSET_PACK.glbPath).not.toMatch(/^[A-Za-z]:|file:\/\//);
   });
@@ -41,5 +47,31 @@ describe("AssetPackRegistry", () => {
       fallbackReason: "GLB_LOAD_FAILED",
       canary: null,
     });
+  });
+
+  it("fails closed for missing, contradictory, mismatched, or externally distributed rights", () => {
+    const registry = structuredClone(LOWPASS_CANARY_ASSET_PACK) as unknown as Record<string, unknown>;
+
+    const missingInternalOnly = { ...registry };
+    delete missingInternalOnly.internalOnly;
+    expect(validateCanaryRegistry(missingInternalOnly)).toContain("RIGHTS_INTERNAL_ONLY_MISSING_OR_INVALID");
+
+    expect(validateCanaryRegistry({
+      ...registry,
+      distributionApproved: true,
+    })).toContain("RIGHTS_NOASSERTION_DISTRIBUTION_BLOCK_REQUIRED");
+
+    expect(validateCanaryRegistry(registry, {
+      manifestRights: {
+        rightsStatus: "NOASSERTION",
+        internalOnly: true,
+        distributionApproved: true,
+        reviewLabel: "INTERNAL REVIEW ONLY",
+      },
+    })).toContain("RIGHTS_REGISTRY_MANIFEST_MISMATCH");
+
+    expect(validateCanaryRegistry(registry, {
+      distributionContext: "external-distribution",
+    })).toContain("RIGHTS_EXTERNAL_DISTRIBUTION_BLOCKED");
   });
 });

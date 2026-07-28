@@ -48,10 +48,14 @@ export interface GuidedAuditStepResult {
   readonly endTick: number;
   readonly durationMs: number;
   readonly timeoutMs: number;
+  readonly expected: string;
   readonly expectedState: string;
+  readonly actual: GuidedQaReadback;
   readonly actualState: GuidedQaReadback;
+  readonly revision: Readonly<Record<string, number>>;
   readonly relevantRevisions: Readonly<Record<string, number>>;
   readonly result: GuidedQaResult;
+  readonly failureReason: string | null;
   readonly failureCode: string | null;
   readonly diagnosticMessage: string;
 }
@@ -128,10 +132,14 @@ export async function runGuidedPhaseGAudit(driver: GuidedAuditDriver): Promise<G
         endTick: waited.readback.tick,
         durationMs: Math.round(endedAt - startedAt),
         timeoutMs: definition.timeoutMs,
+        expected: definition.expectedState,
         expectedState: definition.expectedState,
+        actual: waited.readback,
         actualState: waited.readback,
+        revision: { ...waited.readback.revisions },
         relevantRevisions: { ...waited.readback.revisions },
         result,
+        failureReason: waited.matched ? null : `expected ${definition.expectedState}`,
         failureCode: waited.matched ? null : `TIMEOUT_${definition.id.toUpperCase().replaceAll("-", "_")}`,
         diagnosticMessage: waited.matched
           ? `${actionMessage || "observed"} // ${definition.expectedState}`
@@ -147,10 +155,14 @@ export async function runGuidedPhaseGAudit(driver: GuidedAuditDriver): Promise<G
         endTick: readback.tick,
         durationMs: Math.round(driver.now() - startedAt),
         timeoutMs: definition.timeoutMs,
+        expected: definition.expectedState,
         expectedState: definition.expectedState,
+        actual: readback,
         actualState: readback,
+        revision: { ...readback.revisions },
         relevantRevisions: { ...readback.revisions },
         result: "FAILED",
+        failureReason: error instanceof Error ? error.message : String(error),
         failureCode: `DRIVER_${definition.id.toUpperCase().replaceAll("-", "_")}`,
         diagnosticMessage: error instanceof Error ? error.message : String(error),
       });

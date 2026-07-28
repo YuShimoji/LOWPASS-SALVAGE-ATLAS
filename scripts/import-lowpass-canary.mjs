@@ -37,6 +37,13 @@ export async function importLowpassCanary({ sourceDirectory, projectRoot }) {
   const sourceReadback = parseJson(sourceReadbackText, "READBACK_JSON_INVALID");
   const exactGlbSha256 = sha256(glb);
   validateSourceContract(manifest, sourceReadback, exactGlbSha256);
+  const rights = {
+    rightsStatus: "NOASSERTION",
+    internalOnly: true,
+    distributionApproved: false,
+    reviewLabel: "INTERNAL REVIEW ONLY",
+  };
+  const runtimeManifest = { ...manifest, rights };
 
   const publicDirectory = join(targetRoot, "public", "assets", "lowpass-canary-v1");
   const generatedDirectory = join(targetRoot, "src", "game", "content", "generated");
@@ -92,6 +99,7 @@ export async function importLowpassCanary({ sourceDirectory, projectRoot }) {
     internalOnly: true,
     distributionApproved: false,
     reviewLabel: "INTERNAL REVIEW ONLY",
+    manifestRights: rights,
     glbPath: "assets/lowpass-canary-v1/lowpass-readability-canary-v1.runtime.glb",
     manifestPath: "assets/lowpass-canary-v1/lowpass-readability-canary-v1.manifest.json",
     sourceReadbackPath: "assets/lowpass-canary-v1/lowpass-readability-canary-v1.source-readback.json",
@@ -133,10 +141,7 @@ export async function importLowpassCanary({ sourceDirectory, projectRoot }) {
     schemaVersion: "lowpass-asset-provenance-1.0.0",
     assetPackId: registry.assetPackId,
     source: registry.source,
-    rightsStatus: registry.rightsStatus,
-    internalOnly: true,
-    distributionApproved: false,
-    reviewLabel: registry.reviewLabel,
+    ...rights,
     generatedFromPrimitives: true,
     uvPresent: false,
     textureCount: 0,
@@ -162,18 +167,13 @@ export async function importLowpassCanary({ sourceDirectory, projectRoot }) {
       absolutePathsAbsent: true,
       primitiveFallbackRequired: true,
     },
-    rights: {
-      status: "NOASSERTION",
-      internalOnly: true,
-      distributionApproved: false,
-      reviewLabel: "INTERNAL REVIEW ONLY",
-    },
+    rights: { ...rights },
     counts: registry.counts,
   };
 
   const outputs = [
     [join(publicDirectory, FILES.glb), glb],
-    [join(publicDirectory, FILES.manifest), canonicalJson(manifest)],
+    [join(publicDirectory, FILES.manifest), canonicalJson(runtimeManifest)],
     [join(publicDirectory, "lowpass-readability-canary-v1.source-readback.json"), canonicalJson(sourceReadback)],
     [join(publicDirectory, "rights-provenance.json"), canonicalJson(provenance)],
     [join(publicDirectory, "asset-consumer-readback.json"), canonicalJson(consumerReadback)],

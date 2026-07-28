@@ -8,6 +8,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "build": "npm run typecheck && vite build",
+    "build:external": "npm run typecheck && vite build --mode external && node scripts/verify-external-asset-boundary.mjs",
+    "evidence:phase-g": "node scripts/capture-phase-g-browser-evidence.mjs",
     "preview": "vite preview",
     "assets:import-lowpass-canary": "node scripts/import-lowpass-canary.mjs"
   },

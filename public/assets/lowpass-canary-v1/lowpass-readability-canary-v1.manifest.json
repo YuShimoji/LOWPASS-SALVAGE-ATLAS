@@ -696,6 +696,12 @@
     "scene-part--instance-watcher-drone--watcher-wing-right"
   ],
   "recipeHash": "fnv1a-ca6600c5",
+  "rights": {
+    "distributionApproved": false,
+    "internalOnly": true,
+    "reviewLabel": "INTERNAL REVIEW ONLY",
+    "rightsStatus": "NOASSERTION"
+  },
   "schemaVersion": "lowpass-runtime-asset-pack-1.0.0",
   "socketIds": [
     "socket-cart-handle",

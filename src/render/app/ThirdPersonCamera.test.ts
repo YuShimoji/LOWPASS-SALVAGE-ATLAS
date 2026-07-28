@@ -59,4 +59,12 @@ describe("ThirdPersonCamera zoom", () => {
     wall.geometry.dispose();
     wall.material.dispose();
   });
+
+  it("clamps right-drag and gamepad look deltas to the supported pitch", () => {
+    const rig = new ThirdPersonCamera();
+    rig.applyLookDelta(0, -10_000);
+    expect(rig.getDiagnostics().pitch).toBe(MAX_CAMERA_PITCH);
+    rig.applyLookDelta(0, 10_000);
+    expect(rig.getDiagnostics().pitch).toBe(MIN_CAMERA_PITCH);
+  });
 });
