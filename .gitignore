@@ -12,3 +12,4 @@ Desktop.ini
 *.tmp
 *.swp
 /.serena/
+.playwright-cli/

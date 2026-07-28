@@ -201,8 +201,22 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     qaPanel = createQaNavigation(root, (target) => {
       let position = SHIP_INTERACTIONS.find((interaction) => interaction.id === "expedition-console")?.position;
       if (missionController) {
-        if (target === "extract") position = missionController.definition.extractionPoint;
-        else if (target === "cart") position = missionController.getCartPosition();
+        if (target === "extract") {
+          const extraction = missionController.definition.extractionPoint;
+          position = extraction;
+          if (!missionController.state.cartAttached) {
+            const cart = missionController.getCartPosition();
+            const awayX = extraction.x - cart.x;
+            const awayZ = extraction.z - cart.z;
+            const awayLength = Math.hypot(awayX, awayZ) || 1;
+            const offset = Math.min(1.6, missionController.definition.extractionRadius * 0.8);
+            position = {
+              x: extraction.x + (awayX / awayLength) * offset,
+              y: extraction.y,
+              z: extraction.z + (awayZ / awayLength) * offset,
+            };
+          }
+        } else if (target === "cart") position = missionController.getCartPosition();
         else position = missionController.definition.salvage.find((resource) => resource.sourceId === target)?.position;
       }
       if (!position) return;

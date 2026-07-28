@@ -87,7 +87,8 @@ Three.jsとRapierはゲームルールを所有しません。ゲート室の物
 - `src/render/objects/createFloodedMarket.ts`: 低ポリゴン探索マップと隊員・装備・資源表示
 - `src/render/objects/disposeObjectTree.ts`: geometry/materialの明示破棄
 - `src/ui/MissionResultPanel.ts`: complete/partial結果と船内帰還UI
-- `src/main.ts`: 動的読込、船→探索→船遷移、リソース所有権とdisposeの調停
+- `src/main.ts`: 動的読込、船→探索→船遷移、リソース所有権とdisposeの調停、`?qa=1` の反復確認導線
+- `index.html` / `public/favicon.svg`: 開発・本番ブラウザで不要なfavicon 404を発生させない同梱アイコン
 - `src/game/mission/*Session.test.ts` / `ExpeditionReservation.test.ts`: 遠征ループとトランザクションのテスト
 
 ## フェーズB基準点の検証結果 — 2026-07-20
@@ -115,6 +116,23 @@ Viteは生成JavaScriptが大きい旨の警告を出しますが、ビルドエ
 開発サーバーが転送したブラウザコンソールにはerrorや未処理例外はなく、既知のRapier非推奨warningだけが記録されました。致命UIや遷移停止も発生していません。
 
 Viteの500 kB警告は継続しています。遅延ミッションは分離済みですが、Three.jsとRapierを含む初期チャンクが約2.83 MB（gzip約996 kB）です。警告閾値は変更していません。Rapier警告の文言は `node_modules/@dimforge/rapier3d-compat/rapier_wasm3d.js` 内の生成初期化ラッパーに存在し、公開型は引数なし `init()` です。今回の型検査、テスト、3往復の物理動作には影響しないため依存更新時の対応とします。
+
+## フェーズC引継ぎ再検証 — 2026-07-28
+
+フェーズB基準点からのPhase C正規差分は `7d775d5` の1コミットです。依存定義・lockfile・`ExpeditionManifest` 型に変更はなく、gate evaluatorの上限と構造化違反契約を維持したまま、探索中の可変状態だけを `MissionSession` と所在台帳へ分離しています。
+
+- `npm ci`: PASS（55 packages、脆弱性0件）
+- `npm run typecheck`: PASS
+- `npm test`: PASS（8ファイル、27テスト）
+- `npm run build`: PASS。固定定義1.89 kB、探索ビュー3.68 kBの遅延チャンクを再確認
+- `npm ls --depth=0`: PASS。宣言外・欠損依存なし
+- 実ブラウザ: 18/28Uの不変マニフェストを確定し、TEAM 3・GEAR 2で固定探索へ遷移。3フィルター回収、冷却コイルの手持ち拒絶、カート積載、抽出リング搬送、4資源の `complete`、船内 `RUN 1` 帰還を確認
+- 実ブラウザ: 1フィルターだけを持ち帰る `partial` と、帰還後に同一manifest IDのまま再出撃できることを確認
+- 帰還後診断はRapierコライダー12、シーンオブジェクト60、`SALVAGE INACTIVE` に復帰。新規ブラウザセッションのconsole errorは0件で、既知のRapier初期化warning 1件だけ
+
+QA抽出ボタンは、カート牽引中には従来どおり搬送先へ移動し、カート解放後にはカート操作半径を避けながら抽出リング内へ移動するよう補正しました。これにより通常プレイの判定順序や半径を変えず、`?qa=1` だけで重量物搬送から抽出確定までを一意に反復できます。faviconも同梱し、機能と無関係な404をconsole証拠から除外しました。
+
+この時点でPhase Cの完了条件は満たしています。次フェーズへ進む場合は、不変manifest、`ItemLocation` の単一真実源、予約・精算トランザクション、レンダー/物理がルールを所有しない境界を継続条件とします。
 
 ## 残課題
 
