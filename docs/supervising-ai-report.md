@@ -14,6 +14,16 @@
 
 人間レビュー済みのmovement、wheel zoom、cart、Watcher / Needle外観はPASSです。以前の `GATE_G_A_RETEST_REQUIRED` は、camera orbit、raw QA、意味イベント音の不足が判明する前の停止表現で、現在の必須停止条件ではありません。右ドラッグcamera、Guided QA、one-click 22段階監査、17 semantic cuesと字幕を追加し、Security Cellの状態所有、個体知識と共有知識、WorldState V2 / migration、settlement、ItemLocation、Presence基本重み、共有delay、scan距離、lock判定、pressure budget、contract進捗は変更していません。Phase Hは未実装です。
 
+### 2026-07-28 remote同期監査
+
+`git fetch --prune origin` 後、現行branch `feat/phase-g-guided-qa-canary-v1` の実装基準は `d2683eeec43dc1befad406508f7d8b52f2a43a27`、同名remoteは `f3ea109` です。upstreamは未設定で、共通基点 `52f0cf9db9f563963243e4954e48de9c448ec487` からfetch時local unique 1 / remote unique 3へ分岐していました。本文書commit後の現在値はlocal 2 / remote 3で、localの追加1件はdocs-onlyです。実装tree `f8632871` とremote tree `faf4d58f` も異なり、`range-diff` ではlocal `d2683ee` とremoteの `42c8b8a` / `e1207b2` に直接対応するpatchはありません。remote `f3ea109` はこの別系統をbaseへ整列したmerge commitです。
+
+fetch前はstaged 0、unstaged 0、untracked 0、進行中Git operation 0でした。trackedのreview成果物 `docs/evidence/phase-g-closure/` 34 filesを保持し、ignoredの `.playwright-mcp/`、`.serena/`、`dist/`、`node_modules/` を変更していません。dirty差分、ユーザー差分、ゲームコード、manifest、lockfileはありませんでした。
+
+behind-only / fast-forward条件を満たさないためpullは実行していません。reset、restore、stash、clean、rebase、merge、branch切替、upstream設定、pushも行っていません。`npm ls --depth=0`、`npm run typecheck`、`git diff --check` はPASSです。`127.0.0.1:5173` は接続拒否で、現在Vite processは起動していません。これは端末ローカルの実行状態で、既存のゲーム実装・ブラウザ証拠の失敗を意味しません。
+
+local checkoutは開発・再現可能ですが、共有branchの正本は未決です。remote unique commitsはこのcheckoutで未実行・未受入です。次の具体手は、オーナーまたは監修役がlocal `d2683ee` とremote `f3ea109` のcontract / evidenceを比較し、local採用、remote採用、または専用reconciliation sliceを明示することです。この判断前にPhase H1、push、PR更新、mergeへ進めません。
+
 ### 自動・ブラウザ受入
 
 | Gate | 結果 | 証拠 |
@@ -60,11 +70,11 @@ UV、low-resolution texture、Blender headless validation、rights declaration�
 
 ### 開発可能性と次の一手
 
-現行branchは `feat/phase-g-guided-qa-canary-v1`、作業baseは `52f0cf9db9f563963243e4954e48de9c448ec487`、upstreamは未設定です。このsliceはlocal commitだけとし、push、PR、merge、tag、deploy、release、public visibility変更は行いません。
+現行branchは `feat/phase-g-guided-qa-canary-v1`、実装基準は `d2683eeec43dc1befad406508f7d8b52f2a43a27`、作業baseは `52f0cf9db9f563963243e4954e48de9c448ec487`、upstreamは未設定です。本文書commitを含む現在のbranchは同名remote `f3ea109` とlocal 2 / remote 3で分岐しているため、正本選定前にpull、merge、rebase、push、PR、tag、deploy、release、public visibility変更を行いません。
 
 portableな状態はtracked source、import済みCanary、consumer metadata / fixture、テスト、証拠、正本文書です。`node_modules`、`dist`、`.serena`、ブラウザIndexedDB、音量設定、実行中Viteは端末ローカルです。ブラウザQAでlocal visitは6まで進みましたが、save dataをcommitしません。
 
-次の具体手は、オーナーがPhase H1「契約・証拠・再訪判断の因果深化」の完全Promptを承認することです。目的は、既存のstatic definition / persisted state境界を保ち、帰還済みevidenceから次訪問のrouteまたはsupport差を説明可能にすることです。WorldState migrationを避ける設計を優先し、承認前には実装しません。
+次の具体手は、まずオーナーがlocal / remoteのPhase G Closure正本を選定することです。その後、Phase H1「契約・証拠・再訪判断の因果深化」の完全Promptを承認します。目的は、既存のstatic definition / persisted state境界を保ち、帰還済みevidenceから次訪問のrouteまたはsupport差を説明可能にすることです。WorldState migrationを避ける設計を優先し、両方の承認前には実装しません。
 
 ## 2026-07-27 優先監修結論（履歴）
 
@@ -368,8 +378,8 @@ blockingがあればPhase Hへ進まずPhase Gを修正します。tuningなら�
 | 目的 | 効果 | 要件 | 状態 | 担当 | 次の一手 |
 | --- | --- | --- | --- | --- | --- |
 | Phase G人間感覚レビュー | 音量・音色・疲労感、最終game feelを製品判断できる | ミュートなしdesktop、観察メモ | deferred / non-blocking | human game design / UX | 問題が観測された場合だけG-TUNE候補を作る |
-| Phase H1選定 | 契約・証拠・再訪判断の因果へ次sliceを限定する | 完全Prompt、目的、受入、非対象、停止条件の承認 | 未実装・未承認 | owner / supervising AI | Phase H1 Promptを明示承認 |
-| recovery remote portability | 別端末で操作復旧済み基準から再開する | 同名branch、fetch/readback、push後parity | 実装branchはremote取得可能。handoff更新は本作業で同期 | current operator | docsだけcommit / normal push後に0 / 0をreadback |
+| 同名branch正本選定 | 2系統のPhase G Closureを破壊せず共有開発基準を1つにする | local / remote contract・証拠比較、採用方針、rollback方針 | 現在local 2 / remote 3で分岐。localの追加1件は本文書commit。自動同期不可 | owner / supervising AI | local採用、remote採用、専用reconciliationのいずれかを明示 |
+| Phase H1選定 | 契約・証拠・再訪判断の因果へ次sliceを限定する | branch正本選定後、完全Prompt、目的、受入、非対象、停止条件の承認 | 未実装・正本選定待ち | owner / supervising AI | branch判断後にPhase H1 Promptを明示承認 |
 | draft PR #1 | Phase C〜Fをreview可能にする | human review、CI方針、merge/rollback | OPEN / DRAFT / mergeable | owner / reviewer | G-A後にPR維持・更新・分離を判断 |
 | CI | local gateをPRで再現する | typecheck/test/build workflow | 未設定 | repo owner | merge方針決定時に導入判断 |
 | device performance | chunk warningの実影響を判断する | cold/warm/revisit、frame、memoryの実機値 | 未計測・非ブロッキング | performance | 問題端末で計測 |
@@ -380,15 +390,15 @@ blockingがあればPhase Hへ進まずPhase Gを修正します。tuningなら�
 ## 次のAIが最初に行うこと
 
 1. `PROJECT_HANDOFF.md`、本文書の2026-07-28節、`docs/project-context.md`、READMEのPhase G UX Closure節を読む。
-2. `feat/phase-g-guided-qa-canary-v1`、local commit、clean worktree、upstream未設定、Phase F tagを確認する。
+2. `feat/phase-g-guided-qa-canary-v1`、実装基準 `d2683ee`、同名remote `f3ea109`、現在local 2 / remote 3、clean worktree、upstream未設定を確認する。
 3. evidence index、guided / audio / consumer readback、A/B contact sheet、3 lifecycleを確認する。
 4. Phase G人間感覚レビューは任意とし、観測事実なしにG-TUNEしない。
-5. Phase H1を開始する場合は、最終報告の完全Promptをオーナーが明示承認し、1目的だけ実装する。
+5. branch正本を選定するまではmerge / rebase / pushとPhase H1を保留する。選定後、最終報告の完全Promptをオーナーが明示承認した場合だけ1目的を実装する。
 6. push、PR、merge、tag、deploy、release、public visibilityはそれぞれ明示権限を確認する。
 
 ## 監修役AIへの判断依頼
 
-現時点の次開発判断は1つです。
+現時点の即時判断は、local `d2683ee` とremote `f3ea109` のどちらを正本または統合基準にするかです。これを選定した後の次開発判断は次です。
 
 **帰還済みの契約・証拠を、WorldState migrationなしで次訪問のrouteまたはsupport差へどう結び付け、プレイヤーが因果を説明できるようにするか。**
 
