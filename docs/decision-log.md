@@ -1,6 +1,14 @@
 # Decision Log
 
 この文書は確定済みの設計判断だけを記録します。検討中の案は `idea-ledger.md`、実装・検証の詳細は `README.md` に置きます。
+## 2026-07-29 — Phase G正本を両履歴保全のno-force reconciliationへ確定する
+
+- 決定: canonical implementation sourceはlocal `d2683ee` lineageとし、remote `f3ea10949a908236adad1d2106ff0634804fc4bd` は履歴を保全したgreen baselineだがacceptance-equivalentではないものとしてsupersedeする
+- canonical identity: 両系統を親に持つmerge `65fb21f992d9b2d8f933c343f1b2ab766311bbe2` と、mergeを書き換えず追加したcorrective `bf6341b` / accepted runtime-evidence tip `c9c9cdc16268c60995cf82499dc59ca277d4f1ba`。共有正本はlive `origin/feat/phase-g-guided-qa-canary-v1` と `origin/project/frontier` のreadbackを優先する
+- 理由: local側の22段階Security Cell因果、状態別A/B、semantic event-only audio、明示rights境界を採用しつつ、remote側のgreen履歴と有用な非競合coverageを消さず、normal fast-forward可能な共通祖先を作るため
+- 4 gap: Porter periodic pulseを除去し20の意味cueへ限定、Guided Auditのexpected / actual / tick / duration / revision / failure reasonを個別化、rightsをregistry / manifest / external buildでfail-closed化、6状態 × 4条件の24 A/B証拠を再生成する
+- 履歴方針: force / force-with-lease、rebase、reset、tag上書き、repository全体のours / theirsを使わない。`d2683ee` と `f3ea109` は双方ともcanonical ancestryに残す
+- 帰結: Phase Gは `PHASE_G_CANONICAL_RECONCILIATION_GREEN`。human sensory reviewはdeferred / non-blocking、Canaryは`NOASSERTION` / internal-only、Phase H1はtechnical unlockのみで明示承認前に開始しない。main、PR merge、deploy、release、rights昇格は別gate
 
 ## 2026-07-28 — Phase Gの自動受入と人間感覚レビューを分離する
 

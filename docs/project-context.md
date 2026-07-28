@@ -1,32 +1,29 @@
 # Project Context
 
-更新日: 2026-07-28
+更新日: 2026-07-29 JST
 
 ## North star
 
 `LOWPASS: SALVAGE ATLAS` は、低忠実度3D表現の中で、隊員・装備・通信・非致死的機械生態系・継続世界を一貫した状態モデルとして扱うデスクトップブラウザ探索ゲームです。プレイヤーの判断と敵の判断を、各主体が実際に観測・共有できた情報から説明可能にし、帰還精算を通じて次の訪問へ残します。
 
-## Cockpit
+## Cockpit（2026-07-29正本）
 
 | 項目 | 現在値 |
 | --- | --- |
 | 軸 | 状態所有、限定知識、プレイヤー判断の整合性 |
-| レーン | 固定世界を反復訪問する非致死的探索垂直スライス |
-| 完了スライス | Phase G UX Closure。`PHASE_G_AUTOMATED_ACCEPTANCE_GREEN` |
+| 完了スライス | Phase G canonical reconciliation。`PHASE_G_CANONICAL_RECONCILIATION_GREEN` |
+| canonical source | local `d2683ee` lineage adopted |
+| preserved baseline | remote `f3ea109`、`GREEN_BUT_NOT_ACCEPTANCE_EQUIVALENT` |
+| no-force merge | `65fb21f992d9b2d8f933c343f1b2ab766311bbe2`、両系統を祖先に持つ |
+| accepted runtime / evidence tip | `c9c9cdc16268c60995cf82499dc59ca277d4f1ba` |
+| canonical refs | live `origin/feat/phase-g-guided-qa-canary-v1` と `origin/project/frontier`。静的SHAよりfetch後readbackを優先 |
+| automated acceptance | 34 files / 202 tests、build / external build、Guided Audit 22 / 22、audio 20 / 20、24 A/B、3 lifecycle PASS |
 | 人間感覚レビュー | `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING` |
-| Canary consumer | `LOWPASS_CANARY_CONSUMER_READY_INTERNAL_ONLY` |
-| 作業ブランチ | `feat/phase-g-guided-qa-canary-v1` |
-| fetch時HEAD | `d2683eeec43dc1befad406508f7d8b52f2a43a27` |
-| 作業base | `52f0cf9db9f563963243e4954e48de9c448ec487` |
-| Phase F保全 | tag `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a` |
-| Phase G分岐元 | `4e3cdc66d357e8054d45e0a42c4f41f166087b20` |
-| Phase G実装 | `6df8ba0621baf8976fc56373863cf57565cc12ba`、件名 `feat: coordinate hostile machine security cells` |
-| recovery分岐元 | `756e54b0e54a7b4b6fee7da2a0d5bed47f01a5a3` |
-| recovery実装 | `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`、件名 `fix: restore playable movement camera and cart controls` |
-| remote状態 | upstream未設定。同名remote `f3ea109` と現在local 3 / remote 3で分岐。pull / merge / rebase / push未実施 |
-| canonical candidate | local `d2683ee` 系統を技術推奨。remote `f3ea109` はgreenだが受入非等価 |
-| 次のゲート | local正本確認またはremote bounded repair指示、その後Phase H1 Promptのオーナー承認。Phase H未実装 |
-| 受入の正本 | `README.md` のPhase G検証結果、`PROJECT_HANDOFF.md`、`docs/supervising-ai-report.md` |
+| Canary consumer | `CANARY_RIGHTS_FAIL_CLOSED`、`NOASSERTION` / internal-only、外部buildから除外 |
+| 次の開発候補 | Phase H1「契約・証拠・再訪判断の因果深化」。technical unlockのみ、owner承認前は未実装 |
+| 受入の正本 | `README.md`、`PROJECT_HANDOFF.md`、本文書、`docs/supervising-ai-report.md`、`docs/decision-log.md` |
+
+local `d2683ee` とremote `f3ea109` の候補選定は完了しました。以降の2026-07-28 candidate比較は履歴であり、remote bounded repairや正本選定を再び停止条件にしません。Phase H、main merge、deploy、release、rights昇格は未実施です。
 
 ## 現行アーキテクチャ
 
@@ -55,7 +52,7 @@
 - canvas右drag yaw / pitch、clamp、click threshold、modal / QA exclusion、Pointer Lock fallback、wheel / Gamepad regressionを自動固定した。physical Gamepadは未接続
 - Guided QAはraw button列をdrawerへ置き換え、孤立復帰の目的、before / expected / actual、現在状態を表示する。raw controlは削除せず折り畳んだ
 - one-click Guided Auditはwatchful開始からflare fact失効まで22 / 22 PASS、timeout 0、duplicate 0
-- semantic audioは17 cue、AudioContext状態、単独試聴、同時字幕を提供し、waveform / peak / duration / distinctness / mute / resume / rate-limitを自動監査した
+- semantic audioは20 cue、AudioContext状態、単独試聴、同時字幕を提供し、waveform / peak / duration / distinctness / mute / resume / rate-limitを自動監査した。Porterは意味event-onlyで周期pulseを持たない
 - CGAWの契約commit `c893374ab0edd7329bd1482dbd6b99960acbbb68` とexact GLB SHA-256 `54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102` を検証し、決定論的importを追加した
 - rightsは `NOASSERTION`、internal only、distribution未承認。UV、low-resolution texture、Blender headless、rights declaration、production approvalは未完了
 - A/B 24枚、contact sheet、console / performance readback、3 lifecycleを [`evidence/phase-g-closure/`](evidence/phase-g-closure/) へ保存した
@@ -95,18 +92,17 @@ Gate G-Aは `GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` で中断されました�
 
 ## Re-entry snapshot
 
-- current branchは `feat/phase-g-guided-qa-canary-v1`、fetch時HEADは `d2683eeec43dc1befad406508f7d8b52f2a43a27`、baseは `52f0cf9db9f563963243e4954e48de9c448ec487`、upstream未設定
-- `git fetch --prune origin` 後、同名remoteは `f3ea109`。共通基点 `52f0cf9` からfetch時local unique 1 / remote unique 3へ分岐し、実装treeもlocal `f8632871` / remote `faf4d58f` で異なる。監修文書commit 2件後の現在値はlocal 3 / remote 3。behind-onlyではないためpullしていない
-- local `d2683ee` とremote `42c8b8a` / `e1207b2` はGuided QA、Canary、音、証拠を別構成で実装している。reset、restore、stash、clean、merge、rebase、pushで自動解消しない
-- candidate auditではlocal 34 files / 199 tests、remote 31 files / 187 tests、両方typecheck / build PASS。remoteは周期Porter pulse、18段階の因果coverage不足、rights fail-closed flag不足のため受入非等価。技術推奨はlocal `d2683ee`
-- 再現URLは `http://127.0.0.1:5173/?qa=1&security-posture=watchful&asset-mode=primitive` と `asset-mode=canary-v1`
-- portableな状態はsource、Canary runtime copy、registry、consumer metadata / fixture、tests、closure evidence、authority docs
-- `node_modules`、`dist`、`.serena`、browser IndexedDB、音量設定、実行中Viteは端末ローカル。browser QAのvisit 6はcommitしない
-- CGAWはread-only供給元としてcleanを維持し、LOWPASS consumer integrationのための変更・commitは作っていない
-- current bottleneckは同名branchの正本確認。比較は完了しlocalを技術推奨。owner / supervising AIはlocal正本確認かremote bounded repairを選ぶ
-- Phase H1は正本選定後のowner decision。human sensory reviewはdeferred / non-blocking
-- final local gateはdependencies、typecheck、34 files / 199 tests、production build、diff checkがPASS。buildは79 modulesで、MachineFeedbackAudioとCanaryMissionAssetPackの遅延chunkを維持
-- 先行sync auditのlive minimal gateは `npm ls --depth=0`、`npm run typecheck`、`git diff --check` がPASS。今回さらにlocal全gateとremote一時copyの全gateを実行した。Viteは現在未起動で、`127.0.0.1:5173` は接続拒否
+- 最初に `git fetch --prune --tags origin` を行い、live `origin/feat/phase-g-guided-qa-canary-v1` と `origin/project/frontier` のidentityを確認する。両refは本Phase G正本を含む同一commitであることが完了条件で、静的SHAよりlive refを優先する
+- canonical ancestryはlocal `d2683ee` とremote `f3ea109` の双方。no-force mergeは `65fb21f`、accepted runtime / evidence tipは `c9c9cdc`
+- preflightと競合解決は `artifacts/reconciliation/phase-g-canonical-v2/`、fresh browser evidenceは `docs/evidence/phase-g-closure/` にある
+- local / fresh gateは34 files / 202 tests、typecheck、production build、external build、diff checkがPASS。Dドライブfresh `npm ci` は55 packages、0 vulnerabilities
+- Guided Auditは22 / 22、semantic audioは20 / 20、Porter periodic pulse 0。各stepはexpected / actual / tick / duration / revision / result / failure reasonを持つ
+- rightsは `NOASSERTION` / `internalOnly: true` / `distributionApproved: false`。registry / manifest不一致、欠落、external distributionではprimitiveへfallbackし、external outputにCanary GLBを含めない
+- A/Bは6状態 × 4条件 = 24 screenshots。固定seed / posture / camera / 1280×720のreadbackを持つ
+- browserはconsole error、unhandled rejection、external request、event duplicationが各0。3 lifecycleのscene 60 / geometry 47 / texture 3 / program 4 / draw calls 66 / DOM 238 / HUD 41は一定
+- portableなのはtracked source、tests、Canary copy、registry / manifest、artifacts、evidence、正本文書。`node_modules`、`dist`、`.serena`、IndexedDB、音量設定、Vite / Chrome processは端末ローカル
+- human sensory reviewはdeferred / non-blocking。physical Gamepad、rights、production asset、remote CI、PR review、main統合、deploy、releaseは未完了またはowner gate
+- Phase H1はtechnical unlockのみ。完全Promptのowner承認前に実装しない。V2 schema、static / persisted境界、WorldState / ItemLocation / settlement / Security knowledge authorityを維持する
 
 ### 2026-07-27 snapshot（履歴）
 

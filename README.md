@@ -42,7 +42,7 @@ npm run build
 
 `?qa=1` を付けた開発URLでは、画面端のGuided QA drawerから28U編成、watchful出撃、孤立→共有→再視認→lock→援軍→Porter→退避、relay、flareを意味と期待結果付きで順に再現できます。`Run full guided audit` は既存controllerとQA配置を用いて22段階の因果列を監査し、AI状態をPASSへ直接書き換えません。従来の位置移動や短縮操作は `Advanced / Raw Controls` に折り畳み、`QA WITHDRAW` は通常表示から外して「援軍を離脱させ、プレイヤーを孤立状態へ戻す」と明示しました。drawer操作中はworld入力を止め、閉じると復帰します。
 
-`&security-posture=routine` または `&security-posture=watchful` はその訪問だけ警戒姿勢を強制し、永続WorldStateを変更しません。`&asset-mode=primitive` / `canary-v1` で表示asset packを選択でき、既定はprimitiveです。Canaryロード失敗時はsessionを継続してprimitiveへfallbackし、理由をGuided QAとreadbackへ残します。`&audio=muted` ではAudioContextを生成せず、通常時は17種類の短いsemantic cueと同時字幕を使います。通常の編成、インタラクション、ItemLocation、通信グラフ、抽出処理はQA表示でも迂回しません。
+`&security-posture=routine` または `&security-posture=watchful` はその訪問だけ警戒姿勢を強制し、永続WorldStateを変更しません。`&asset-mode=primitive` / `canary-v1` で表示asset packを選択でき、既定はprimitiveです。Canaryロード失敗時はsessionを継続してprimitiveへfallbackし、理由をGuided QAとreadbackへ残します。`&audio=muted` ではAudioContextを生成せず、通常時は20種類の短いsemantic cueと同時字幕を使います。通常の編成、インタラクション、ItemLocation、通信グラフ、抽出処理はQA表示でも迂回しません。
 
 ## Phase G playability recovery（2026-07-26）
 
@@ -56,7 +56,7 @@ ThirdPersonCameraは希望距離を2.3〜6.5 mで保持し、wheelとLB / RBを�
 
 この節は2026-07-26時点の履歴です。当時は `GATE_G_A_RETEST_REQUIRED` でしたが、現在状態は次節のPhase G UX Closureを正本とします。
 
-## Phase G UX Closure / LOWPASS Canary consumer（2026-07-28）
+## Phase G canonical reconciliation / LOWPASS Canary consumer（2026-07-29）
 
 現在の製品進行分類は次です。
 
@@ -64,15 +64,15 @@ ThirdPersonCameraは希望距離を2.3〜6.5 mで保持し、wheelとLB / RBを�
 - `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING`
 - `LOWPASS_CANARY_CONSUMER_READY_INTERNAL_ONLY`
 
-人間が既に確認したmovement、wheel zoom、cart操作、Watcher / Needle外観はPASSとして保持します。未完了だったcamera orbitは、canvas右ドラッグの4px閾値、yaw / pitch、pitch clamp、modal・QA・editable除外、Pointer Lock fallback、wheel・Gamepad回帰を追加して自動受入へ閉じました。物理Gamepadは未接続のため実機確認済みとはしません。Guided QAは22段階を一操作で再現し、保存済み監査は22 / 22 PASS、timeout 0、duplicate 0です。semantic audioは17 cueの非無音、peak、長さ、波形識別、rate-limit、mute、suspended recovery、字幕対応を自動監査しました。音量・音色・疲労感などの人間感覚評価は非ブロッキングであり、human sensory PASS、production audio complete、final game feel acceptedとは扱いません。
+人間が既に確認したmovement、wheel zoom、cart操作、Watcher / Needle外観はPASSとして保持します。未完了だったcamera orbitは、canvas右ドラッグの4px閾値、yaw / pitch、pitch clamp、modal・QA・editable除外、Pointer Lock fallback、wheel・Gamepad回帰を追加して自動受入へ閉じました。物理Gamepadは未接続のため実機確認済みとはしません。Guided QAは22段階を一操作で再現し、保存済み監査は22 / 22 PASS、timeout 0、duplicate 0です。各stepはexpected / actual、start / end tick、duration、revision、result、failure reasonを保持します。semantic audioは20 cueの非無音、peak、長さ、波形識別、rate-limit、mute、suspended recovery、字幕対応を自動監査し、Porterはauth、command accepted、carry accepted、path failure、gate rejectedなどの意味eventだけで発音します。1.6秒周期pulseはありません。音量・音色・疲労感などの人間感覚評価は非ブロッキングであり、human sensory PASS、production audio complete、final game feel acceptedとは扱いません。
 
-Canary consumerはCGAW `feat/lowpass-asset-canary-v1` の契約commit `c893374ab0edd7329bd1482dbd6b99960acbbb68` を基準とし、GLB SHA-256 `54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102` をimport時とruntime registryで固定します。Needle、Watcher、Porter、Shopping cart、Field terminalはsimulation stateを真実源とする視覚adapterで、GLB node transformやcollision proxyをgameplay authorityへ昇格しません。rightsは `NOASSERTION`、`internalOnly: true`、`distributionApproved: false` です。UV、low-resolution texture、Blender headless validation、rights declaration、production asset approvalは未完了です。
+Canary consumerはCGAW `feat/lowpass-asset-canary-v1` の契約commit `c893374ab0edd7329bd1482dbd6b99960acbbb68` を基準とし、GLB SHA-256 `54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102` をimport時とruntime registryで固定します。Needle、Watcher、Porter、Shopping cart、Field terminalはsimulation stateを真実源とする視覚adapterで、GLB node transformやcollision proxyをgameplay authorityへ昇格しません。rightsは `NOASSERTION`、`internalOnly: true`、`distributionApproved: false` です。registry / manifestのrights一致と型を検証し、欠落・矛盾・external distributionではprimitiveへfail-closed fallbackしてsessionを継続します。external buildへ内部Canary GLBを含めません。UV、low-resolution texture、Blender headless validation、rights declaration、production asset approvalは未完了です。
 
 証拠は [`docs/evidence/phase-g-closure/`](docs/evidence/phase-g-closure/) にまとめました。Guided audit JSON / HTML、audio audit、QA panel、primitive / Canary × PS1 OFF / ONの24枚とcontact sheet、console、performance、3回のship→mission→ship readbackを含みます。Canaryはmission chunkとともに遅延ロードされ、3 cycleでship帰還値はscene 60、geometry 47、texture 3、program 4へ復帰し、単調増加を観測していません。ブラウザconsole errorとunhandled rejectionは0で、既知のRapier初期化非推奨warning 1種類だけが残ります。Phase Hは実装していません。
 
-最終gateはtop-level依存整合、typecheck、34ファイル199テスト、production build、diff checkがPASSです。buildは79 modulesを処理し、MachineFeedbackAudio 3.33 kBとCanaryMissionAssetPack 46.72 kBの遅延chunkを維持しました。既知の500 kB large-chunk warningだけが残ります。
+最終gateはtop-level依存整合、typecheck、34ファイル202テスト、production build、external build、diff checkがPASSです。buildは79 modulesを処理し、Canaryをmission chunkとして遅延loadします。既知の500 kB large-chunk warningだけが残ります。
 
-同名remote `f3ea109` はfresh install、typecheck、31ファイル187テスト、production buildがPASSしましたが、現Closureと受入等価ではありません。remoteは18段階の汎用controller監査でSecurity Cell因果を個別に証明せず、1.6秒周期Porter pulseを再導入し、明示的なinternal-only / distribution fail-closed flagをruntime consumerに持ちません。技術推奨はlocal `d2683ee` 系統です。ownerがlocal正本を確認するか、remote bounded repairを指示するまでPhase Hとbranch統合を保留します。
+正本はlocal `d2683ee` 系統を実装採用元として確定し、remote `f3ea109` は `GREEN_BUT_NOT_ACCEPTANCE_EQUIVALENT` の保全baselineへ降格しました。no-force merge `65fb21f992d9b2d8f933c343f1b2ab766311bbe2` は両系統を祖先に持ち、その後のcorrective tip `c9c9cdc16268c60995cf82499dc59ca277d4f1ba` で証拠script末尾とfresh importer portabilityを修正しています。remote baselineで不足したPorter event-only音、22段階の個別因果、rights fail-closed、6状態 × 4条件のA/B証拠はcanonical側で閉じました。Phase Hは実装していません。
 
 ## アーキテクチャ
 
@@ -448,8 +448,8 @@ Viteの500 kB警告は継続しています。警告閾値は変更していま�
 | 目的 | 影響 | 要件 | 状態 | 担当 | 次の一手 |
 | --- | --- | --- | --- | --- | --- |
 | Phase G人間感覚レビュー | cueの音量・音色・疲労感と最終game feelを製品判断できる | デスクトップ実機、ミュートなし、観察メモ | 自動受入green。製品進行を止めない任意レビュー | ゲームデザイン / UX | 問題が観測された場合だけG-TUNE候補を別slice化する |
-| branch正本確認 | Phase G Closureの共有基準を1つにする | candidate audit、rollback方針、owner確認 | local推奨、remoteはbounded repair対象 | オーナー / 監修役AI | local `d2683ee` 系統を正本確認、またはremote repairを指示 |
-| Phase H1開始判断 | 契約・証拠・再訪判断の因果を次sliceへ限定する | branch正本確認、accepted base、目的、受入、非対象、停止条件のオーナー承認 | 未実装・Prompt提案のみ | オーナー / 監修役AI | branch確認後に本報告末尾のPhase H1 Promptを明示承認 |
+| Phase G canonical remote維持 | 共有開発基準をno-forceで一意に保つ | live ref readback、通常push、Draft PR / Authority Guard整合 | local採用元とremote baselineの両履歴を統合済み | 監修役AI / repo owner | live `origin/feat/phase-g-guided-qa-canary-v1` と `origin/project/frontier` をこの文書を含む同一commitへ保つ |
+| Phase H1開始判断 | 契約・証拠・再訪判断の因果を次sliceへ限定する | accepted canonical base、目的、受入、非対象、停止条件のオーナー承認 | 実装未開始・technical unlockのみ | オーナー / 監修役AI | 本報告末尾のPhase H1 Promptを明示承認する |
 | 初期バンドル分割 | 初回ダウンロードが大きい | Three.js/Rapierのvendor分割、実機起動・cache・再訪計測 | warningのみ・非ブロッキング | performance | 体感問題が出た端末で3値を測り、分割効果が見込める場合だけ着手する |
 | Rapier非推奨warning | 開発consoleに既知warningが残る | 依存版と初期化APIの互換性、物理回帰 | 非ブロッキング | 依存更新 | Rapier更新スライスで解消可否を判断する |
 
