@@ -51,23 +51,41 @@ Canaryはgeometry / flat material / semantic anchorのinternal canaryで、produ
 
 - 現行branch: `fix/phase-g-playability-recovery`
 - 分岐元: `756e54b0e54a7b4b6fee7da2a0d5bed47f01a5a3`
-- playability recovery commit: 件名 `fix: restore playable movement camera and cart controls`。正確なIDはこの作業の最終報告と `git log -1` を参照
+- playability recovery実装基準: `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`、件名 `fix: restore playable movement camera and cart controls`
 - Phase G実装commit: `6df8ba0621baf8976fc56373863cf57565cc12ba`
 - Phase F保全tag: `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a`
 - Phase G到達点: Security Cellの技術実装は維持。感覚受入はplayability baselineで中断され、未受入
 - playability到達点: keyboard alias、Arrow左右、Gamepad API、wheel zoom、決定論的push-cart、F1診断、UI resource解放
-- 2026-07-26検証: 依存、型、28ファイル176テスト、build、diff、実ブラウザ移動・カート・積載・partial抽出・帰還・resource復帰をPASS
-- remote未取込: このfix branchはpushしていない。分岐元は `origin/feat/phase-g-security-cell` より1commit先
+- 2026-07-27再検証: 依存、型、28ファイル176テスト、build、diffをPASS。同一runtime基準のscene描画、固定60 Hz、console error 0を確認
+- upstream: `origin/fix/phase-g-playability-recovery`。同期監査時HEAD `a3b5e73` と0 / 0で、remoteから取り込むcommitなし
 - remote Phase G branch: `origin/feat/phase-g-security-cell` としてpush済み
 - remote Phase F tag: `phase-f-world-persistence` としてpush済み
 - 次の必須gate: `GATE_G_A_RETEST_REQUIRED`。Phase Gミュートなし人間受入を最初から再実施
-- Phase G branch/tag push: 実施済み
+- recovery branch、Phase G branch、Phase F tag: remote取得可能
 - PR更新、main統合、deploy、release: 未実施
 - Security Cellの距離、共有delay、scan、音、文言: 変更なし
 - Phase H: 未開始
-- worktree: recovery commit後cleanであることを最終確認する
+- portable境界: tracked source / lockfile / authority docs / remote refs。`node_modules`、`dist`、`.serena`、IndexedDB、実行中Viteは端末ローカル
+- worktree: 2026-07-27同期監査開始時clean。ゲームコード、manifest、lockfile、untracked、review成果物の差分なし
 
-監修役AIは最初に [`docs/supervising-ai-report.md`](docs/supervising-ai-report.md) の2026-07-26節を読み、playability technical PASSとPhase G human acceptance未実施を分離してください。2026-07-25以前の節は履歴証拠です。
+監修役AIは最初に [`docs/supervising-ai-report.md`](docs/supervising-ai-report.md) の2026-07-27節を読み、playability technical PASSとPhase G human acceptance未実施を分離してください。2026-07-26以前の節は履歴証拠です。
+
+## 2026-07-27 sync / restart audit
+
+- `git fetch --prune --tags origin`: PASS
+- branch / upstream: `fix/phase-g-playability-recovery` / `origin/fix/phase-g-playability-recovery`
+- fetch時HEAD / upstream: `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90` / 同一
+- ahead / behind: `0 / 0`。behind-onlyではなく取り込み対象0件だったためpullは実行していない
+- fetch前state: staged 0、unstaged 0、untracked 0、進行中Git operation 0
+- ignored / local-only: `node_modules`、build後の`dist`、`.serena`、browser IndexedDB、ユーザー起動中のVite process
+- `npm ls --depth=0`: PASS
+- `npm run typecheck`: PASS
+- `npm test -- --run`: PASS、28 files / 176 tests
+- `npm run build`: PASS、Vite 8.1.5 / 69 modules。既知のlarge chunk warningのみ
+- `git diff --check`: PASS
+- browser runtime: `http://localhost:5173/?qa=1&security-posture=watchful` でscene描画、固定60 Hz、console error 0。既知のRapier warningのみ
+
+plain `npm run dev` はこのWindows端末では `[::1]:5173` にbindしました。その状態で `127.0.0.1` を開くと接続できず、黒画面または到達不能に見えます。再現時は `npm run dev -- --host 127.0.0.1` を使い、`http://127.0.0.1:5173/` を開いてください。plain起動済みなら `http://localhost:5173/` で同じsceneを確認できます。これは端末ローカルのlistener境界であり、Vite設定やゲームコードは変更していません。
 
 ## 2026-07-26 recoveryの再現
 
@@ -88,9 +106,10 @@ QA URLは `http://127.0.0.1:5173/?qa=1&audio=muted` です。F1を開き、held 
 
 | ref | remote値 | localとの関係 |
 | --- | --- | --- |
+| `origin/fix/phase-g-playability-recovery` | `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`（同期監査時） | 現branchと0 / 0。recoveryのremote基準 |
 | `origin/main` | `c5ae3b9a168eb81c41886aab93699980be4c90df` | local `main` と0 / 0 |
-| `origin/feat/phase-f-world-persistence` | `d25a9c04c277d5d4728904a11429f45413599a83` | 現branchが6commit先行、local Phase F branchが2commit先行 |
-| `origin/feat/phase-g-security-cell` | `71ae93cd43d9b64614404448b97ebf4bf12fe40e` | 現branchとparity 0 / 0 |
+| `origin/feat/phase-f-world-persistence` | `d25a9c04c277d5d4728904a11429f45413599a83` | 現branchが8commit先行、local Phase F branchが2commit先行 |
+| `origin/feat/phase-g-security-cell` | `71ae93cd43d9b64614404448b97ebf4bf12fe40e` | 現branchが2commit先行 |
 | remote `phase-f-world-persistence` tag | `1e98860597ac940ff8d47505a5b00736d852c43a` | local tagと同一 |
 
 2026-07-25に再確認したdraft PR [#1](https://github.com/YuShimoji/LOWPASS-SALVAGE-ATLAS/pull/1) はOPEN / DRAFT / mergeableで、Phase C〜Fを `main` へ向けています。headは `d25a9c0`、checksは0件で、Phase Gは含みません。
@@ -102,28 +121,28 @@ git status -sb
 git rev-parse HEAD
 git show-ref --verify refs/tags/phase-f-world-persistence
 git fetch --prune --tags origin
-git rev-list --left-right --count HEAD...origin/feat/phase-g-security-cell
+git rev-list --left-right --count HEAD...origin/fix/phase-g-playability-recovery
 npm ls --depth=0
 npm run typecheck
 npm test -- --run
 npm run build
 git diff --check
-npm run dev
+npm run dev -- --host 127.0.0.1
 ```
 
 期待値:
 
-- branch: `feat/phase-g-security-cell`
-- current HEAD: `71ae93cd43d9b64614404448b97ebf4bf12fe40e`
+- branch: `fix/phase-g-playability-recovery`
+- gameplay/runtime基準: `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`
 - implementation ancestor: `6df8ba0621baf8976fc56373863cf57565cc12ba`
-- divergence: 現branchとremote Phase G branchは0 / 0
-- tests: 26 files / 151 tests
-- build: initial 2,904.36 kB / gzip 1,019.06 kB
+- divergence: 現branchと同名upstreamは0 / 0
+- tests: 28 files / 176 tests
+- build: initial 2,914.05 kB / gzip 1,022.12 kB
 - Security Cell dynamic chunk: 44.38 kB / gzip 11.89 kB
 
 QA URLは `http://127.0.0.1:5173/?qa=1&audio=muted` です。訪問限定構成は `&security-posture=routine` / `watchful` を使えます。音の人間評価では `audio=muted` を外します。npm操作は直列で実行します。
 
-## 2026-07-25 live verification
+## 2026-07-25 historical live verification
 
 - `git fetch --prune --tags origin`: PASS
 - `git pull --ff-only --prune origin feat/phase-g-security-cell`: PASS、`Already up to date`
@@ -164,8 +183,7 @@ QA URLは `http://127.0.0.1:5173/?qa=1&audio=muted` です。訪問限定構成�
 | --- | --- | --- | --- | --- | --- |
 | Phase G感覚評価 | watcher、chirp、圧力、退避を製品判断する | ミュートなしdesktop、5観点、accepted/tuning/blocking | 技術検証済み・人間待ち | human game design / UX | Gate G-Aを1回実施 |
 | Phase H選定 | 次sliceを最大gapへ集中する | G-A結果、目的1文、受入、非対象、停止条件 | 未承認 | owner / supervising AI | 4候補から1案だけ承認 |
-| 2026-07-25 handoff docs | 最新の同期・検証値を保持する | 4文書の整合とreview | 4ファイル変更・未commit | current operator / owner | review後、commit / pushは明示方針に従う |
-| Phase G remote portability | 別端末でPhase Gを取得可能にする | branch/tag確認、明示push権限、push後parity | 完了・parity 0 / 0 | owner | 別端末でfetch後に同じbranchをcheckout |
+| recovery remote portability | 別端末で操作復旧済み基準を取得可能にする | 同名branch、upstream、fetch/readback | 実装branchはremote取得可能。handoff更新は本作業で同期 | current operator | docs commit後にnormal pushし0 / 0をreadback |
 | draft PR #1 | Phase C〜Fをreview可能にする | human review、CI方針、merge / rollback | OPEN / DRAFT / mergeable | owner / reviewer | G-A後に維持・更新・分離を判断 |
 | CI | local gateをPR上で再現する | typecheck/test/build workflow | 未設定 | repo owner | merge方針時に導入判断 |
 | device performance | Vite warningの実影響を判断する | cold/warm/revisit、frame、memory実測 | warningのみ・非ブロッキング | performance | 問題端末で計測 |
@@ -176,7 +194,7 @@ QA URLは `http://127.0.0.1:5173/?qa=1&audio=muted` です。訪問限定構成�
 ## 次のAIの開始順
 
 1. 本文書、`docs/supervising-ai-report.md`、`docs/project-context.md`、README Phase G節を読む。
-2. clean state、HEAD、Phase F tag、remote divergenceを確認する。
+2. `fix/phase-g-playability-recovery` のclean state、HEAD、同名upstream、Phase F tag、remote divergenceを確認する。
 3. 人間のGate G-Aメモを探す。
 4. メモがなければ音量、scan、距離、delayを最終調整しない。
 5. blockingならPhase Gだけを修正する。acceptedならPhase Hを1目的だけ仕様化する。

@@ -14,6 +14,8 @@ npm ls --depth=0
 npm run dev -- --host 127.0.0.1
 ```
 
+Windowsでplain `npm run dev` が `[::1]` だけへbindした場合、`http://127.0.0.1:5173/` には到達できません。その場合は上の明示hostコマンドで起動するか、plain起動中は `http://localhost:5173/` を開いてください。
+
 検証コマンド:
 
 ```powershell
