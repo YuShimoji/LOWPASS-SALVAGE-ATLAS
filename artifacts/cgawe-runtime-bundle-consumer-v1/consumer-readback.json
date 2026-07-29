@@ -1,0 +1,339 @@
+{
+  "state": "CGAWE_RB_C1_LOWPASS_EXTERNAL_CONSUMER_LOCAL_GREEN",
+  "targetBase": "c5ae3b9a168eb81c41886aab93699980be4c90df",
+  "producerCommit": "831bdf587d26f74964f8d8a90f178f93e7213e54",
+  "contractVersion": "cgawe-runtime-bundle-1.0.0",
+  "manifestSchemaVersion": "1.0.0",
+  "positiveResults": [
+    {
+      "producerCommit": "831bdf587d26f74964f8d8a90f178f93e7213e54",
+      "caseId": "starter",
+      "contractVersion": "cgawe-runtime-bundle-1.0.0",
+      "manifestSchemaVersion": "1.0.0",
+      "manifestSha256": "sha256:9378e8cb189cba95ec21cec337cf8c85aa1d0f88b93637d79a506eee9a81160c",
+      "glbSha256": "sha256:5b39c86b7bb7999e8401a27c1dc34cb3172cc58e5cbdabc36fe071aff8d437ea",
+      "rightsStatus": "NOASSERTION",
+      "declaredCounts": {
+        "nodes": 41,
+        "meshes": 26,
+        "triangles": 2720
+      },
+      "parsedCounts": {
+        "nodes": 42,
+        "meshes": 26,
+        "triangles": 2720
+      },
+      "resolvedStableIdCount": 41,
+      "parserInvocations": 1,
+      "attachmentCount": 1,
+      "duplicateAttachmentBlocked": true,
+      "sentinelPreserved": true,
+      "disposal": {
+        "geometries": 26,
+        "materials": 26,
+        "detached": true,
+        "alreadyDisposed": false
+      },
+      "repeatedDisposal": {
+        "geometries": 0,
+        "materials": 0,
+        "detached": false,
+        "alreadyDisposed": true
+      }
+    },
+    {
+      "producerCommit": "831bdf587d26f74964f8d8a90f178f93e7213e54",
+      "caseId": "paper-glider-generic",
+      "contractVersion": "cgawe-runtime-bundle-1.0.0",
+      "manifestSchemaVersion": "1.0.0",
+      "manifestSha256": "sha256:b8cbaee3d1b8ff155ffc19a0a4285c0389b97aca98c10b317abd87d18643cc99",
+      "glbSha256": "sha256:27e13b5ed5b9b6d521d39936127e73f75c8c7de5fc3724e2240b39d6e2cd12fe",
+      "rightsStatus": "NOASSERTION",
+      "declaredCounts": {
+        "nodes": 13,
+        "meshes": 8,
+        "triangles": 1064
+      },
+      "parsedCounts": {
+        "nodes": 14,
+        "meshes": 8,
+        "triangles": 1064
+      },
+      "resolvedStableIdCount": 13,
+      "parserInvocations": 1,
+      "attachmentCount": 1,
+      "duplicateAttachmentBlocked": true,
+      "sentinelPreserved": true,
+      "disposal": {
+        "geometries": 8,
+        "materials": 8,
+        "detached": true,
+        "alreadyDisposed": false
+      },
+      "repeatedDisposal": {
+        "geometries": 0,
+        "materials": 0,
+        "detached": false,
+        "alreadyDisposed": true
+      }
+    }
+  ],
+  "negativeResults": [
+    {
+      "caseId": "unknown-contract-version",
+      "errorCode": "CGAWE_CONTRACT_VERSION_UNSUPPORTED",
+      "errorStage": "pre-parse",
+      "parserInvocations": 0,
+      "attachmentCount": 0,
+      "sentinelPreserved": true,
+      "disposal": {
+        "geometries": 0,
+        "materials": 0,
+        "detached": false,
+        "alreadyDisposed": false
+      }
+    },
+    {
+      "caseId": "unknown-manifest-schema-version",
+      "errorCode": "CGAWE_MANIFEST_SCHEMA_VERSION_UNSUPPORTED",
+      "errorStage": "pre-parse",
+      "parserInvocations": 0,
+      "attachmentCount": 0,
+      "sentinelPreserved": true,
+      "disposal": {
+        "geometries": 0,
+        "materials": 0,
+        "detached": false,
+        "alreadyDisposed": false
+      }
+    },
+    {
+      "caseId": "manifest-sha-mismatch",
+      "errorCode": "CGAWE_MANIFEST_SHA256_MISMATCH",
+      "errorStage": "pre-parse",
+      "parserInvocations": 0,
+      "attachmentCount": 0,
+      "sentinelPreserved": true,
+      "disposal": {
+        "geometries": 0,
+        "materials": 0,
+        "detached": false,
+        "alreadyDisposed": false
+      }
+    },
+    {
+      "caseId": "glb-byte-count-mismatch",
+      "errorCode": "CGAWE_GLB_BYTE_COUNT_MISMATCH",
+      "errorStage": "pre-parse",
+      "parserInvocations": 0,
+      "attachmentCount": 0,
+      "sentinelPreserved": true,
+      "disposal": {
+        "geometries": 0,
+        "materials": 0,
+        "detached": false,
+        "alreadyDisposed": false
+      }
+    },
+    {
+      "caseId": "glb-sha-mismatch",
+      "errorCode": "CGAWE_GLB_SHA256_MISMATCH",
+      "errorStage": "pre-parse",
+      "parserInvocations": 0,
+      "attachmentCount": 0,
+      "sentinelPreserved": true,
+      "disposal": {
+        "geometries": 0,
+        "materials": 0,
+        "detached": false,
+        "alreadyDisposed": false
+      }
+    },
+    {
+      "caseId": "unknown-rights-status",
+      "errorCode": "CGAWE_RIGHTS_STATUS_INVALID",
+      "errorStage": "pre-parse",
+      "parserInvocations": 0,
+      "attachmentCount": 0,
+      "sentinelPreserved": true,
+      "disposal": {
+        "geometries": 0,
+        "materials": 0,
+        "detached": false,
+        "alreadyDisposed": false
+      }
+    },
+    {
+      "caseId": "blank-rights-notice",
+      "errorCode": "CGAWE_RIGHTS_NOTICE_INVALID",
+      "errorStage": "pre-parse",
+      "parserInvocations": 0,
+      "attachmentCount": 0,
+      "sentinelPreserved": true,
+      "disposal": {
+        "geometries": 0,
+        "materials": 0,
+        "detached": false,
+        "alreadyDisposed": false
+      }
+    },
+    {
+      "caseId": "declared-missing-license-id",
+      "errorCode": "CGAWE_RIGHTS_LICENSE_ID_REQUIRED",
+      "errorStage": "pre-parse",
+      "parserInvocations": 0,
+      "attachmentCount": 0,
+      "sentinelPreserved": true,
+      "disposal": {
+        "geometries": 0,
+        "materials": 0,
+        "detached": false,
+        "alreadyDisposed": false
+      }
+    },
+    {
+      "caseId": "declared-blank-license-id",
+      "errorCode": "CGAWE_RIGHTS_LICENSE_ID_INVALID",
+      "errorStage": "pre-parse",
+      "parserInvocations": 0,
+      "attachmentCount": 0,
+      "sentinelPreserved": true,
+      "disposal": {
+        "geometries": 0,
+        "materials": 0,
+        "detached": false,
+        "alreadyDisposed": false
+      }
+    },
+    {
+      "caseId": "duplicate-stable-id",
+      "errorCode": "CGAWE_STABLE_ID_DUPLICATE",
+      "errorStage": "pre-parse",
+      "parserInvocations": 0,
+      "attachmentCount": 0,
+      "sentinelPreserved": true,
+      "disposal": {
+        "geometries": 0,
+        "materials": 0,
+        "detached": false,
+        "alreadyDisposed": false
+      }
+    },
+    {
+      "caseId": "duplicate-glb-node-name",
+      "errorCode": "CGAWE_GLB_NODE_NAME_DUPLICATE",
+      "errorStage": "pre-parse",
+      "parserInvocations": 0,
+      "attachmentCount": 0,
+      "sentinelPreserved": true,
+      "disposal": {
+        "geometries": 0,
+        "materials": 0,
+        "detached": false,
+        "alreadyDisposed": false
+      }
+    },
+    {
+      "caseId": "missing-glb-node-reference",
+      "errorCode": "CGAWE_GLB_NODE_REFERENCE_MISSING",
+      "errorStage": "post-parse",
+      "parserInvocations": 1,
+      "attachmentCount": 0,
+      "sentinelPreserved": true,
+      "disposal": {
+        "geometries": 26,
+        "materials": 26,
+        "detached": false,
+        "alreadyDisposed": false
+      }
+    },
+    {
+      "caseId": "malformed-glb",
+      "errorCode": "CGAWE_GLTF_PARSE_FAILED",
+      "errorStage": "parse",
+      "parserInvocations": 1,
+      "attachmentCount": 0,
+      "sentinelPreserved": true,
+      "disposal": {
+        "geometries": 0,
+        "materials": 0,
+        "detached": false,
+        "alreadyDisposed": false
+      }
+    }
+  ],
+  "parserBeforeFailureCounts": {
+    "unknown-contract-version": 0,
+    "unknown-manifest-schema-version": 0,
+    "manifest-sha-mismatch": 0,
+    "glb-byte-count-mismatch": 0,
+    "glb-sha-mismatch": 0,
+    "unknown-rights-status": 0,
+    "blank-rights-notice": 0,
+    "declared-missing-license-id": 0,
+    "declared-blank-license-id": 0,
+    "duplicate-stable-id": 0,
+    "duplicate-glb-node-name": 0,
+    "missing-glb-node-reference": 1,
+    "malformed-glb": 1
+  },
+  "recovery": {
+    "producerCommit": "831bdf587d26f74964f8d8a90f178f93e7213e54",
+    "caseId": "starter-recovery-after-negatives",
+    "contractVersion": "cgawe-runtime-bundle-1.0.0",
+    "manifestSchemaVersion": "1.0.0",
+    "manifestSha256": "sha256:9378e8cb189cba95ec21cec337cf8c85aa1d0f88b93637d79a506eee9a81160c",
+    "glbSha256": "sha256:5b39c86b7bb7999e8401a27c1dc34cb3172cc58e5cbdabc36fe071aff8d437ea",
+    "rightsStatus": "NOASSERTION",
+    "declaredCounts": {
+      "nodes": 41,
+      "meshes": 26,
+      "triangles": 2720
+    },
+    "parsedCounts": {
+      "nodes": 42,
+      "meshes": 26,
+      "triangles": 2720
+    },
+    "resolvedStableIdCount": 41,
+    "parserInvocations": 1,
+    "attachmentCount": 1,
+    "duplicateAttachmentBlocked": true,
+    "sentinelPreserved": true,
+    "disposal": {
+      "geometries": 26,
+      "materials": 26,
+      "detached": true,
+      "alreadyDisposed": false
+    },
+    "repeatedDisposal": {
+      "geometries": 0,
+      "materials": 0,
+      "detached": false,
+      "alreadyDisposed": true
+    }
+  },
+  "checks": {
+    "protectedArtifactHashCount": 4,
+    "externalPositiveCount": 2,
+    "negativeCount": 13,
+    "preParseFailuresWithoutParser": true,
+    "malformedAttachmentCount": 0,
+    "sentinelPreservedForAllNegatives": true,
+    "validRecoveryAfterNegativeSequence": true,
+    "producerArtifactsCopiedToTarget": 0,
+    "gameplayIntegrationPerformed": false,
+    "visualAcceptancePerformed": false
+  },
+  "claimBoundary": {
+    "proven": "Repository-external Three.js Runtime Bundle consumer conformance.",
+    "notProven": [
+      "Cross-engine portability.",
+      "Production asset adoption or shipping readiness.",
+      "Gameplay or visual acceptance.",
+      "Mainline integration in either repository."
+    ],
+    "rights": "NOASSERTION grants no license or distribution permission.",
+    "artifactShipping": "No CodexGameAssetWorkbench artifact ships from LOWPASS-SALVAGE-ATLAS."
+  }
+}

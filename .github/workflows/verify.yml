@@ -1,0 +1,57 @@
+name: Verify
+
+on:
+  push:
+    branches:
+      - main
+      - "codex/**"
+
+permissions:
+  contents: read
+
+jobs:
+  windows-verify:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      CGAWE_WORKBENCH_ROOT: ${{ github.workspace }}\External Sources\CodexGameAssetWorkbench
+    steps:
+      - name: Check out LOWPASS
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Check out exact CodexGameAssetWorkbench producer
+        uses: actions/checkout@v4
+        with:
+          repository: YuShimoji/CodexGameAssetWorkbench
+          ref: 831bdf587d26f74964f8d8a90f178f93e7213e54
+          path: External Sources/CodexGameAssetWorkbench
+          persist-credentials: false
+
+      - name: Use Node.js 24.13.0
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.13.0
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Inspect dependency tree
+        run: npm ls --depth=0
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Check external CGAWE Runtime Bundle consumer
+        run: npm run cgawe:consumer:check
+
+      - name: Check whitespace
+        run: git diff --check
