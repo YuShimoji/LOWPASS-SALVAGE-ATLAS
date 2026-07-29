@@ -17,6 +17,18 @@ npm test
 npm run build
 ```
 
+### External CGAWE Runtime Bundle consumer
+
+通常のgame startupとは分離した、repository-external Three.js contract proofです。exact CodexGameAssetWorkbench checkoutをread-onlyで指定します。
+
+```powershell
+$env:CGAWE_WORKBENCH_ROOT = 'X:\path\to\exact\CodexGameAssetWorkbench'
+npm run cgawe:consumer:check
+Remove-Item Env:CGAWE_WORKBENCH_ROOT
+```
+
+accepted producer commitは`831bdf587d26f74964f8d8a90f178f93e7213e54`です。proofはproducer artifactをこのrepositoryへcopyせず、contract、file identity、rights、Stable ID、pre-attachment failure、owned-resource disposalを検証します。現在のbounded statusとclaim boundaryは[`docs/CGAWE_RUNTIME_BUNDLE_EXTERNAL_CONSUMER_V1.md`](docs/CGAWE_RUNTIME_BUNDLE_EXTERNAL_CONSUMER_V1.md)を参照してください。
+
 ## 操作
 
 - `WASD` / 矢印キー: 移動
