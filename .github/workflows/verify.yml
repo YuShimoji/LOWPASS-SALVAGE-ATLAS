@@ -45,7 +45,7 @@ jobs:
         run: npm run typecheck
 
       - name: Test
-        run: npm test
+        run: npm test -- --exclude "External Sources/**"
 
       - name: Build
         run: npm run build
