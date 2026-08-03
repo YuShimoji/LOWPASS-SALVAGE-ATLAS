@@ -12,10 +12,21 @@ Phase G正本はlocal `d2683ee` lineageを実装採用元として確定し、re
 - `LOCAL_CANDIDATE_LINEAGE_ADOPTED`
 - `REMOTE_GREEN_BASELINE_SUPERSEDED`
 - `CANARY_RIGHTS_FAIL_CLOSED`
+- `LOWPASS_CANARY_PROJECT_SCOPED_PRODUCTION_APPROVED`
 - `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING`
 - `PHASE_H1_IMPLEMENTATION_UNLOCKED`
 
-最後の分類はtechnical unlockで、Phase H実装の承認ではありません。Phase H、main変更、PR ready化、PR merge、deploy、release、public visibility変更、rights昇格は行っていません。
+Phase Hの分類はtechnical unlockで、実装承認ではありません。一方、exact procedural Canaryは2026-08-04のowner指示によりproject-scoped rightsとLOWPASS production利用を承認済みです。Phase H、main変更、PR ready化、PR merge、deploy、release、public visibility変更は行っていません。
+
+### 2026-08-04 Canary rights / production receipt
+
+- Producer: CGAW `5d33ba89f141303072e2bc782c8f54302c6fd572`
+- GLB SHA-256: `54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102`
+- Manifest SHA-256: `9b2e9b87805456f72ca66fd0e4915bff1b23c1c4f4f4c6e7052fdfb4c8ee9f05`
+- Rights: `LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1`, LOWPASS game development/build/distribution only
+- Consumer: exact manifest/hash/license fail-close、primitive fallback維持、external build同梱検証
+- Latest local gate: 34 files / 203 tests、typecheck、production build、external build PASS
+- Boundary: standalone reuse、concept art、future third-party material、PR/main、release/deploy/publicationは未承認
 
 ### Canonical ancestryとrange-diff分類
 
@@ -78,7 +89,7 @@ Cドライブfresh試行は一度process crash、次にENOSPCとなりました�
 
 ### 開発可能性、portable境界、次の具体手
 
-canonical source、tests、Canary copy、registry / manifest、reconciliation artifacts、closure evidence、正本文書はportableです。`node_modules`、`dist`、`.serena`、IndexedDB、音量、実行中Vite / Chrome、C / D一時worktreeは端末ローカルです。remote CI、human sensory、rights、production、main integration、deploy / releaseは別gateです。
+canonical source、tests、Canary copy、registry / manifest、reconciliation artifacts、closure evidence、正本文書はportableです。`node_modules`、`dist`、`.serena`、IndexedDB、音量、実行中Vite / Chrome、C / D一時worktreeは端末ローカルです。Exact procedural Canaryのrights/production gateは完了しました。remote CI、human sensory、main integration、deploy / releaseは別gateです。
 
 正本選定のbottleneckは解消しました。次の開発候補はPhase H1「契約・証拠・再訪判断の因果深化」だけです。既存V2 schemaを維持し、static definitionとpersisted stateの境界を変えず、帰還済みevidenceから次訪問のrouteまたはsupport差を1つだけ説明可能にします。完全Promptのowner承認前には開始しません。
 
@@ -90,7 +101,7 @@ canonical source、tests、Canary copy、registry / manifest、reconciliation ar
 | Draft PR #4 | canonical Phase Gをmain統合前にreviewする | remote checks、review / rollback方針 | Draftを維持。ready / merge未許可 | owner / reviewer | reviewを行い、ready化・mergeは別承認する |
 | Authority Guard PR #3 | live frontier authorityを静的snapshotより優先する | `origin/project/frontier` readback、docs-only guard | ready維持、merge未許可 | owner / reviewer | frontier変更時だけguard snapshotを更新する |
 | Phase H1 | 帰還済みevidenceを次訪問のroute / support判断へ因果接続する | accepted canonical base、完全Prompt、1目的、受入 / 非対象 / 停止条件のowner承認 | technical unlock、未実装 | owner / supervising AI | 下記Promptを明示承認後にthin sliceを開始する |
-| rights / production asset | Canaryを外部配布可能なassetへ昇格する | provenance、license、UV / texture、Blender validation、production approval | NOASSERTION / internal-only、external outputから除外 | owner / art / legal | 権利宣言まではprimitiveを外部既定にする |
+| Canary texture / independent rubric | 承認済みprocedural packのvisual depthを上げる | UV / texture tool、performance budget、比較rubric | project-scoped rights / production利用承認済み、texture 0 | asset / art owner | 1 assetのtexture/LOD thin sliceを独立提案 |
 | physical Gamepad / performance | 実機操作とbundle warningの影響を判断する | device、cold / warm / revisit計測 | mock green、実機未確認、warning非ブロッキング | QA / performance | 問題端末がある場合だけ計測sliceを作る |
 | main / deploy / release | accepted変更を製品配布へ進める | review、rights、CI、target、rollbackの明示承認 | 未許可・未実施 | owner only | 現段階では進めない |
 
@@ -104,7 +115,7 @@ canonical source、tests、Canary copy、registry / manifest、reconciliation ar
 | H2 consequence depth | H1で選ばなかったroute / support側に対価と再訪理由を1つ追加 | 単なるcontent増加でなく選択の緊張を作る | H1 accepted、metrics / observationで判断価値を確認 | 無限分岐、hidden state、説明不能な自動難化 | 2回の再訪で因果が維持されるか判定 |
 | H3 world expansion | stable ID / reachability / safe anchor契約を満たす第2作者定義world候補を検証 | 既存loopの転用性を証明 | H1-H2 green、content / asset予算、rights | procedural生成、V2破壊、同時asset全面置換 | definition追加だけで成立するかpreflight |
 | H4 interruption resilience | mission途中再開の必要性と最小snapshot境界を判断 | 長時間sessionの復旧性 | 実ユーザー需要、save isolation、migration / rollback設計 | runtime task / physics / transient knowledgeの無差別保存 | prototype前にschema costとfailure modeを承認 |
-| A1 production asset | Canaryを権利・UV・texture・validation済み製品assetへ置換 | 外部配布可能なvisual quality | provenance / license、Blender validation、予算、rollback | NOASSERTIONの昇格推測、collision authority移譲 | primitive A/Bとperformanceを再受入 |
+| A1 visual depth | 承認済みCanaryへUV / texture / LODを必要な範囲だけ追加 | project-scoped production packのvisual quality向上 | tool approval、budget、rollback、比較rubric | 権利範囲の拡張推測、collision authority移譲 | 1 assetのthin sliceでprimitive A/Bとperformanceを再受入 |
 | Q1 delivery hardening | CI、physical Gamepad、問題端末性能、bundle戦略を必要箇所だけ固める | merge / release判断の再現性 | target device、CI方針、測定値 | warningだけを理由に大規模refactor | main / release gateをownerが個別承認 |
 ## 次のAIが最初に行うこと
 

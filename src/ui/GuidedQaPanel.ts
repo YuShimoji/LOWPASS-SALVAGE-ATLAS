@@ -137,7 +137,7 @@ export class GuidedQaPanel {
       <span>ASSET PACK</span>
       <select>
         <option value="primitive">primitive</option>
-        <option value="canary-v1">canary-v1 · INTERNAL</option>
+        <option value="canary-v1">canary-v1 · LOWPASS APPROVED</option>
       </select>
     `;
     const assetSelect = assetRow.querySelector<HTMLSelectElement>("select");

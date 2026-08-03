@@ -218,16 +218,18 @@
     "triangles": 1068
   },
   "displayName": "LOWPASS Semantic Canary v1",
-  "distributionApproved": false,
+  "distributionApproved": true,
   "exactGlbSha256": "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
   "glbPath": "assets/lowpass-canary-v1/lowpass-readability-canary-v1.runtime.glb",
-  "internalOnly": true,
+  "internalOnly": false,
+  "licenseId": "LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1",
   "manifestPath": "assets/lowpass-canary-v1/lowpass-readability-canary-v1.manifest.json",
   "manifestRights": {
-    "distributionApproved": false,
-    "internalOnly": true,
-    "reviewLabel": "INTERNAL REVIEW ONLY",
-    "rightsStatus": "NOASSERTION"
+    "distributionApproved": true,
+    "internalOnly": false,
+    "licenseId": "LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1",
+    "reviewLabel": "LOWPASS PROJECT USE APPROVED",
+    "rightsStatus": "DECLARED"
   },
   "manifestVersion": "lowpass-runtime-asset-pack-1.0.0",
   "materialMap": {
@@ -239,13 +241,14 @@
     "mat-terminal-screen": "mat-terminal-screen",
     "mat-terminal-shell": "mat-terminal-shell"
   },
-  "reviewLabel": "INTERNAL REVIEW ONLY",
-  "rightsStatus": "NOASSERTION",
+  "reviewLabel": "LOWPASS PROJECT USE APPROVED",
+  "rightsStatus": "DECLARED",
   "schemaVersion": "lowpass-asset-pack-registry-1.0.0",
   "source": {
     "artifactGlbSha256": "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
-    "branch": "feat/lowpass-asset-canary-v1",
-    "commit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
+    "artifactManifestSha256": "9b2e9b87805456f72ca66fd0e4915bff1b23c1c4f4f4c6e7052fdfb4c8ee9f05",
+    "branch": "codex/runtime-bundle-rights-gate-v1",
+    "commit": "5d33ba89f141303072e2bc782c8f54302c6fd572",
     "repository": "CodexGameAssetWorkbench"
   },
   "sourceReadbackPath": "assets/lowpass-canary-v1/lowpass-readability-canary-v1.source-readback.json",

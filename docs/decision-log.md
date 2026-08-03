@@ -2,6 +2,13 @@
 
 この文書は確定済みの設計判断だけを記録します。検討中の案は `idea-ledger.md`、実装・検証の詳細は `README.md` に置きます。
 
+## 2026-08-04 — Procedural CanaryをLOWPASS project-scoped productionへ昇格する
+
+- 決定: `lowpass-readability-canary-v1`を`LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1`の範囲で`DECLARED`とし、LOWPASS gameの開発・保守・build・同gameの配布へ使用できるproduction packとして承認する
+- authority: ownerの本task内指示。producer正本はCGAW commit `5d33ba89f141303072e2bc782c8f54302c6fd572`と`docs/compat/lowpass-v1/RIGHTS.md`
+- 実装: importerはGLB/manifest SHA、producer commit、LicenseRef、manifest/readback rights一致をfail closedで固定する。external buildはassetを除去せず、exact GLBとproject scopeを検証して同梱する
+- 境界: standalone asset配布、一般第三者再利用、concept art、将来texture/audio/第三者素材、PR/main、release/deploy/publicationは承認しない。primitive fallback、simulation authority、Security Cell規則は維持する
+
 ## 2026-08-04 — 回収物の視覚言語をgameplay stateの投影に限定する
 
 - 決定: 浄水フィルター、冷却コイル、リレーコアを別シルエット・別色にし、必須 / 任意をtick数で区別するground markerと抽出方向chevronをgeometry-onlyで描画する

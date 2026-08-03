@@ -1,6 +1,6 @@
 # LOWPASS: SALVAGE ATLAS — 再開引き継ぎ
 
-更新日: 2026-07-29 JST
+更新日: 2026-08-04 JST
 
 ## 現在地（2026-07-29の正本）
 
@@ -10,10 +10,11 @@
 - `LOCAL_CANDIDATE_LINEAGE_ADOPTED`
 - `REMOTE_GREEN_BASELINE_SUPERSEDED`
 - `CANARY_RIGHTS_FAIL_CLOSED`
+- `LOWPASS_CANARY_PROJECT_SCOPED_PRODUCTION_APPROVED`
 - `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING`
 - `PHASE_H1_IMPLEMENTATION_UNLOCKED`
 
-`PHASE_H1_IMPLEMENTATION_UNLOCKED` は技術的な開始可能性だけを示し、実装承認ではありません。Phase H、main merge、deploy、releaseは未実施です。
+`PHASE_H1_IMPLEMENTATION_UNLOCKED` は技術的な開始可能性だけを示し、実装承認ではありません。Exact procedural Canaryのproject-scoped rights/production利用は承認済みです。Phase H、main merge、deploy、releaseは未実施です。
 
 ### Canonical identity
 
@@ -26,8 +27,19 @@
 | canonical local checkout | `feat/phase-g-guided-qa-canary-v1` | reconciliation branchへfast-forwardし、同名originをupstreamにする |
 | canonical development refs | `origin/feat/phase-g-guided-qa-canary-v1`、`origin/project/frontier` | 本文書を含む最終commitへ通常fast-forwardし、live ref readbackを正とする |
 | Phase F保全 | `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a` | 既存tagを変更しない |
-| exact Canary source | CGAW `c893374ab0edd7329bd1482dbd6b99960acbbb68` | supply contract |
+| exact Canary source | CGAW `5d33ba89f141303072e2bc782c8f54302c6fd572` | declared-rights supply contract |
 | exact GLB SHA-256 | `54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102` | import / registry / fresh acceptanceで一致 |
+| exact manifest SHA-256 | `9b2e9b87805456f72ca66fd0e4915bff1b23c1c4f4f4c6e7052fdfb4c8ee9f05` | rights/source identityを含むproducer manifest |
+| rights | `LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1` | LOWPASS game development/build/distribution only |
+
+### 2026-08-04 rights / production update
+
+- Canaryは`DECLARED`、`internalOnly: false`、`distributionApproved: true`へ移行した。
+- importerはproducer manifest byte identityとrights readbackを追加検証する。
+- external buildはCanaryを同梱し、GLB hashとproject-scoped rightsをbuild後に検証する。
+- 34 files / 203 tests、typecheck、production build、external buildがPASSした。
+- UV / texture / Blender headlessと独立human rubricは未完了だが、ownerはこのexact procedural packのproduction利用を承認した。
+- standalone再配布、一般第三者再利用、PR/main、release/deploy/publicationはこの判断に含まない。
 
 merge前監査は [`artifacts/reconciliation/phase-g-canonical-v2/`](artifacts/reconciliation/phase-g-canonical-v2/) にあり、merge base、両側commit、range-diff、file分類、4 gap、競合12件のfile-specific resolutionを保存しています。repository全体のours / theirs、force push、rebase、resetは使っていません。
 
@@ -101,7 +113,7 @@ portableなのはtracked source、tests、import済みCanary、registry / manife
 | Draft PR #4 review | canonical Phase Gをmain統合前に人間レビューできる | remote checks、review方針、rollback判断 | Draft維持。ready / mergeは未許可 | owner / reviewer | reviewを行い、ready化・mergeは別承認する |
 | Authority Guard PR #3 | live frontierと静的snapshotの優先関係を維持する | `origin/project/frontier` readback、docs-only guard | readyのまま維持、merge未許可 | owner / reviewer | frontier drift時だけCURRENT_FRONTIERを更新する |
 | Phase H1開始判断 | 契約・証拠・再訪判断の因果を1 sliceへ限定する | accepted canonical base、完全Prompt、目的・受入・非対象・停止条件の明示承認 | technical unlock、実装未開始 | owner / supervising AI | 本報告の次Promptを明示承認してから開始する |
-| rights / production asset | 外部配布可能なvisualへ昇格する | provenance、license、UV / texture、Blender validation、production approval | CanaryはNOASSERTION / internal-only、外部buildから除外 | owner / art / legal | 権利宣言が得られるまでprimitiveを外部既定に保つ |
+| Canary texture / independent rubric | 承認済みprocedural packのvisual depthを上げる | UV / texture tool、performance budget、比較rubric | rights / production利用承認済み、flat material / texture 0 | asset / art owner | 1 assetだけでtexture/LOD thin sliceを切る |
 | device / performance | physical Gamepadと大容量warningの実影響を判断する | 実機、cold / warm / revisit計測 | mock controller green、物理Gamepad未確認、warning非ブロッキング | QA / performance | 問題端末がある場合だけ専用計測sliceを作る |
 | deploy / release | 製品を外部配布する | review、rights、品質、target、rollbackの明示承認 | 未許可 | owner only | 現段階では実施しない |
 

@@ -58,6 +58,15 @@ describe("LOWPASS Canary importer", () => {
     writeFileSync(glbPath, bytes);
     expect(() => runImport(mutatedSource, temporary())).toThrow(/GLB_SHA256_MISMATCH/);
   });
+
+  it("rejects a source manifest whose project-scoped rights declaration changes", () => {
+    const source = portableSource();
+    const manifestPath = join(source, "lowpass-readability-canary-v1.manifest.json");
+    const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+    manifest.license.licenseId = "LicenseRef-Unexpected";
+    writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+    expect(() => runImport(source, temporary())).toThrow(/MANIFEST_SHA256_MISMATCH/);
+  });
 });
 
 function portableSource(): string {

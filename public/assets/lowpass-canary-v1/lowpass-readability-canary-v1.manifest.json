@@ -72,7 +72,7 @@
       ],
       "sourceProvenance": {
         "generatedFromPrimitives": true,
-        "rightsStatus": "NOASSERTION",
+        "rightsStatus": "DECLARED",
         "sourceRecipe": "samples/lowpass-canary/lowpass-readability-canary-v1.recipe.json"
       },
       "stableNodeIds": [
@@ -180,7 +180,7 @@
       ],
       "sourceProvenance": {
         "generatedFromPrimitives": true,
-        "rightsStatus": "NOASSERTION",
+        "rightsStatus": "DECLARED",
         "sourceRecipe": "samples/lowpass-canary/lowpass-readability-canary-v1.recipe.json"
       },
       "stableNodeIds": [
@@ -319,7 +319,7 @@
       ],
       "sourceProvenance": {
         "generatedFromPrimitives": true,
-        "rightsStatus": "NOASSERTION",
+        "rightsStatus": "DECLARED",
         "sourceRecipe": "samples/lowpass-canary/lowpass-readability-canary-v1.recipe.json"
       },
       "stableNodeIds": [
@@ -425,7 +425,7 @@
       ],
       "sourceProvenance": {
         "generatedFromPrimitives": true,
-        "rightsStatus": "NOASSERTION",
+        "rightsStatus": "DECLARED",
         "sourceRecipe": "samples/lowpass-canary/lowpass-readability-canary-v1.recipe.json"
       },
       "stableNodeIds": [
@@ -523,7 +523,7 @@
       ],
       "sourceProvenance": {
         "generatedFromPrimitives": true,
-        "rightsStatus": "NOASSERTION",
+        "rightsStatus": "DECLARED",
         "sourceRecipe": "samples/lowpass-canary/lowpass-readability-canary-v1.recipe.json"
       },
       "stableNodeIds": [
@@ -623,8 +623,9 @@
     "scene-part--instance-shopping-cart--cart-anchor-load"
   ],
   "license": {
-    "notice": "Project-owned procedural Recipe source is recorded, but this canary does not make a distribution license assertion.",
-    "status": "NOASSERTION"
+    "licenseId": "LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1",
+    "notice": "Project-owned procedural Canary licensed for LOWPASS project development, game builds, maintenance, and distribution only; no standalone or general third-party reuse grant.",
+    "status": "DECLARED"
   },
   "lods": [
     {
@@ -696,12 +697,6 @@
     "scene-part--instance-watcher-drone--watcher-wing-right"
   ],
   "recipeHash": "fnv1a-ca6600c5",
-  "rights": {
-    "distributionApproved": false,
-    "internalOnly": true,
-    "reviewLabel": "INTERNAL REVIEW ONLY",
-    "rightsStatus": "NOASSERTION"
-  },
   "schemaVersion": "lowpass-runtime-asset-pack-1.0.0",
   "socketIds": [
     "socket-cart-handle",
