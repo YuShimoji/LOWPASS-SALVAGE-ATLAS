@@ -2,6 +2,12 @@
 
 この文書は確定済みの設計判断だけを記録します。検討中の案は `idea-ledger.md`、実装・検証の詳細は `README.md` に置きます。
 
+## 2026-08-04 — 回収物の視覚言語をgameplay stateの投影に限定する
+
+- 決定: 浄水フィルター、冷却コイル、リレーコアを別シルエット・別色にし、必須 / 任意をtick数で区別するground markerと抽出方向chevronをgeometry-onlyで描画する
+- 理由: 現行primitiveではリレーコアが冷却コイルと同じ姿になり、目的種別、必須性、帰還方向を画面だけで説明できなかったため
+- 帰結: marker表示は`ItemLocation.kind === "mission-ground"`から投影し、運搬時は消す。Three.js表示は所在、衝突、経路、精算を所有しない。texture追加、gameplay変更、Canary rights昇格、production asset承認は行わない
+
 ## 2026-08-04 — field visualを「明るい無人街」まで拡張する
 
 - 決定: LOWPASSのfield既定を「暗い放棄施設」に限定しない。普通のoffice、building、shopping mall、station、housing、library、hotel、medical center、parking / logistics、school / community campusを含む、人は不在だが必ずしも崩壊していない都市を正規の探索範囲とする

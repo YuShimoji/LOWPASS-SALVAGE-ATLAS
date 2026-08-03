@@ -27,6 +27,14 @@ Fieldは暗い放棄施設だけに限定しません。人が不在でも通常
 
 local `d2683ee` とremote `f3ea109` の候補選定は完了しました。以降の2026-07-28 candidate比較は履歴であり、remote bounded repairや正本選定を再び停止条件にしません。Phase H、main merge、deploy、release、rights昇格は未実施です。
 
+## 2026-08-04 visual readability slice
+
+- `docs/concept-art/visual-overhaul-v1/` を現行浸水marketへ適用し、浄水フィルター、冷却コイル、任意回収物のリレーコアを色とシルエットの両方で分離した
+- 回収物がmission groundにある間だけ、必須目標は4 tick、任意目標は3 tickのgeometry-only markerを表示する。運搬・カート積載・抽出時はmarkerを消し、`ItemLocation`を唯一の所在表現として維持する
+- 中央通路の低いamber chevronは抽出地点へ向ける。ブラウザ確認で逆向きを検出したため同一スライス内で修正した
+- runtime screenshotでは必須フィルター3個、冷却コイル、カート、味方隊員、抽出ring、退避方向を初期market画角で判別できた。texture countは3のまま、Three.js objectは表示投影だけでgameplay、navigation、collision、Security Cellを変更しない
+- concept画像と本visual adapterは引き続きproduction asset approval、rights昇格、Phase H承認を意味しない
+
 ## 現行アーキテクチャ
 
 - TypeScript / Vite / Three.js / Rapier / DOM UI。ゲームルールは `src/game/` が所有し、Three.js、Rapier、DOMを真実源にしない

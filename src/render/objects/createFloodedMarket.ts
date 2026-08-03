@@ -8,6 +8,7 @@ import {
   PointLight,
   TorusGeometry,
   Vector3,
+  type Material,
   type Object3D,
 } from "three";
 import type { ExpeditionManifest } from "../../game/mission/expeditionTypes";
@@ -61,6 +62,7 @@ export function createFloodedMarket(
   const amber = materials.createEmissive("#e6a85d", 0.9);
   const cyan = materials.createEmissive("#64ddd3", 0.95);
   const red = materials.createEmissive("#ef654f", 0.85);
+  const violet = materials.createEmissive("#c286ef", 0.88);
   const dark = materials.create({ color: "#141d1d", roughness: 0.9 });
   const ivory = materials.create({ color: "#b8b18f", roughness: 0.88 });
   const bronze = materials.create({ color: "#735f3e", metalness: 0.34, roughness: 0.76 });
@@ -100,6 +102,14 @@ export function createFloodedMarket(
       routeStud.position.set(x, 0.072, z);
       root.add(routeStud);
     }
+  }
+
+  for (const z of [-4.2, -2.2, -0.2, 1.8, 3.8]) {
+    const routeChevron = createRouteChevron(amber);
+    routeChevron.name = `extraction-route-chevron-${z}`;
+    routeChevron.position.set(0, 0.085, z);
+    routeChevron.rotation.y = Math.PI;
+    root.add(routeChevron);
   }
 
   for (const x of [-5.6, -2.8, 0, 2.8, 5.6]) {
@@ -183,6 +193,7 @@ export function createFloodedMarket(
   root.add(extractionLight);
 
   const resourceViews = new Map<string, Group>();
+  const resourceGroundMarkers = new Map<string, Group>();
   for (const resource of definition.salvage) {
     const itemId = `${session.sessionId}:${resource.sourceId}`;
     const resourceView = new Group();
@@ -199,7 +210,7 @@ export function createFloodedMarket(
         resourceView.add(cap);
       }
       resourceView.add(casing, band);
-    } else {
+    } else if (resource.resourceType === "cooling-coil") {
       const housing = new Mesh(new BoxGeometry(0.98, 0.56, 0.78), ivory);
       const grille = new Mesh(new TorusGeometry(0.24, 0.055, 6, 14), bronze);
       grille.rotation.y = Math.PI / 2;
@@ -213,6 +224,23 @@ export function createFloodedMarket(
       const status = new Mesh(new BoxGeometry(0.12, 0.08, 0.04), amber);
       status.position.set(0.5, 0.15, -0.2);
       resourceView.add(housing, grille, status);
+    } else {
+      const core = new Mesh(new CylinderGeometry(0.2, 0.24, 0.58, 6), dark);
+      core.rotation.z = Math.PI / 2;
+      const energyCell = new Mesh(new CylinderGeometry(0.12, 0.12, 0.64, 6), violet);
+      energyCell.rotation.z = Math.PI / 2;
+      for (const x of [-0.34, 0.34]) {
+        const cage = new Mesh(new TorusGeometry(0.24, 0.045, 5, 10), bronze);
+        cage.rotation.y = Math.PI / 2;
+        cage.position.x = x;
+        resourceView.add(cage);
+      }
+      for (const z of [-0.25, 0.25]) {
+        const contact = new Mesh(new BoxGeometry(0.42, 0.09, 0.1), ivory);
+        contact.position.set(0, -0.19, z);
+        resourceView.add(contact);
+      }
+      resourceView.add(core, energyCell);
     }
     resourceView.position.set(resource.position.x, resource.position.y, resource.position.z);
     resourceView.traverse((object) => {
@@ -220,6 +248,14 @@ export function createFloodedMarket(
     });
     root.add(resourceView);
     resourceViews.set(itemId, resourceView);
+    const groundMarker = createSalvageGroundMarker(
+      resource.resourceType === "water-filter" ? cyan : resource.resourceType === "cooling-coil" ? amber : violet,
+      resource.required,
+    );
+    groundMarker.name = `salvage-ground-marker-${resource.sourceId}`;
+    groundMarker.position.set(resource.position.x, 0.08, resource.position.z);
+    root.add(groundMarker);
+    resourceGroundMarkers.set(itemId, groundMarker);
   }
 
   const cart = createCart(materials);
@@ -348,9 +384,14 @@ export function createFloodedMarket(
     }
     for (const [itemId, view] of resourceViews) {
       const location = activeSession.itemLocations[itemId];
+      const groundMarker = resourceGroundMarkers.get(itemId);
       if (location?.kind === "mission-ground") {
         view.visible = true;
         view.position.set(location.position.x, location.position.y, location.position.z);
+        if (groundMarker) {
+          groundMarker.visible = true;
+          groundMarker.position.set(location.position.x, 0.08, location.position.z);
+        }
       } else if (location?.kind === "cart") {
         view.visible = true;
         view.position.set(cart.position.x, cart.position.y + 0.58, cart.position.z);
@@ -363,7 +404,9 @@ export function createFloodedMarket(
       } else {
         view.visible = false;
       }
+      if (groundMarker && location?.kind !== "mission-ground") groundMarker.visible = false;
       view.rotation.y = elapsedSeconds * 0.35;
+      if (groundMarker?.visible) groundMarker.rotation.y = -elapsedSeconds * 0.18;
     }
     extractionRing.rotation.z = elapsedSeconds * 0.18;
     extractionLight.intensity = 2.1 + Math.sin(elapsedSeconds * 3.2) * 0.4;
@@ -565,6 +608,33 @@ interface DroneView {
   readonly contactHalo: Mesh;
   readonly scanBeam: Mesh;
   readonly wideScan: Mesh | null;
+}
+
+function createRouteChevron(material: Material): Group {
+  const chevron = new Group();
+  for (const side of [-1, 1]) {
+    const stroke = new Mesh(new BoxGeometry(0.09, 0.035, 0.52), material);
+    stroke.position.set(side * 0.14, 0, 0);
+    stroke.rotation.y = side * 0.58;
+    chevron.add(stroke);
+  }
+  return chevron;
+}
+
+function createSalvageGroundMarker(material: Material, required: boolean): Group {
+  const marker = new Group();
+  const ring = new Mesh(new TorusGeometry(required ? 0.56 : 0.46, 0.035, 5, 16), material);
+  ring.rotation.x = Math.PI / 2;
+  marker.add(ring);
+  const tickCount = required ? 4 : 3;
+  for (let index = 0; index < tickCount; index += 1) {
+    const angle = (index / tickCount) * Math.PI * 2;
+    const tick = new Mesh(new BoxGeometry(0.09, 0.035, required ? 0.24 : 0.18), material);
+    tick.position.set(Math.sin(angle) * 0.68, 0, Math.cos(angle) * 0.68);
+    tick.rotation.y = angle;
+    marker.add(tick);
+  }
+  return marker;
 }
 
 function setCanaryTransform(

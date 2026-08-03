@@ -26,7 +26,7 @@
     "distributionApproved": false,
     "internalOnly": true,
     "reviewLabel": "INTERNAL REVIEW ONLY",
-    "status": "NOASSERTION"
+    "rightsStatus": "NOASSERTION"
   },
   "schemaVersion": "lowpass-asset-consumer-readback-1.0.0",
   "sourceCommit": "c893374ab0edd7329bd1482dbd6b99960acbbb68",
