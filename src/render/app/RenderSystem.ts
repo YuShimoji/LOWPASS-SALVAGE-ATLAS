@@ -4,6 +4,7 @@ import {
   Color,
   DirectionalLight,
   Fog,
+  HemisphereLight,
   PCFShadowMap,
   SRGBColorSpace,
   Vector2,
@@ -46,7 +47,7 @@ export class RenderSystem {
   private missionView: MissionWorldView | null = null;
   private readonly interpolatedPlayer = new Vector3();
   private readonly drawingBufferSize = new Vector2();
-  private readonly fog = new Fog(0x091114, 9, 31);
+  private readonly fog = new Fog(0x07171a, 10, 34);
   private readonly gateAudio: GateFeedbackAudio;
   private lastGateScanRevision = -1;
   private lastLowResolution: boolean | null = null;
@@ -65,20 +66,22 @@ export class RenderSystem {
     this.canvas.tabIndex = 0;
     this.renderer.outputColorSpace = SRGBColorSpace;
     this.renderer.toneMapping = ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 0.92;
+    this.renderer.toneMappingExposure = 1.18;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = PCFShadowMap;
-    this.renderer.setClearColor(new Color("#091114"));
+    this.renderer.setClearColor(new Color("#07171a"));
 
-    this.scene.background = new Color("#091114");
+    this.scene.background = new Color("#07171a");
     this.scene.fog = this.fog;
     const initialShip = this.ship;
     if (!initialShip) throw new Error("Ship view failed to initialize");
     this.scene.add(initialShip.root, this.avatar);
 
-    const ambient = new AmbientLight(0x8ea6a2, 1.5);
+    const ambient = new AmbientLight(0x8aa5a1, 1.05);
     this.scene.add(ambient);
-    const key = new DirectionalLight(0xffddb2, 3.4);
+    const environment = new HemisphereLight(0xa4cfca, 0x231c15, 1.55);
+    this.scene.add(environment);
+    const key = new DirectionalLight(0xffddb2, 3.1);
     key.position.set(3, 8, 4);
     key.castShadow = true;
     key.shadow.mapSize.set(1024, 1024);
@@ -86,7 +89,11 @@ export class RenderSystem {
     key.shadow.camera.right = 9;
     key.shadow.camera.top = 7;
     key.shadow.camera.bottom = -11;
+    key.shadow.bias = -0.00035;
     this.scene.add(key);
+    const floodFill = new DirectionalLight(0x70bcc2, 1.4);
+    floodFill.position.set(-6, 4, -5);
+    this.scene.add(floodFill);
 
     this.mount.prepend(this.canvas);
     window.addEventListener("resize", this.handleResize);

@@ -1,5 +1,6 @@
 import {
   BoxGeometry,
+  ConeGeometry,
   CylinderGeometry,
   Group,
   Mesh,
@@ -35,21 +36,34 @@ export function createFloodedMarket(
 ): MissionWorldView {
   const root = new Group();
   root.name = "phase-d-flooded-market";
-  const concrete = materials.create({ color: "#353b37" });
-  const wall = materials.create({ color: "#59625b" });
-  const shelf = materials.create({ color: "#42463d", metalness: 0.22 });
+  const concrete = materials.create({ color: "#34413e", roughness: 0.94 });
+  const wall = materials.create({ color: "#5b675e", roughness: 0.9 });
+  const shelf = materials.create({ color: "#465047", metalness: 0.28, roughness: 0.78 });
   const water = materials.create({
-    color: "#183f43",
-    emissive: "#123337",
-    emissiveIntensity: 0.28,
+    color: "#0d3439",
+    emissive: "#08292d",
+    emissiveIntensity: 0.34,
+    metalness: 0.12,
+    roughness: 0.34,
     transparent: true,
-    opacity: 0.68,
+    opacity: 0.76,
     depthWrite: false,
   });
-  const amber = materials.createEmissive("#e0a35c", 0.75);
-  const cyan = materials.createEmissive("#6bd2cc", 0.8);
-  const red = materials.createEmissive("#d95d50", 0.65);
-  const dark = materials.create({ color: "#202725" });
+  const waterSheen = materials.create({
+    color: "#2f7b80",
+    emissive: "#18575d",
+    emissiveIntensity: 0.42,
+    transparent: true,
+    opacity: 0.12,
+    depthWrite: false,
+    roughness: 0.22,
+  });
+  const amber = materials.createEmissive("#e6a85d", 0.9);
+  const cyan = materials.createEmissive("#64ddd3", 0.95);
+  const red = materials.createEmissive("#ef654f", 0.85);
+  const dark = materials.create({ color: "#141d1d", roughness: 0.9 });
+  const ivory = materials.create({ color: "#b8b18f", roughness: 0.88 });
+  const bronze = materials.create({ color: "#735f3e", metalness: 0.34, roughness: 0.76 });
   const cameraOccluders: Object3D[] = [];
   const shortcutViews = new Map<string, Object3D>();
 
@@ -70,10 +84,23 @@ export function createFloodedMarket(
     if (spec.surface !== "floor") cameraOccluders.push(mesh);
   }
 
-  const floodPlane = new Mesh(new PlaneGeometry(13.4, 13.4, 1, 1), water);
+  const floodPlane = new Mesh(new PlaneGeometry(13.4, 13.4, 8, 8), water);
   floodPlane.rotation.x = -Math.PI / 2;
   floodPlane.position.y = 0.045;
   root.add(floodPlane);
+  const floodHighlight = new Mesh(new PlaneGeometry(9.8, 12.4, 6, 8), waterSheen);
+  floodHighlight.rotation.x = -Math.PI / 2;
+  floodHighlight.position.set(0, 0.056, -0.2);
+  floodHighlight.rotation.z = -0.07;
+  root.add(floodHighlight);
+
+  for (const z of [-5.2, -3.2, -1.2, 0.8, 2.8, 4.8]) {
+    for (const x of [-1.05, 1.05]) {
+      const routeStud = new Mesh(new BoxGeometry(0.16, 0.035, 0.38), z < 3.5 ? bronze : amber);
+      routeStud.position.set(x, 0.072, z);
+      root.add(routeStud);
+    }
+  }
 
   for (const x of [-5.6, -2.8, 0, 2.8, 5.6]) {
     const ceilingStrip = new Mesh(new BoxGeometry(1.45, 0.08, 0.18), x === 0 ? red : amber);
@@ -85,11 +112,40 @@ export function createFloodedMarket(
   marketSign.position.set(0, 2.55, -6.72);
   root.add(marketSign);
 
+  for (const x of [-3.4, 0, 3.4]) {
+    const hangingSign = new Group();
+    const panel = new Mesh(new BoxGeometry(2.05, 0.52, 0.12), dark);
+    const cap = new Mesh(new BoxGeometry(2.15, 0.08, 0.16), x === 0 ? red : amber);
+    cap.position.y = 0.3;
+    for (const side of [-1, 1]) {
+      const hanger = new Mesh(new CylinderGeometry(0.025, 0.025, 0.62, 5), bronze);
+      hanger.position.set(side * 0.72, 0.61, 0);
+      hangingSign.add(hanger);
+    }
+    hangingSign.add(panel, cap);
+    hangingSign.position.set(x, 2.35, 0.6);
+    root.add(hangingSign);
+  }
+
   for (const x of [-4.8, -1.6, 1.6, 4.8]) {
     const checkout = new Mesh(new BoxGeometry(1.1, 0.78, 1.35), dark);
     checkout.position.set(x, 0.39, 4.9);
     checkout.castShadow = true;
-    root.add(checkout);
+    const counter = new Mesh(new BoxGeometry(1.24, 0.13, 1.46), ivory);
+    counter.position.set(x, 0.83, 4.9);
+    const locator = new Mesh(new BoxGeometry(0.34, 0.09, 0.06), amber);
+    locator.position.set(x, 0.72, 4.2);
+    root.add(checkout, counter, locator);
+  }
+
+  for (const x of [-2.5, 0, 2.5]) {
+    const servicePanel = new Group();
+    const housing = new Mesh(new BoxGeometry(1.5, 0.92, 0.18), dark);
+    const fan = new Mesh(new TorusGeometry(0.31, 0.055, 6, 14), bronze);
+    fan.position.z = -0.12;
+    servicePanel.add(housing, fan);
+    servicePanel.position.set(x, 1.58, -6.58);
+    root.add(servicePanel);
   }
 
   const extractionRing = new Mesh(new TorusGeometry(1.35, 0.1, 6, 20), cyan);
@@ -100,6 +156,28 @@ export function createFloodedMarket(
     definition.extractionPoint.z,
   );
   root.add(extractionRing);
+  const extractionSurface = new Mesh(
+    new CylinderGeometry(1.22, 1.22, 0.025, 20),
+    materials.create({
+      color: "#276c6d",
+      emissive: "#3aaba5",
+      emissiveIntensity: 0.52,
+      transparent: true,
+      opacity: 0.34,
+      depthWrite: false,
+    }),
+  );
+  extractionSurface.position.set(definition.extractionPoint.x, 0.075, definition.extractionPoint.z);
+  root.add(extractionSurface);
+  for (const angle of [0, Math.PI / 2, Math.PI, (Math.PI * 3) / 2]) {
+    const marker = new Mesh(new CylinderGeometry(0.055, 0.08, 0.42, 6), cyan);
+    marker.position.set(
+      definition.extractionPoint.x + Math.cos(angle) * 1.46,
+      0.25,
+      definition.extractionPoint.z + Math.sin(angle) * 1.46,
+    );
+    root.add(marker);
+  }
   const extractionLight = new PointLight("#63d8cd", 2.4, 6, 2);
   extractionLight.position.set(definition.extractionPoint.x, 1.6, definition.extractionPoint.z);
   root.add(extractionLight);
@@ -110,17 +188,31 @@ export function createFloodedMarket(
     const resourceView = new Group();
     resourceView.name = `salvage-${resource.sourceId}`;
     if (resource.resourceType === "water-filter") {
-      const casing = new Mesh(new BoxGeometry(0.58, 0.42, 0.42), cyan);
-      const cap = new Mesh(new CylinderGeometry(0.1, 0.1, 0.18, 6), dark);
-      cap.rotation.z = Math.PI / 2;
-      cap.position.x = 0.34;
-      resourceView.add(casing, cap);
+      const casing = new Mesh(new CylinderGeometry(0.19, 0.19, 0.54, 8), ivory);
+      casing.rotation.z = Math.PI / 2;
+      const band = new Mesh(new TorusGeometry(0.205, 0.045, 5, 10), cyan);
+      band.rotation.y = Math.PI / 2;
+      for (const x of [-0.29, 0.29]) {
+        const cap = new Mesh(new CylinderGeometry(0.14, 0.14, 0.08, 8), dark);
+        cap.rotation.z = Math.PI / 2;
+        cap.position.x = x;
+        resourceView.add(cap);
+      }
+      resourceView.add(casing, band);
     } else {
-      const coil = new Mesh(new TorusGeometry(0.42, 0.12, 6, 12), amber);
-      coil.rotation.x = Math.PI / 2;
-      const housing = new Mesh(new BoxGeometry(0.95, 0.24, 0.82), dark);
-      housing.position.y = -0.12;
-      resourceView.add(housing, coil);
+      const housing = new Mesh(new BoxGeometry(0.98, 0.56, 0.78), ivory);
+      const grille = new Mesh(new TorusGeometry(0.24, 0.055, 6, 14), bronze);
+      grille.rotation.y = Math.PI / 2;
+      grille.position.x = -0.51;
+      for (const z of [-0.24, 0, 0.24]) {
+        const coil = new Mesh(new CylinderGeometry(0.045, 0.045, 0.8, 6), bronze);
+        coil.rotation.z = Math.PI / 2;
+        coil.position.set(0.05, 0, z);
+        resourceView.add(coil);
+      }
+      const status = new Mesh(new BoxGeometry(0.12, 0.08, 0.04), amber);
+      status.position.set(0.5, 0.15, -0.2);
+      resourceView.add(housing, grille, status);
     }
     resourceView.position.set(resource.position.x, resource.position.y, resource.position.z);
     resourceView.traverse((object) => {
@@ -276,6 +368,8 @@ export function createFloodedMarket(
     extractionRing.rotation.z = elapsedSeconds * 0.18;
     extractionLight.intensity = 2.1 + Math.sin(elapsedSeconds * 3.2) * 0.4;
     floodPlane.position.y = 0.045 + Math.sin(elapsedSeconds * 0.8) * 0.008;
+    floodHighlight.position.x = Math.sin(elapsedSeconds * 0.18) * 0.12;
+    floodHighlight.position.z = -0.2 + Math.cos(elapsedSeconds * 0.14) * 0.1;
     for (const [crewId, view] of crewViews) {
       const agent = activeSquad.agents[crewId];
       view.visible = Boolean(agent && activeSquad.control.controlledAgentId !== crewId);
@@ -497,18 +591,28 @@ function orientWorldScanBeam(beam: Mesh, from: Vector3, to: Vector3): void {
 
 function createScoutDrone(materials: Ps1MaterialFactory): DroneView {
   const root = new Group();
-  const hull = new Mesh(new BoxGeometry(0.74, 0.28, 0.5), materials.create({ color: "#3d4641", metalness: 0.48 }));
+  const shell = materials.create({ color: "#2d3532", metalness: 0.52, roughness: 0.58 });
+  const guard = materials.create({ color: "#56604f", metalness: 0.34, roughness: 0.72 });
+  const hull = new Mesh(new ConeGeometry(0.4, 1.02, 4), shell);
+  hull.rotation.x = -Math.PI / 2;
+  hull.position.z = -0.08;
   hull.castShadow = true;
-  const optic = new Mesh(new BoxGeometry(0.18, 0.16, 0.08), materials.createEmissive("#d95d50", 0.92));
-  optic.position.set(0, -0.02, -0.29);
+  const spine = new Mesh(new BoxGeometry(0.34, 0.18, 0.58), guard);
+  spine.position.set(0, 0.08, 0.12);
+  const optic = new Mesh(new BoxGeometry(0.24, 0.1, 0.055), materials.createEmissive("#ef654f", 1.05));
+  optic.position.set(0, -0.01, -0.57);
+  const keel = new Mesh(new ConeGeometry(0.11, 0.38, 4), shell);
+  keel.position.set(0, -0.27, -0.2);
   const rotor = new Group();
   for (const x of [-0.52, 0.52]) {
-    const arm = new Mesh(new BoxGeometry(0.44, 0.045, 0.05), materials.create({ color: "#202725" }));
-    arm.position.x = x;
-    const ring = new Mesh(new TorusGeometry(0.23, 0.028, 5, 12), materials.create({ color: "#59625b", metalness: 0.5 }));
+    const arm = new Mesh(new BoxGeometry(0.38, 0.07, 0.12), shell);
+    arm.position.set(x * 0.52, 0.02, 0.09);
+    const ring = new Mesh(new TorusGeometry(0.24, 0.045, 6, 14), guard);
     ring.rotation.x = Math.PI / 2;
-    ring.position.x = x;
-    rotor.add(arm, ring);
+    ring.position.set(x, 0.02, 0.09);
+    const blade = new Mesh(new BoxGeometry(0.38, 0.025, 0.055), shell);
+    blade.position.set(x, 0.02, 0.09);
+    rotor.add(arm, ring, blade);
   }
   const contactHalo = new Mesh(
     new TorusGeometry(0.62, 0.045, 5, 16),
@@ -522,25 +626,33 @@ function createScoutDrone(materials: Ps1MaterialFactory): DroneView {
     materials.createEmissive("#ef745f", 1.15),
   );
   scanBeam.visible = false;
-  root.add(hull, optic, rotor, contactHalo, scanBeam);
+  root.add(hull, spine, optic, keel, rotor, contactHalo, scanBeam);
   return { root, rotor, contactHalo, scanBeam, wideScan: null };
 }
 
 function createObservationDrone(materials: Ps1MaterialFactory): DroneView {
   const root = new Group();
-  const hull = new Mesh(new BoxGeometry(1.22, 0.2, 0.42), materials.create({ color: "#4b5652", metalness: 0.42 }));
-  const keel = new Mesh(new BoxGeometry(0.28, 0.34, 0.5), materials.create({ color: "#26302e", metalness: 0.36 }));
-  keel.position.y = -0.16;
-  const optic = new Mesh(new BoxGeometry(0.72, 0.11, 0.08), materials.createEmissive("#e0a35c", 0.86));
-  optic.position.set(0, -0.08, -0.26);
+  const shell = materials.create({ color: "#394541", metalness: 0.46, roughness: 0.62 });
+  const guard = materials.create({ color: "#77745f", metalness: 0.32, roughness: 0.72 });
+  const hull = new Mesh(new BoxGeometry(1.12, 0.25, 0.56), shell);
+  const canopy = new Mesh(new BoxGeometry(0.58, 0.22, 0.72), guard);
+  canopy.position.y = 0.12;
+  const keel = new Mesh(new BoxGeometry(0.34, 0.42, 0.52), shell);
+  keel.position.y = -0.25;
+  const optic = new Mesh(new BoxGeometry(0.8, 0.12, 0.055), materials.createEmissive("#e6a85d", 0.98));
+  optic.position.set(0, -0.08, -0.315);
   const rotor = new Group();
-  for (const x of [-0.78, 0.78]) {
-    const arm = new Mesh(new BoxGeometry(0.48, 0.04, 0.08), materials.create({ color: "#252d2b" }));
-    arm.position.x = x;
-    const ring = new Mesh(new TorusGeometry(0.27, 0.025, 5, 12), materials.create({ color: "#697670", metalness: 0.48 }));
-    ring.rotation.x = Math.PI / 2;
-    ring.position.x = x;
-    rotor.add(arm, ring);
+  for (const x of [-0.76, 0.76]) {
+    for (const z of [-0.19, 0.19]) {
+      const pod = new Mesh(new BoxGeometry(0.48, 0.12, 0.36), shell);
+      pod.position.set(x, 0, z);
+      const ring = new Mesh(new TorusGeometry(0.18, 0.035, 6, 12), guard);
+      ring.rotation.x = Math.PI / 2;
+      ring.position.set(x, 0.075, z);
+      const blade = new Mesh(new BoxGeometry(0.28, 0.02, 0.045), shell);
+      blade.position.set(x, 0.075, z);
+      rotor.add(pod, ring, blade);
+    }
   }
   const contactHalo = new Mesh(
     new TorusGeometry(0.74, 0.035, 5, 16),
@@ -563,7 +675,7 @@ function createObservationDrone(materials: Ps1MaterialFactory): DroneView {
     }),
   );
   wideScan.position.set(0, -0.72, -2.1);
-  root.add(hull, keel, optic, rotor, contactHalo, scanBeam, wideScan);
+  root.add(hull, canopy, keel, optic, rotor, contactHalo, scanBeam, wideScan);
   return { root, rotor, contactHalo, scanBeam, wideScan };
 }
 
@@ -573,20 +685,35 @@ function createPorterAndroid(materials: Ps1MaterialFactory): {
   readonly statusLight: Mesh;
 } {
   const root = new Group();
-  const chassis = new Mesh(new BoxGeometry(0.92, 1.15, 0.7), materials.create({ color: "#66716a", metalness: 0.34 }));
+  const shell = materials.create({ color: "#72776a", metalness: 0.32, roughness: 0.76 });
+  const dark = materials.create({ color: "#1b2423", roughness: 0.88 });
+  const bronze = materials.create({ color: "#806845", metalness: 0.3, roughness: 0.74 });
+  const chassis = new Mesh(new BoxGeometry(1.02, 0.72, 0.78), shell);
   chassis.position.y = 0.78;
-  const base = new Mesh(new BoxGeometry(1.15, 0.28, 0.86), materials.create({ color: "#252d2b" }));
-  base.position.y = 0.14;
-  const statusLight = new Mesh(new BoxGeometry(0.42, 0.12, 0.05), materials.createEmissive("#70d6b3", 0.78));
-  statusLight.position.set(0, 1.12, -0.38);
+  const canopy = new Mesh(new BoxGeometry(0.76, 0.2, 0.68), bronze);
+  canopy.position.y = 1.22;
+  const base = new Mesh(new BoxGeometry(1.2, 0.34, 0.92), dark);
+  base.position.y = 0.26;
+  const statusLight = new Mesh(new BoxGeometry(0.46, 0.14, 0.055), materials.createEmissive("#64ddd3", 0.95));
+  statusLight.position.set(0, 0.92, -0.42);
   statusLight.visible = false;
+  for (const x of [-0.52, 0.52]) {
+    for (const z of [-0.31, 0.31]) {
+      const wheel = new Mesh(new CylinderGeometry(0.18, 0.18, 0.12, 8), dark);
+      wheel.rotation.z = Math.PI / 2;
+      wheel.position.set(x, 0.2, z);
+      root.add(wheel);
+    }
+  }
   const loadArms = new Group();
   for (const x of [-0.52, 0.52]) {
-    const arm = new Mesh(new BoxGeometry(0.18, 0.82, 0.18), materials.create({ color: "#9b8058", metalness: 0.22 }));
-    arm.position.set(x, 0.68, -0.28);
-    loadArms.add(arm);
+    const arm = new Mesh(new BoxGeometry(0.15, 0.72, 0.16), bronze);
+    arm.position.set(x, 0.7, -0.27);
+    const fork = new Mesh(new BoxGeometry(0.15, 0.12, 0.58), bronze);
+    fork.position.set(x, 0.36, -0.48);
+    loadArms.add(arm, fork);
   }
-  root.add(chassis, base, statusLight, loadArms);
+  root.add(chassis, canopy, base, statusLight, loadArms);
   return { root, loadArms, statusLight };
 }
 
@@ -601,40 +728,91 @@ function orientScanBeam(beam: Mesh, from: { x: number; y: number; z: number }, t
 
 function createRelay(materials: Ps1MaterialFactory): Group {
   const relay = new Group();
-  const housing = new Mesh(new BoxGeometry(0.42, 0.72, 0.36), materials.create({ color: "#56645e" }));
-  housing.position.y = 0.36;
-  const antenna = new Mesh(new CylinderGeometry(0.025, 0.025, 0.8, 5), materials.createEmissive("#7bd4c8", 0.5));
-  antenna.position.y = 1;
-  relay.add(housing, antenna);
+  const shell = materials.create({ color: "#4e5c56", metalness: 0.28, roughness: 0.78 });
+  const bronze = materials.create({ color: "#806845", metalness: 0.32, roughness: 0.72 });
+  const housing = new Mesh(new CylinderGeometry(0.25, 0.3, 0.34, 8), shell);
+  housing.position.y = 0.22;
+  const linkRing = new Mesh(new TorusGeometry(0.26, 0.045, 6, 12), materials.createEmissive("#64ddd3", 0.74));
+  linkRing.rotation.x = Math.PI / 2;
+  linkRing.position.y = 0.38;
+  const antenna = new Mesh(new CylinderGeometry(0.025, 0.035, 0.82, 6), bronze);
+  antenna.position.y = 0.86;
+  for (const angle of [0, (Math.PI * 2) / 3, (Math.PI * 4) / 3]) {
+    const foot = new Mesh(new BoxGeometry(0.08, 0.08, 0.34), bronze);
+    foot.position.set(Math.sin(angle) * 0.22, 0.07, Math.cos(angle) * 0.22);
+    foot.rotation.y = angle;
+    relay.add(foot);
+  }
+  relay.add(housing, linkRing, antenna);
   return relay;
 }
 
 function createSignalBeacon(materials: Ps1MaterialFactory): Group {
   const beacon = new Group();
-  const flare = new Mesh(new CylinderGeometry(0.09, 0.12, 0.54, 6), materials.createEmissive("#f1814f", 1.2));
-  flare.position.y = 0.3;
+  const cage = materials.create({ color: "#332725", metalness: 0.36, roughness: 0.72 });
+  const base = new Mesh(new CylinderGeometry(0.15, 0.19, 0.22, 8), cage);
+  base.position.y = 0.12;
+  const flare = new Mesh(new CylinderGeometry(0.08, 0.12, 0.48, 6), materials.createEmissive("#ff694e", 1.35));
+  flare.position.y = 0.42;
   const halo = new Mesh(new TorusGeometry(0.42, 0.045, 5, 12), materials.createEmissive("#ffd08c", 0.9));
   halo.rotation.x = Math.PI / 2;
-  halo.position.y = 0.42;
-  beacon.add(flare, halo);
+  halo.position.y = 0.5;
+  for (const x of [-0.13, 0.13]) {
+    const bar = new Mesh(new BoxGeometry(0.035, 0.52, 0.035), cage);
+    bar.position.set(x, 0.43, 0);
+    beacon.add(bar);
+  }
+  beacon.add(base, flare, halo);
   return beacon;
 }
 
 function createCart(materials: Ps1MaterialFactory): Group {
   const cart = new Group();
-  const metal = materials.create({ color: "#81755c", metalness: 0.4 });
-  const dark = materials.create({ color: "#1f2725" });
-  const basket = new Mesh(new BoxGeometry(1.15, 0.55, 0.82), metal);
-  basket.position.y = 0.35;
-  cart.add(basket);
-  const handle = new Mesh(new BoxGeometry(1.25, 0.08, 0.08), dark);
-  handle.position.set(0, 0.84, 0.48);
+  const metal = materials.create({ color: "#7c6948", metalness: 0.46, roughness: 0.7 });
+  const dark = materials.create({ color: "#17201f", roughness: 0.88 });
+  const strap = materials.createEmissive("#d99a52", 0.48);
+  const floor = new Mesh(new BoxGeometry(1.06, 0.1, 0.76), dark);
+  floor.position.y = 0.08;
+  cart.add(floor);
+  for (const x of [-0.54, 0.54]) {
+    for (const z of [-0.36, 0.36]) {
+      const post = new Mesh(new BoxGeometry(0.055, 0.58, 0.055), metal);
+      post.position.set(x, 0.39, z);
+      cart.add(post);
+    }
+  }
+  for (const y of [0.2, 0.48, 0.68]) {
+    for (const z of [-0.36, 0.36]) {
+      const rail = new Mesh(new BoxGeometry(1.12, 0.045, 0.045), metal);
+      rail.position.set(0, y, z);
+      cart.add(rail);
+    }
+    for (const x of [-0.54, 0.54]) {
+      const rail = new Mesh(new BoxGeometry(0.045, 0.045, 0.76), metal);
+      rail.position.set(x, y, 0);
+      cart.add(rail);
+    }
+  }
+  for (const x of [-0.32, 0.32]) {
+    const tieDown = new Mesh(new BoxGeometry(0.055, 0.64, 0.045), strap);
+    tieDown.rotation.x = Math.PI / 2;
+    tieDown.position.set(x, 0.71, 0);
+    cart.add(tieDown);
+  }
+  const handle = new Mesh(new BoxGeometry(1.24, 0.09, 0.09), dark);
+  handle.position.set(0, 0.88, 0.5);
+  for (const x of [-0.5, 0.5]) {
+    const stem = new Mesh(new BoxGeometry(0.07, 0.55, 0.07), metal);
+    stem.position.set(x, 0.62, 0.46);
+    stem.rotation.x = -0.16;
+    cart.add(stem);
+  }
   cart.add(handle);
   for (const x of [-0.42, 0.42]) {
     for (const z of [-0.28, 0.28]) {
-      const wheel = new Mesh(new CylinderGeometry(0.1, 0.1, 0.08, 6), dark);
+      const wheel = new Mesh(new CylinderGeometry(0.12, 0.12, 0.1, 8), dark);
       wheel.rotation.z = Math.PI / 2;
-      wheel.position.set(x, -0.24, z);
+      wheel.position.set(x, -0.36, z);
       cart.add(wheel);
     }
   }
@@ -644,16 +822,31 @@ function createCart(materials: Ps1MaterialFactory): Group {
 function createCrewMarker(materials: Ps1MaterialFactory, id: string, equipmentCount: number): Group {
   const crew = new Group();
   crew.name = `selected-crew-${id}`;
-  const suit = materials.create({ color: id === "mara" ? "#9b765e" : "#6b8784" });
-  const visor = materials.createEmissive("#8fdad6", 0.55);
-  const body = new Mesh(new BoxGeometry(0.58, 1.05, 0.38), suit);
-  body.position.y = 0.8;
-  const head = new Mesh(new BoxGeometry(0.48, 0.42, 0.42), visor);
-  head.position.y = 1.54;
-  crew.add(body, head);
+  const suit = materials.create({ color: id === "mara" ? "#8b674f" : id === "ito" ? "#607a7b" : "#aa925d" });
+  const armor = materials.create({ color: "#c2b991", roughness: 0.88 });
+  const dark = materials.create({ color: "#151e20", roughness: 0.88 });
+  const visor = materials.createEmissive("#70ddd3", 0.76);
+  const body = new Mesh(new BoxGeometry(0.58, 0.72, 0.4), suit);
+  body.position.y = 0.88;
+  const chest = new Mesh(new BoxGeometry(0.4, 0.28, 0.07), armor);
+  chest.position.set(0, 0.92, -0.235);
+  const head = new Mesh(new CylinderGeometry(0.23, 0.25, 0.36, 6), dark);
+  head.position.y = 1.48;
+  const face = new Mesh(new BoxGeometry(0.3, 0.11, 0.05), visor);
+  face.position.set(0, 1.49, -0.25);
+  const pack = new Mesh(new BoxGeometry(0.44, 0.54, 0.22), dark);
+  pack.position.set(0, 0.92, 0.3);
+  crew.add(body, chest, head, face, pack);
+  for (const side of [-1, 1]) {
+    const arm = new Mesh(new BoxGeometry(0.16, 0.58, 0.2), suit);
+    arm.position.set(side * 0.39, 0.82, 0);
+    const leg = new Mesh(new BoxGeometry(0.2, 0.62, 0.24), dark);
+    leg.position.set(side * 0.16, 0.32, 0);
+    crew.add(arm, leg);
+  }
   for (let index = 0; index < equipmentCount; index += 1) {
-    const equipment = new Mesh(new BoxGeometry(0.18, 0.22, 0.16), materials.create({ color: "#c7a363" }));
-    equipment.position.set(-0.2 + index * 0.2, 0.86, -0.27);
+    const equipment = new Mesh(new BoxGeometry(0.16, 0.2, 0.14), materials.create({ color: "#b58c4f" }));
+    equipment.position.set(-0.2 + index * 0.2, 0.82, -0.29);
     crew.add(equipment);
   }
   return crew;

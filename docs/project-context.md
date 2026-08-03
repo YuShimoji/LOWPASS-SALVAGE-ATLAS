@@ -1,10 +1,12 @@
 # Project Context
 
-更新日: 2026-07-29 JST
+更新日: 2026-08-04 JST
 
 ## North star
 
 `LOWPASS: SALVAGE ATLAS` は、低忠実度3D表現の中で、隊員・装備・通信・非致死的機械生態系・継続世界を一貫した状態モデルとして扱うデスクトップブラウザ探索ゲームです。プレイヤーの判断と敵の判断を、各主体が実際に観測・共有できた情報から説明可能にし、帰還精算を通じて次の訪問へ残します。
+
+Fieldは暗い放棄施設だけに限定しません。人が不在でも通常機能と日常建築が残るoffice、building、shopping mall、station、housing、library、hotel、medical center、parking / logistics、school / community campusを正規の探索範囲とします。都市scaleのvisual基準は `docs/concept-art/field-expansion-v1/`、現行浸水marketの局所studyは `docs/concept-art/visual-overhaul-v1/` です。
 
 ## Cockpit（2026-07-29正本）
 

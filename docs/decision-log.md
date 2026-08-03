@@ -1,6 +1,14 @@
 # Decision Log
 
 この文書は確定済みの設計判断だけを記録します。検討中の案は `idea-ledger.md`、実装・検証の詳細は `README.md` に置きます。
+
+## 2026-08-04 — field visualを「明るい無人街」まで拡張する
+
+- 決定: LOWPASSのfield既定を「暗い放棄施設」に限定しない。普通のoffice、building、shopping mall、station、housing、library、hotel、medical center、parking / logistics、school / community campusを含む、人は不在だが必ずしも崩壊していない都市を正規の探索範囲とする
+- visual evidence: `docs/concept-art/field-expansion-v1/` の10枚を都市scaleのconcept基準とする。`docs/concept-art/visual-overhaul-v1/` は現行浸水marketとmachine / propの局所studyへ限定する
+- 理由: 無人状態を全面的な暗さ、瓦礫、放棄施設だけで表現すると、場所の用途、route topology、日常生活の不在というLOWPASS固有の判断材料が失われるため
+- 帰結: 昼光、通常建築、glass、植栽、暖色舗装、稼働中設備を既定選択肢に含める。浸水、停電、破損、過成長はfield固有条件とし、全体paletteへ昇格しない。concept画像は`CONCEPT_REFERENCE_ONLY`で、gameplay authorityやproduction asset approvalを変更しない
+
 ## 2026-07-29 — Phase G正本を両履歴保全のno-force reconciliationへ確定する
 
 - 決定: canonical implementation sourceはlocal `d2683ee` lineageとし、remote `f3ea10949a908236adad1d2106ff0634804fc4bd` は履歴を保全したgreen baselineだがacceptance-equivalentではないものとしてsupersedeする
