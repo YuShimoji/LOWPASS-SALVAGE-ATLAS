@@ -45,9 +45,9 @@
       "sha256": "sha256:54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102"
     },
     "manifest": {
-      "bytes": 38961,
+      "bytes": 39074,
       "name": "lowpass-readability-canary-v1.manifest.json",
-      "sha256": "sha256:a1dd222f98c109697849279f3f5644266d685bc7b4d543534c8e4191b225c353"
+      "sha256": "sha256:9b2e9b87805456f72ca66fd0e4915bff1b23c1c4f4f4c6e7052fdfb4c8ee9f05"
     },
     "visualProofs": [
       {
@@ -71,8 +71,9 @@
   "generatorVersion": "cgawe-lowpass-canary-1.0.0",
   "recipeHash": "fnv1a-ca6600c5",
   "rights": {
-    "notice": "Project-owned procedural Recipe source is recorded, but this canary does not make a distribution license assertion.",
-    "status": "NOASSERTION"
+    "licenseId": "LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1",
+    "notice": "Project-owned procedural Canary licensed for LOWPASS project development, game builds, maintenance, and distribution only; no standalone or general third-party reuse grant.",
+    "status": "DECLARED"
   },
   "schemaVersion": "lowpass-runtime-asset-pack-1.0.0",
   "state": "LOWPASS_ASSET_CANARY_V1_LOCAL_GREEN",

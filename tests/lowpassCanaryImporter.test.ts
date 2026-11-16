@@ -24,6 +24,8 @@ describe("LOWPASS Canary importer", () => {
     const files = [
       "public/assets/lowpass-canary-v1/lowpass-readability-canary-v1.runtime.glb",
       "public/assets/lowpass-canary-v1/lowpass-readability-canary-v1.manifest.json",
+      "public/assets/lowpass-canary-v1/lowpass-readability-canary-v1.source-readback.json",
+      "public/assets/lowpass-canary-v1/rights-provenance.json",
       "public/assets/lowpass-canary-v1/asset-consumer-readback.json",
       "src/game/content/generated/lowpassCanaryRegistry.json",
       "src/game/content/fixtures/lowpassCanaryConsumerFixture.json",
@@ -33,6 +35,12 @@ describe("LOWPASS Canary importer", () => {
       const right = readFileSync(join(second, file));
       expect(left.equals(right)).toBe(true);
       expect(left.toString("utf8")).not.toMatch(/[A-Za-z]:\\|file:\/\/|C:\\Users\\/);
+      const tracked = readFileSync(resolve(file));
+      if (file.endsWith(".json")) {
+        expect(JSON.parse(left.toString("utf8"))).toEqual(JSON.parse(tracked.toString("utf8")));
+      } else {
+        expect(left.equals(tracked)).toBe(true);
+      }
     }
     const glb = readFileSync(join(first, files[0]!));
     expect(createHash("sha256").update(glb).digest("hex")).toBe(
@@ -49,6 +57,15 @@ describe("LOWPASS Canary importer", () => {
     bytes[bytes.length - 1] = (bytes[bytes.length - 1] ?? 0) ^ 1;
     writeFileSync(glbPath, bytes);
     expect(() => runImport(mutatedSource, temporary())).toThrow(/GLB_SHA256_MISMATCH/);
+  });
+
+  it("rejects a source manifest whose project-scoped rights declaration changes", () => {
+    const source = portableSource();
+    const manifestPath = join(source, "lowpass-readability-canary-v1.manifest.json");
+    const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+    manifest.license.licenseId = "LicenseRef-Unexpected";
+    writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+    expect(() => runImport(source, temporary())).toThrow(/MANIFEST_SHA256_MISMATCH/);
   });
 });
 

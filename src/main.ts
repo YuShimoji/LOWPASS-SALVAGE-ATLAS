@@ -917,8 +917,24 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     }
     let position = SHIP_INTERACTIONS.find((interaction) => interaction.id === "expedition-console")?.position;
     if (missionController) {
-      if (target === "extract") position = missionController.definition.extractionPoint;
-      else if (target === "cart") position = missionController.getCartPosition();
+      if (target === "extract") {
+        const { extractionPoint, extractionRadius } = missionController.definition;
+        position = extractionPoint;
+        if (!missionController.state.cartAttached) {
+          const cart = missionController.getCartPosition();
+          const awayX = extractionPoint.x - cart.x;
+          const awayZ = extractionPoint.z - cart.z;
+          const distance = Math.hypot(awayX, awayZ);
+          if (distance > 0) {
+            const offset = Math.min(1.6, extractionRadius * 0.8);
+            position = {
+              x: extractionPoint.x + (awayX / distance) * offset,
+              y: extractionPoint.y,
+              z: extractionPoint.z + (awayZ / distance) * offset,
+            };
+          }
+        }
+      } else if (target === "cart") position = missionController.getCartPosition();
       else if (target === "drone") position = threatController?.state.drone.position;
       else if (target === "porter") position = porterController?.state.position;
       else position = missionController.definition.salvage.find((resource) => resource.sourceId === target)?.position

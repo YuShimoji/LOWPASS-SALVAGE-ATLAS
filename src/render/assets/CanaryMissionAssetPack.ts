@@ -40,10 +40,10 @@ export async function loadCanaryMissionAssetPack(
   const manifestUrl = new URL(registry.manifestPath, document.baseURI).href;
   const manifestResponse = await fetch(manifestUrl, { credentials: "same-origin" });
   if (!manifestResponse.ok) throw new Error(`CANARY_MANIFEST_HTTP_${manifestResponse.status}`);
-  const manifest = await manifestResponse.json() as { readonly rights?: unknown };
+  const manifest = await manifestResponse.json() as { readonly license?: unknown };
   const manifestFailures = validateCanaryRegistry(registry, {
     ...options,
-    manifestRights: manifest.rights,
+    manifestRights: normalizeProducerLicense(manifest.license),
   });
   if (manifestFailures.length > 0) {
     throw new Error(`CANARY_MANIFEST_RIGHTS_INVALID // ${manifestFailures.join(",")}`);
@@ -57,6 +57,18 @@ export async function loadCanaryMissionAssetPack(
     throw new Error(`CANARY_GLB_SHA256_MISMATCH // expected ${registry.exactGlbSha256}, actual ${hash}`);
   }
   return parseCanaryMissionAssetPack(bytes, performance.now() - startedAt, registry);
+}
+
+function normalizeProducerLicense(value: unknown): unknown {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return value;
+  const license = value as Record<string, unknown>;
+  return {
+    rightsStatus: license.status,
+    licenseId: license.licenseId,
+    internalOnly: false,
+    distributionApproved: true,
+    reviewLabel: "LOWPASS PROJECT USE APPROVED",
+  };
 }
 
 export async function parseCanaryMissionAssetPack(

@@ -31,10 +31,11 @@ export interface CanaryAssetPackRegistryEntry {
   readonly displayName: string;
   readonly manifestVersion: "lowpass-runtime-asset-pack-1.0.0";
   readonly exactGlbSha256: string;
-  readonly rightsStatus: "NOASSERTION";
-  readonly internalOnly: true;
-  readonly distributionApproved: false;
-  readonly reviewLabel: "INTERNAL REVIEW ONLY";
+  readonly rightsStatus: "DECLARED";
+  readonly licenseId: "LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1";
+  readonly internalOnly: false;
+  readonly distributionApproved: true;
+  readonly reviewLabel: "LOWPASS PROJECT USE APPROVED";
   readonly manifestRights: CanaryManifestRights;
   readonly glbPath: string;
   readonly manifestPath: string;
@@ -55,10 +56,11 @@ export interface CanaryAssetPackRegistryEntry {
 }
 
 export interface CanaryManifestRights {
-  readonly rightsStatus: "NOASSERTION";
-  readonly internalOnly: true;
-  readonly distributionApproved: false;
-  readonly reviewLabel: "INTERNAL REVIEW ONLY";
+  readonly rightsStatus: "DECLARED";
+  readonly licenseId: "LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1";
+  readonly internalOnly: false;
+  readonly distributionApproved: true;
+  readonly reviewLabel: "LOWPASS PROJECT USE APPROVED";
 }
 
 export interface AssetPackSelection {
@@ -103,11 +105,20 @@ export function validateCanaryRegistry(
   if (typeof registry.rightsStatus !== "string" || registry.rightsStatus.length === 0) {
     failures.push("RIGHTS_STATUS_MISSING_OR_INVALID");
   }
+  if (typeof registry.licenseId !== "string" || registry.licenseId.length === 0) {
+    failures.push("RIGHTS_LICENSE_ID_MISSING_OR_INVALID");
+  }
   if (registry.rightsStatus === "NOASSERTION" && registry.distributionApproved !== false) {
     failures.push("RIGHTS_NOASSERTION_DISTRIBUTION_BLOCK_REQUIRED");
   }
+  if (registry.distributionApproved === true && registry.rightsStatus !== "DECLARED") {
+    failures.push("RIGHTS_DECLARED_DISTRIBUTION_REQUIRED");
+  }
   const distributionContext = options.distributionContext ?? "internal-review";
-  if (distributionContext === "external-distribution" && registry.internalOnly === true) {
+  if (
+    distributionContext === "external-distribution"
+    && (registry.internalOnly === true || registry.distributionApproved !== true)
+  ) {
     failures.push("RIGHTS_EXTERNAL_DISTRIBUTION_BLOCKED");
   }
   const manifestRights = options.manifestRights ?? registry.manifestRights;
@@ -115,6 +126,7 @@ export function validateCanaryRegistry(
     failures.push("MANIFEST_RIGHTS_MISSING_OR_INVALID");
   } else if (
     registry.rightsStatus !== manifestRights.rightsStatus
+    || registry.licenseId !== manifestRights.licenseId
     || registry.internalOnly !== manifestRights.internalOnly
     || registry.distributionApproved !== manifestRights.distributionApproved
     || registry.reviewLabel !== manifestRights.reviewLabel
@@ -122,10 +134,11 @@ export function validateCanaryRegistry(
     failures.push("RIGHTS_REGISTRY_MANIFEST_MISMATCH");
   }
   if (
-    registry.rightsStatus !== "NOASSERTION"
-    || registry.internalOnly !== true
-    || registry.distributionApproved !== false
-    || registry.reviewLabel !== "INTERNAL REVIEW ONLY"
+    registry.rightsStatus !== "DECLARED"
+    || registry.licenseId !== "LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1"
+    || registry.internalOnly !== false
+    || registry.distributionApproved !== true
+    || registry.reviewLabel !== "LOWPASS PROJECT USE APPROVED"
   ) failures.push("RIGHTS_BOUNDARY_INVALID");
 
   const assetDefinitions = isRecord(registry.assetDefinitions) ? registry.assetDefinitions : {};
@@ -174,6 +187,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function hasRightsBoundary(value: unknown): value is Record<keyof CanaryManifestRights, unknown> {
   return isRecord(value)
     && typeof value.rightsStatus === "string"
+    && typeof value.licenseId === "string"
     && typeof value.internalOnly === "boolean"
     && typeof value.distributionApproved === "boolean"
     && typeof value.reviewLabel === "string";

@@ -1,45 +1,50 @@
-import { access, readdir, rm } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { readFile } from "node:fs/promises";
 import { resolve, sep } from "node:path";
 
 const projectRoot = resolve(process.cwd());
 const distRoot = resolve(projectRoot, "dist");
-const internalAssetDirectory = resolve(distRoot, "assets", "lowpass-canary-v1");
+const assetRoot = resolve(distRoot, "assets", "lowpass-canary-v1");
+const expectedHash = "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102";
+const expectedLicense = "LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1";
 
-if (!internalAssetDirectory.startsWith(`${distRoot}${sep}`)) {
-  throw new Error(`EXTERNAL_ASSET_BOUNDARY_INVALID // ${internalAssetDirectory}`);
+if (!assetRoot.startsWith(`${distRoot}${sep}`)) {
+  throw new Error(`EXTERNAL_ASSET_BOUNDARY_INVALID // ${assetRoot}`);
 }
 
-await rm(internalAssetDirectory, { recursive: true, force: true });
+const [glb, manifestText, provenanceText] = await Promise.all([
+  readFile(resolve(assetRoot, "lowpass-readability-canary-v1.runtime.glb")),
+  readFile(resolve(assetRoot, "lowpass-readability-canary-v1.manifest.json"), "utf8"),
+  readFile(resolve(assetRoot, "rights-provenance.json"), "utf8"),
+]);
+const manifest = JSON.parse(manifestText);
+const provenance = JSON.parse(provenanceText);
+const actualHash = createHash("sha256").update(glb).digest("hex");
 
-const remaining = await walk(distRoot);
-const forbidden = remaining.filter((path) =>
-  path.endsWith(".glb")
-  || path.includes("lowpass-readability-canary-v1.runtime")
-  || path.includes("rights-provenance.json"));
-if (forbidden.length > 0) {
-  throw new Error(`EXTERNAL_ASSET_BOUNDARY_FAILED // ${forbidden.join(",")}`);
+if (actualHash !== expectedHash) {
+  throw new Error(`EXTERNAL_ASSET_HASH_MISMATCH // expected ${expectedHash}, actual ${actualHash}`);
 }
-
-try {
-  await access(internalAssetDirectory);
-  throw new Error(`EXTERNAL_ASSET_DIRECTORY_REMAINS // ${internalAssetDirectory}`);
-} catch (error) {
-  if (error instanceof Error && !("code" in error && error.code === "ENOENT")) throw error;
+const manifestRights = {
+  rightsStatus: manifest.license?.status,
+  licenseId: manifest.license?.licenseId,
+  internalOnly: false,
+  distributionApproved: true,
+};
+for (const [label, rights] of [["manifest", manifestRights], ["provenance", provenance]]) {
+  if (
+    rights?.rightsStatus !== "DECLARED"
+    || rights?.licenseId !== expectedLicense
+    || rights?.internalOnly !== false
+    || rights?.distributionApproved !== true
+  ) {
+    throw new Error(`EXTERNAL_ASSET_RIGHTS_INVALID // ${label}`);
+  }
 }
 
 console.log(JSON.stringify({
   state: "EXTERNAL_ASSET_BOUNDARY_PASS",
-  removed: "dist/assets/lowpass-canary-v1",
-  forbiddenAssetCount: 0,
+  included: "dist/assets/lowpass-canary-v1",
+  exactGlbSha256: actualHash,
+  licenseId: expectedLicense,
+  distributionScope: "LOWPASS game builds",
 }, null, 2));
-
-async function walk(directory) {
-  const entries = await readdir(directory, { withFileTypes: true });
-  const paths = [];
-  for (const entry of entries) {
-    const path = resolve(directory, entry.name);
-    if (entry.isDirectory()) paths.push(...await walk(path));
-    else paths.push(path);
-  }
-  return paths;
-}

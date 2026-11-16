@@ -126,7 +126,7 @@ export function createInitialGameState(): GameState {
       activeModal: "none",
     },
     settings: {
-      lowResolution: true,
+      lowResolution: false,
       distanceFog: true,
       vertexSnap: true,
       dithering: true,

@@ -72,6 +72,10 @@ describe("flooded market render adapter", () => {
         porter.state,
       );
       expect(view.root.children.length).toBeGreaterThan(0);
+      expect(view.root.getObjectByName("salvage-ground-marker-filter-01")).toBeDefined();
+      expect(view.root.getObjectByName("salvage-ground-marker-cooling-coil")).toBeDefined();
+      expect(view.root.getObjectByName("salvage-ground-marker-relay-core-01")).toBeDefined();
+      expect(view.root.getObjectByName("extraction-route-chevron-1.8")).toBeDefined();
       view.update(session.state, squad.state, threat.state, porter.state, 1);
       view.dispose();
       expect(view.root.children).toHaveLength(0);

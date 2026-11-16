@@ -1,10 +1,12 @@
 # Project Context
 
-更新日: 2026-07-29 JST
+更新日: 2026-08-04 JST
 
 ## North star
 
 `LOWPASS: SALVAGE ATLAS` は、低忠実度3D表現の中で、隊員・装備・通信・非致死的機械生態系・継続世界を一貫した状態モデルとして扱うデスクトップブラウザ探索ゲームです。プレイヤーの判断と敵の判断を、各主体が実際に観測・共有できた情報から説明可能にし、帰還精算を通じて次の訪問へ残します。
+
+Fieldは暗い放棄施設だけに限定しません。人が不在でも通常機能と日常建築が残るoffice、building、shopping mall、station、housing、library、hotel、medical center、parking / logistics、school / community campusを正規の探索範囲とします。都市scaleのvisual基準は `docs/concept-art/field-expansion-v1/`、現行浸水marketの局所studyは `docs/concept-art/visual-overhaul-v1/` です。
 
 ## Cockpit（2026-07-29正本）
 
@@ -17,13 +19,21 @@
 | no-force merge | `65fb21f992d9b2d8f933c343f1b2ab766311bbe2`、両系統を祖先に持つ |
 | accepted runtime / evidence tip | `c9c9cdc16268c60995cf82499dc59ca277d4f1ba` |
 | canonical refs | live `origin/feat/phase-g-guided-qa-canary-v1` と `origin/project/frontier`。静的SHAよりfetch後readbackを優先 |
-| automated acceptance | 34 files / 202 tests、build / external build、Guided Audit 22 / 22、audio 20 / 20、24 A/B、3 lifecycle PASS |
+| automated acceptance | 34 files / 203 tests、build / external build、Guided Audit 22 / 22、audio 20 / 20、24 A/B、3 lifecycle PASS |
 | 人間感覚レビュー | `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING` |
-| Canary consumer | `CANARY_RIGHTS_FAIL_CLOSED`、`NOASSERTION` / internal-only、外部buildから除外 |
+| Canary consumer | `DECLARED` project-scoped rights、LOWPASS production利用承認、外部build同梱可 |
 | 次の開発候補 | Phase H1「契約・証拠・再訪判断の因果深化」。technical unlockのみ、owner承認前は未実装 |
 | 受入の正本 | `README.md`、`PROJECT_HANDOFF.md`、本文書、`docs/supervising-ai-report.md`、`docs/decision-log.md` |
 
-local `d2683ee` とremote `f3ea109` の候補選定は完了しました。以降の2026-07-28 candidate比較は履歴であり、remote bounded repairや正本選定を再び停止条件にしません。Phase H、main merge、deploy、release、rights昇格は未実施です。
+local `d2683ee` とremote `f3ea109` の候補選定は完了しました。以降の2026-07-28 candidate比較は履歴であり、remote bounded repairや正本選定を再び停止条件にしません。Exact procedural Canaryのrights/production昇格は2026-08-04に完了しました。Phase H、main merge、deploy、releaseは未実施です。
+
+## 2026-08-04 visual readability slice
+
+- `docs/concept-art/visual-overhaul-v1/` を現行浸水marketへ適用し、浄水フィルター、冷却コイル、任意回収物のリレーコアを色とシルエットの両方で分離した
+- 回収物がmission groundにある間だけ、必須目標は4 tick、任意目標は3 tickのgeometry-only markerを表示する。運搬・カート積載・抽出時はmarkerを消し、`ItemLocation`を唯一の所在表現として維持する
+- 中央通路の低いamber chevronは抽出地点へ向ける。ブラウザ確認で逆向きを検出したため同一スライス内で修正した
+- runtime screenshotでは必須フィルター3個、冷却コイル、カート、味方隊員、抽出ring、退避方向を初期market画角で判別できた。texture countは3のまま、Three.js objectは表示投影だけでgameplay、navigation、collision、Security Cellを変更しない
+- concept画像と回収物markerは引き続きCanary以外のproduction asset approval、rights昇格、Phase H承認を意味しない
 
 ## 現行アーキテクチャ
 
@@ -53,8 +63,8 @@ local `d2683ee` とremote `f3ea109` の候補選定は完了しました。以�
 - Guided QAはraw button列をdrawerへ置き換え、孤立復帰の目的、before / expected / actual、現在状態を表示する。raw controlは削除せず折り畳んだ
 - one-click Guided Auditはwatchful開始からflare fact失効まで22 / 22 PASS、timeout 0、duplicate 0
 - semantic audioは20 cue、AudioContext状態、単独試聴、同時字幕を提供し、waveform / peak / duration / distinctness / mute / resume / rate-limitを自動監査した。Porterは意味event-onlyで周期pulseを持たない
-- CGAWの契約commit `c893374ab0edd7329bd1482dbd6b99960acbbb68` とexact GLB SHA-256 `54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102` を検証し、決定論的importを追加した
-- rightsは `NOASSERTION`、internal only、distribution未承認。UV、low-resolution texture、Blender headless、rights declaration、production approvalは未完了
+- CGAWのproducer commit `5d33ba89f141303072e2bc782c8f54302c6fd572`、exact GLB SHA-256 `54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102`、manifest SHA-256 `9b2e9b87805456f72ca66fd0e4915bff1b23c1c4f4f4c6e7052fdfb4c8ee9f05` を検証し、決定論的importを追加した
+- rightsは `DECLARED`、LOWPASS project-scoped、distribution承認済み。UV、low-resolution texture、Blender headless、独立human rubricは未完了だが、exact procedural packのproduction利用は承認済み
 - A/B 24枚、contact sheet、console / performance readback、3 lifecycleを [`evidence/phase-g-closure/`](evidence/phase-g-closure/) へ保存した
 - Phase H、WorldState schema、Security Cell規則、contract進捗は変更していない
 
@@ -95,13 +105,13 @@ Gate G-Aは `GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` で中断されました�
 - 最初に `git fetch --prune --tags origin` を行い、live `origin/feat/phase-g-guided-qa-canary-v1` と `origin/project/frontier` のidentityを確認する。両refは本Phase G正本を含む同一commitであることが完了条件で、静的SHAよりlive refを優先する
 - canonical ancestryはlocal `d2683ee` とremote `f3ea109` の双方。no-force mergeは `65fb21f`、accepted runtime / evidence tipは `c9c9cdc`
 - preflightと競合解決は `artifacts/reconciliation/phase-g-canonical-v2/`、fresh browser evidenceは `docs/evidence/phase-g-closure/` にある
-- local / fresh gateは34 files / 202 tests、typecheck、production build、external build、diff checkがPASS。Dドライブfresh `npm ci` は55 packages、0 vulnerabilities
+- latest local gateは34 files / 203 tests、typecheck、production build、external build、diff checkがPASS。2026-07-29のDドライブfresh `npm ci` は55 packages、0 vulnerabilities
 - Guided Auditは22 / 22、semantic audioは20 / 20、Porter periodic pulse 0。各stepはexpected / actual / tick / duration / revision / result / failure reasonを持つ
-- rightsは `NOASSERTION` / `internalOnly: true` / `distributionApproved: false`。registry / manifest不一致、欠落、external distributionではprimitiveへfallbackし、external outputにCanary GLBを含めない
+- rightsは `DECLARED` / `internalOnly: false` / `distributionApproved: true` / `LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1`。registry / producer manifest / provenance不一致、欠落ではprimitiveへfallbackし、external outputはexact GLBとproject scopeを検証する
 - A/Bは6状態 × 4条件 = 24 screenshots。固定seed / posture / camera / 1280×720のreadbackを持つ
 - browserはconsole error、unhandled rejection、external request、event duplicationが各0。3 lifecycleのscene 60 / geometry 47 / texture 3 / program 4 / draw calls 66 / DOM 238 / HUD 41は一定
 - portableなのはtracked source、tests、Canary copy、registry / manifest、artifacts、evidence、正本文書。`node_modules`、`dist`、`.serena`、IndexedDB、音量設定、Vite / Chrome processは端末ローカル
-- human sensory reviewはdeferred / non-blocking。physical Gamepad、rights、production asset、remote CI、PR review、main統合、deploy、releaseは未完了またはowner gate
+- human sensory reviewはdeferred / non-blocking。physical Gamepad、remote CI、PR review、main統合、deploy、releaseは未完了またはowner gate。Exact procedural Canaryのrights/production asset gateは完了
 - Phase H1はtechnical unlockのみ。完全Promptのowner承認前に実装しない。V2 schema、static / persisted境界、WorldState / ItemLocation / settlement / Security knowledge authorityを維持する
 
 ### 2026-07-27 snapshot（履歴）

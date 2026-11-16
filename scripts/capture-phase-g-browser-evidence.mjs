@@ -88,7 +88,7 @@ class CdpClient {
 
 const execFileAsync = promisify(execFile);
 const root = resolve(process.cwd());
-const evidenceDirectory = join(root, "docs", "evidence", "phase-g-closure");
+const evidenceDirectory = resolve(root, process.argv[2] ?? "docs/evidence/phase-g-closure");
 const screenshotDirectory = join(evidenceDirectory, "screenshots");
 const chromePath = await resolveChromePath();
 const vitePort = await freePort();
@@ -130,7 +130,7 @@ const externalRequests = new Set();
 let monitorGameRuntime = true;
 const captureReadbacks = [];
 const cycleReadbacks = [];
-let rightsFallbackReadback = null;
+let externalCanaryReadback = null;
 
 try {
   await mkdir(screenshotDirectory, { recursive: true });
@@ -301,23 +301,23 @@ try {
   await waitForExpression("Boolean(window.__LOWPASS_DEBUG__)", 20_000);
   await perform("apply-loadout");
   await perform("deploy-watchful");
-  rightsFallbackReadback = await cdp.evaluate("window.__LOWPASS_DEBUG__.assetReadback()");
+  externalCanaryReadback = await cdp.evaluate("window.__LOWPASS_DEBUG__.assetReadback()");
   if (
-    rightsFallbackReadback.requestedMode !== "canary-v1"
-    || rightsFallbackReadback.activeMode !== "primitive"
-    || !String(rightsFallbackReadback.fallbackReason).includes("RIGHTS_EXTERNAL_DISTRIBUTION_BLOCKED")
-  ) throw new Error(`EXTERNAL_RIGHTS_FALLBACK_FAILED // ${JSON.stringify(rightsFallbackReadback)}`);
-  await writeJson(join(evidenceDirectory, "rights-fallback-readback.json"), {
-    schemaVersion: "phase-g-rights-fallback-readback-1.0.0",
+    externalCanaryReadback.requestedMode !== "canary-v1"
+    || externalCanaryReadback.activeMode !== "canary-v1"
+    || externalCanaryReadback.fallbackReason != null
+  ) throw new Error(`EXTERNAL_CANARY_SELECTION_FAILED // ${JSON.stringify(externalCanaryReadback)}`);
+  await writeJson(join(evidenceDirectory, "external-canary-readback.json"), {
+    schemaVersion: "phase-g-external-canary-readback-1.0.0",
     result: "PASS",
     distributionContext: "external-distribution",
-    readback: rightsFallbackReadback,
-    externalOutputAssetBoundary: "npm run build:external removes dist/assets/lowpass-canary-v1 and verifies no GLB remains",
+    readback: externalCanaryReadback,
+    externalOutputAssetBoundary: "npm run build:external verifies the included Canary GLB hash and project-scoped rights",
   });
 
   await writeJson(join(evidenceDirectory, "browser-console-readback.json"), {
     schemaVersion: "phase-g-browser-console-readback-2.0.0",
-    result: lifecycleStable && rightsFallbackReadback?.activeMode === "primitive"
+    result: lifecycleStable && externalCanaryReadback?.activeMode === "canary-v1"
       && consoleErrors.length === 0 && unhandledRejections.length === 0 && externalRequests.size === 0 ? "PASS" : "FAILED",
     consoleErrorCount: consoleErrors.length,
     consoleErrors,
@@ -331,7 +331,7 @@ try {
       canaryMode: captureReadbacks.some((entry) => entry.asset.activeMode === "canary-v1") ? "PASS" : "FAILED",
       exactHash: "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
       threeCycles: lifecycleStable ? "PASS" : "FAILED",
-      rightsFallback: rightsFallbackReadback?.activeMode === "primitive" ? "PASS" : "FAILED",
+      externalCanary: externalCanaryReadback?.activeMode === "canary-v1" ? "PASS" : "FAILED",
     },
   });
 
@@ -344,7 +344,7 @@ try {
     consoleErrorCount: consoleErrors.length,
     externalRequestCount: externalRequests.size,
     lifecycleStable,
-    rightsFallback: rightsFallbackReadback?.activeMode ?? "missing",
+    externalCanary: externalCanaryReadback?.activeMode ?? "missing",
   }, null, 2));
 } finally {
   try { await cdp?.close(); } catch {}

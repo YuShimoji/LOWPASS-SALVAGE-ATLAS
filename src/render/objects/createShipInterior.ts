@@ -27,12 +27,13 @@ export interface GateVisualFeedback {
 export function createShipInterior(materials: Ps1MaterialFactory): ShipInteriorView {
   const root = new Group();
   root.name = "phase-a-ship-interior";
-  const floor = materials.create({ color: "#303a3a" });
-  const wall = materials.create({ color: "#59605a" });
-  const fixture = materials.create({ color: "#252d2c" });
-  const brass = materials.create({ color: "#8d7650", metalness: 0.35 });
-  const amber = materials.createEmissive("#d69b58", 0.8);
-  const cyan = materials.createEmissive("#65c6bf", 0.75);
+  const floor = materials.create({ color: "#303d3d", roughness: 0.9 });
+  const wall = materials.create({ color: "#626e68", roughness: 0.88 });
+  const fixture = materials.create({ color: "#222c2d", roughness: 0.9 });
+  const brass = materials.create({ color: "#735f3e", metalness: 0.38, roughness: 0.72 });
+  const ivory = materials.create({ color: "#b6ae8a", roughness: 0.86 });
+  const amber = materials.createEmissive("#e3a45c", 0.95);
+  const cyan = materials.createEmissive("#64d8cf", 0.9);
   const gateRingMaterial = materials.create({
     color: "#8d7650",
     emissive: "#243832",
@@ -66,9 +67,11 @@ export function createShipInterior(materials: Ps1MaterialFactory): ShipInteriorV
   }
 
   for (let z = 3; z >= -9; z -= 1.5) {
-    const strip = new Mesh(new BoxGeometry(0.12, 0.018, 0.78), brass);
-    strip.position.set(0, 0.025, z);
-    root.add(strip);
+    for (const x of [-1.05, 1.05]) {
+      const strip = new Mesh(new BoxGeometry(0.13, 0.022, 0.82), z < -6 ? cyan : brass);
+      strip.position.set(x, 0.027, z);
+      root.add(strip);
+    }
   }
 
   for (const x of [-5.15, 5.15]) {
@@ -101,6 +104,9 @@ export function createShipInterior(materials: Ps1MaterialFactory): ShipInteriorV
   gateRing.position.set(0, 1.7, -9.94);
   gateRing.castShadow = true;
   root.add(gateRing);
+  const gateInnerRing = new Mesh(new TorusGeometry(1.31, 0.075, 6, 20), cyan);
+  gateInnerRing.position.set(0, 1.7, -9.91);
+  root.add(gateInnerRing);
 
   const gateSurface = new Mesh(
     new CircleLikeGeometry(1.49, 20),
@@ -154,7 +160,21 @@ export function createShipInterior(materials: Ps1MaterialFactory): ShipInteriorV
     root.add(berth);
     const berthLamp = new Mesh(new BoxGeometry(0.34, 0.06, 0.12), amber);
     berthLamp.position.set(x, 0.54, 2.94);
-    root.add(berthLamp);
+    const berthFrame = new Mesh(new BoxGeometry(1.7, 0.12, 1.02), ivory);
+    berthFrame.position.set(x, 0.52, 3.35);
+    root.add(berthLamp, berthFrame);
+  }
+
+  for (const x of [-4.75, 4.75]) {
+    for (const z of [-6.2, -3.2, -0.2]) {
+      const locker = new Group();
+      const shell = new Mesh(new BoxGeometry(0.48, 1.2, 1.1), fixture);
+      const latch = new Mesh(new BoxGeometry(0.06, 0.26, 0.32), amber);
+      latch.position.set(x < 0 ? 0.27 : -0.27, 0, -0.28);
+      locker.add(shell, latch);
+      locker.position.set(x, 1.05, z);
+      root.add(locker);
+    }
   }
 
   for (const x of [-3.4, 3.4]) {
@@ -195,6 +215,7 @@ export function createShipInterior(materials: Ps1MaterialFactory): ShipInteriorV
       gateLight.intensity = lightIntensity;
       gateLight.color.set(gateFeedback?.accepted ? "#55e59c" : gateFeedback ? "#ff594d" : "#5caaa0");
       gateSurface.rotation.z = elapsedSeconds * 0.025;
+      gateInnerRing.rotation.z = -elapsedSeconds * 0.04;
     },
     dispose(): void {
       disposeObjectTree(root);

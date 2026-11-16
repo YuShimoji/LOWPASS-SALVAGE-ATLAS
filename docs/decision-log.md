@@ -1,6 +1,27 @@
 # Decision Log
 
 この文書は確定済みの設計判断だけを記録します。検討中の案は `idea-ledger.md`、実装・検証の詳細は `README.md` に置きます。
+
+## 2026-08-04 — Procedural CanaryをLOWPASS project-scoped productionへ昇格する
+
+- 決定: `lowpass-readability-canary-v1`を`LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1`の範囲で`DECLARED`とし、LOWPASS gameの開発・保守・build・同gameの配布へ使用できるproduction packとして承認する
+- authority: ownerの本task内指示。producer正本はCGAW commit `5d33ba89f141303072e2bc782c8f54302c6fd572`と`docs/compat/lowpass-v1/RIGHTS.md`
+- 実装: importerはGLB/manifest SHA、producer commit、LicenseRef、manifest/readback rights一致をfail closedで固定する。external buildはassetを除去せず、exact GLBとproject scopeを検証して同梱する
+- 境界: standalone asset配布、一般第三者再利用、concept art、将来texture/audio/第三者素材、PR/main、release/deploy/publicationは承認しない。primitive fallback、simulation authority、Security Cell規則は維持する
+
+## 2026-08-04 — 回収物の視覚言語をgameplay stateの投影に限定する
+
+- 決定: 浄水フィルター、冷却コイル、リレーコアを別シルエット・別色にし、必須 / 任意をtick数で区別するground markerと抽出方向chevronをgeometry-onlyで描画する
+- 理由: 現行primitiveではリレーコアが冷却コイルと同じ姿になり、目的種別、必須性、帰還方向を画面だけで説明できなかったため
+- 帰結: marker表示は`ItemLocation.kind === "mission-ground"`から投影し、運搬時は消す。Three.js表示は所在、衝突、経路、精算を所有しない。texture追加、gameplay変更、Canary rights昇格、production asset承認は行わない
+
+## 2026-08-04 — field visualを「明るい無人街」まで拡張する
+
+- 決定: LOWPASSのfield既定を「暗い放棄施設」に限定しない。普通のoffice、building、shopping mall、station、housing、library、hotel、medical center、parking / logistics、school / community campusを含む、人は不在だが必ずしも崩壊していない都市を正規の探索範囲とする
+- visual evidence: `docs/concept-art/field-expansion-v1/` の10枚を都市scaleのconcept基準とする。`docs/concept-art/visual-overhaul-v1/` は現行浸水marketとmachine / propの局所studyへ限定する
+- 理由: 無人状態を全面的な暗さ、瓦礫、放棄施設だけで表現すると、場所の用途、route topology、日常生活の不在というLOWPASS固有の判断材料が失われるため
+- 帰結: 昼光、通常建築、glass、植栽、暖色舗装、稼働中設備を既定選択肢に含める。浸水、停電、破損、過成長はfield固有条件とし、全体paletteへ昇格しない。concept画像は`CONCEPT_REFERENCE_ONLY`で、gameplay authorityやproduction asset approvalを変更しない
+
 ## 2026-07-29 — Phase G正本を両履歴保全のno-force reconciliationへ確定する
 
 - 決定: canonical implementation sourceはlocal `d2683ee` lineageとし、remote `f3ea10949a908236adad1d2106ff0634804fc4bd` は履歴を保全したgreen baselineだがacceptance-equivalentではないものとしてsupersedeする

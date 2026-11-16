@@ -4,8 +4,11 @@ import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 export const EXPECTED_GLB_SHA256 = "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102";
+export const EXPECTED_MANIFEST_SHA256 = "9b2e9b87805456f72ca66fd0e4915bff1b23c1c4f4f4c6e7052fdfb4c8ee9f05";
 export const EXPECTED_SCHEMA_VERSION = "lowpass-runtime-asset-pack-1.0.0";
-export const EXPECTED_SOURCE_COMMIT = "c893374ab0edd7329bd1482dbd6b99960acbbb68";
+export const EXPECTED_SOURCE_COMMIT = "5d33ba89f141303072e2bc782c8f54302c6fd572";
+export const EXPECTED_SOURCE_BRANCH = "codex/runtime-bundle-rights-gate-v1";
+export const EXPECTED_LICENSE_ID = "LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1";
 const EXPECTED_ROLES = [
   "allied-porter",
   "field-terminal",
@@ -36,15 +39,15 @@ export async function importLowpassCanary({ sourceDirectory, projectRoot }) {
   const manifest = parseJson(manifestText, "MANIFEST_JSON_INVALID");
   const sourceReadback = parseJson(sourceReadbackText, "READBACK_JSON_INVALID");
   const exactGlbSha256 = sha256(glb);
-  validateSourceContract(manifest, sourceReadback, exactGlbSha256);
+  const exactManifestSha256 = sha256(Buffer.from(manifestText));
+  validateSourceContract(manifest, sourceReadback, exactGlbSha256, exactManifestSha256);
   const rights = {
-    rightsStatus: "NOASSERTION",
-    internalOnly: true,
-    distributionApproved: false,
-    reviewLabel: "INTERNAL REVIEW ONLY",
+    rightsStatus: "DECLARED",
+    licenseId: EXPECTED_LICENSE_ID,
+    internalOnly: false,
+    distributionApproved: true,
+    reviewLabel: "LOWPASS PROJECT USE APPROVED",
   };
-  const runtimeManifest = { ...manifest, rights };
-
   const publicDirectory = join(targetRoot, "public", "assets", "lowpass-canary-v1");
   const generatedDirectory = join(targetRoot, "src", "game", "content", "generated");
   const fixtureDirectory = join(targetRoot, "src", "game", "content", "fixtures");
@@ -95,19 +98,21 @@ export async function importLowpassCanary({ sourceDirectory, projectRoot }) {
     displayName: "LOWPASS Semantic Canary v1",
     manifestVersion: manifest.schemaVersion,
     exactGlbSha256,
-    rightsStatus: "NOASSERTION",
-    internalOnly: true,
-    distributionApproved: false,
-    reviewLabel: "INTERNAL REVIEW ONLY",
+    rightsStatus: rights.rightsStatus,
+    licenseId: rights.licenseId,
+    internalOnly: rights.internalOnly,
+    distributionApproved: rights.distributionApproved,
+    reviewLabel: rights.reviewLabel,
     manifestRights: rights,
     glbPath: "assets/lowpass-canary-v1/lowpass-readability-canary-v1.runtime.glb",
     manifestPath: "assets/lowpass-canary-v1/lowpass-readability-canary-v1.manifest.json",
     sourceReadbackPath: "assets/lowpass-canary-v1/lowpass-readability-canary-v1.source-readback.json",
     source: {
       repository: "CodexGameAssetWorkbench",
-      branch: "feat/lowpass-asset-canary-v1",
+      branch: EXPECTED_SOURCE_BRANCH,
       commit: EXPECTED_SOURCE_COMMIT,
       artifactGlbSha256: exactGlbSha256,
+      artifactManifestSha256: exactManifestSha256,
     },
     counts: {
       assets: manifest.assets.length,
@@ -150,7 +155,7 @@ export async function importLowpassCanary({ sourceDirectory, projectRoot }) {
   };
   const consumerReadback = {
     schemaVersion: "lowpass-asset-consumer-readback-1.0.0",
-    state: "LOWPASS_CANARY_IMPORTED_INTERNAL_ONLY",
+    state: "LOWPASS_CANARY_IMPORTED_PROJECT_SCOPED_PRODUCTION",
     assetPackId: registry.assetPackId,
     exactGlbSha256,
     sourceCommit: EXPECTED_SOURCE_COMMIT,
@@ -166,6 +171,8 @@ export async function importLowpassCanary({ sourceDirectory, projectRoot }) {
       finiteBounds: true,
       absolutePathsAbsent: true,
       primitiveFallbackRequired: true,
+      projectScopedRights: true,
+      distributionApproved: true,
     },
     rights: { ...rights },
     counts: registry.counts,
@@ -173,7 +180,7 @@ export async function importLowpassCanary({ sourceDirectory, projectRoot }) {
 
   const outputs = [
     [join(publicDirectory, FILES.glb), glb],
-    [join(publicDirectory, FILES.manifest), canonicalJson(runtimeManifest)],
+    [join(publicDirectory, FILES.manifest), manifestText],
     [join(publicDirectory, "lowpass-readability-canary-v1.source-readback.json"), canonicalJson(sourceReadback)],
     [join(publicDirectory, "rights-provenance.json"), canonicalJson(provenance)],
     [join(publicDirectory, "asset-consumer-readback.json"), canonicalJson(consumerReadback)],
@@ -192,12 +199,30 @@ export async function importLowpassCanary({ sourceDirectory, projectRoot }) {
   return { registry, consumerReadback, outputs: outputs.map(([path]) => relative(targetRoot, path).replaceAll("\\", "/")) };
 }
 
-export function validateSourceContract(manifest, readback, exactGlbSha256) {
+export function validateSourceContract(manifest, readback, exactGlbSha256, exactManifestSha256 = EXPECTED_MANIFEST_SHA256) {
   if (exactGlbSha256 !== EXPECTED_GLB_SHA256) {
     throw new LowpassCanaryImportError("GLB_SHA256_MISMATCH", `expected ${EXPECTED_GLB_SHA256}, actual ${exactGlbSha256}`);
   }
   if (manifest.schemaVersion !== EXPECTED_SCHEMA_VERSION || readback.schemaVersion !== EXPECTED_SCHEMA_VERSION) {
     throw new LowpassCanaryImportError("SCHEMA_VERSION_MISMATCH", String(manifest.schemaVersion));
+  }
+  if (exactManifestSha256 !== EXPECTED_MANIFEST_SHA256) {
+    throw new LowpassCanaryImportError("MANIFEST_SHA256_MISMATCH", `expected ${EXPECTED_MANIFEST_SHA256}, actual ${exactManifestSha256}`);
+  }
+  if (
+    manifest.license?.status !== "DECLARED"
+    || manifest.license?.licenseId !== EXPECTED_LICENSE_ID
+    || typeof manifest.license?.notice !== "string"
+    || manifest.license.notice.trim().length === 0
+  ) {
+    throw new LowpassCanaryImportError("RIGHTS_DECLARATION_MISMATCH", JSON.stringify(manifest.license ?? null));
+  }
+  if (
+    readback.rights?.status !== manifest.license.status
+    || readback.rights?.licenseId !== manifest.license.licenseId
+    || readback.rights?.notice !== manifest.license.notice
+  ) {
+    throw new LowpassCanaryImportError("RIGHTS_READBACK_MISMATCH", JSON.stringify(readback.rights ?? null));
   }
   const roles = manifest.assets.map((asset) => asset.role).sort();
   if (JSON.stringify(roles) !== JSON.stringify(EXPECTED_ROLES)) {
