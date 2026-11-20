@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>HUD rough (C) 2026-11-21</title>
+<style>
+  :root {
+    --ink: #e4ece0; --muted: #9db3a6; --amber: #f0c47a; --cyan: #7fe0d2; --danger: #ff6a55;
+    --panel: rgba(6, 12, 13, 0.62); --line: rgba(160, 200, 185, 0.22);
+    font-family: "Bahnschrift", "BIZ UDGothic", "Yu Gothic UI", "Segoe UI", sans-serif;
+  }
+  body { margin: 0; background: #0b1112; color: var(--ink); width: 1280px; }
+  .stage { position: relative; width: 1280px; height: 720px; overflow: hidden;
+    background: url("../after-b/market-keyframe-canary-after-b.png") center / cover; }
+  .objective { position: absolute; left: 28px; top: 24px; padding: 10px 16px 11px 14px;
+    border-left: 3px solid var(--amber); background: linear-gradient(90deg, var(--panel), rgba(6,12,13,0)); min-width: 340px; }
+  .objective small { display: block; color: var(--amber); font-size: 12px; letter-spacing: 0.14em; }
+  .objective strong { display: block; margin-top: 3px; font-size: 18px; font-weight: 600; letter-spacing: 0.02em; }
+  .objective span { display: block; margin-top: 2px; color: var(--muted); font-size: 13px; }
+  .status { position: absolute; right: 28px; top: 24px; display: flex; gap: 10px; align-items: center; font-size: 14px; }
+  .status .who { padding: 7px 12px; background: var(--panel); border: 1px solid var(--line); }
+  .status .who b { color: var(--cyan); font-weight: 600; }
+  .status button { width: 34px; height: 34px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 14px; }
+  .caption { position: absolute; left: 50%; top: 92px; transform: translateX(-50%); padding: 8px 20px;
+    font-size: 17px; letter-spacing: 0.04em; background: rgba(40, 8, 4, 0.55); border-top: 1px solid rgba(255,106,85,0.6);
+    border-bottom: 1px solid rgba(255,106,85,0.6); color: #ffd9cf; }
+  .prompt { position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%); display: flex; gap: 10px; align-items: center;
+    padding: 9px 16px; background: var(--panel); font-size: 16px; }
+  .key { display: inline-grid; place-items: center; min-width: 26px; height: 26px; padding: 0 6px; border: 1px solid var(--ink);
+    border-bottom-width: 3px; font-size: 14px; font-weight: 700; color: var(--ink); }
+  .squad { position: absolute; right: 28px; bottom: 28px; width: 250px; padding: 10px 12px; background: var(--panel); border: 1px solid var(--line); font-size: 13px; }
+  .squad .row { display: flex; justify-content: space-between; margin-top: 5px; }
+  .squad .row span:last-child { color: var(--muted); }
+  .squad .dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; background: var(--cyan); }
+  .squad .dot.far { background: #5a6e68; }
+  .hint { position: absolute; left: 28px; bottom: 26px; display: flex; gap: 14px; color: var(--muted); font-size: 13px; opacity: 0.85; }
+  .hint .key { min-width: 20px; height: 20px; font-size: 12px; border-color: var(--muted); color: var(--muted); }
+  .note { position: absolute; border: 1px dashed #ffe08a; color: #ffe08a; font: 12px "BIZ UDGothic", sans-serif; padding: 2px 6px; background: rgba(0,0,0,0.55); }
+  .legend { padding: 14px 28px 20px; font: 14px/1.7 "BIZ UDGothic", "Yu Gothic UI", sans-serif; color: #d6dfd6; }
+  .legend h2 { margin: 0 0 6px; font-size: 16px; color: #ffe08a; }
+  .legend ol { margin: 0; padding-left: 22px; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <section class="objective">
+      <small>目標</small>
+      <strong>浄水フィルターを回収する　0 / 3</strong>
+      <span>冷却コイル：未積載</span>
+    </section>
+    <div class="status"><div class="who">操作中 <b>Rook</b></div><button aria-label="一時停止">Ⅱ</button></div>
+    <div class="caption">監視ドローンに捕捉された</div>
+    <div class="prompt"><span class="key">E</span> 浄水フィルターを回収</div>
+    <aside class="squad">
+      <div><b style="color:var(--cyan)">分隊</b>　2名と通信中</div>
+      <div class="row"><span><i class="dot"></i>Mara</span><span>近い</span></div>
+      <div class="row"><span><i class="dot far"></i>Ito</span><span>通信弱</span></div>
+    </aside>
+    <div class="hint"><span><span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span> 移動</span><span>右ドラッグ 視点</span><span>ホイール 距離</span><span><span class="key">E</span> 調べる</span></div>
+    <span class="note" style="left: 380px; top: 30px;">① 目標だけ大きく（左上）</span>
+    <span class="note" style="left: 640px; top: 140px;">② 字幕は日本語・中央上・1.6秒</span>
+    <span class="note" style="left: 760px; top: 600px;">③ 分隊は名前と距離感だけ</span>
+    <span class="note" style="left: 380px; top: 646px;">④ 操作説明は弱く、F1診断は既定で非表示</span>
+  </div>
+  <div class="legend">
+    <h2>C HUD ラフ（実画面＝B画面適用後の市場に重ねた案）</h2>
+    <ol>
+      <li>文字は最小12px。書体は英数字 Bahnschrift、日本語 BIZ UDゴシック（どちらもWindows標準。外部フォントは読まない）。</li>
+      <li>消すもの：PHASE G / SECURITY CELL、CTRL PLAYER · LEAD PLAYER、DRAFT · 18/28U、英語字幕、右下の診断パネル（F1 と <code>?qa=1</code> で表示）。</li>
+      <li>監視・ロックなどの状態は文字ではなく画面内の光で出す（橙の監視円錐・赤のロックレーザーはB画面で実装済み）。</li>
+    </ol>
+  </div>
+</body>
+</html>

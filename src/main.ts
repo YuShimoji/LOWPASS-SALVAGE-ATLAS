@@ -120,6 +120,7 @@ declare global {
         };
       };
       teleportForQa(x: number, z: number): void;
+      setCameraPoseForQa(yaw: number, pitch: number, distance: number, playerFacingYaw?: number): void;
       setAgentPositionForQa(agentId: CrewId, x: number, z: number): void;
       issueOrderForQa(agentId: CrewId, type: SquadOrderType, zoneId?: string): string;
       switchControlForQa(agentId: CrewId): string;
@@ -1759,6 +1760,10 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       physics?.teleportCharacter(position);
       simulation.teleportPlayer(position);
       refreshMissionInteractions();
+    },
+    setCameraPoseForQa: (yaw, pitch, distance, playerFacingYaw) => {
+      renderSystem?.cameraRig.setPoseForQa(yaw, pitch, distance);
+      if (playerFacingYaw !== undefined) state.player.facingYaw = playerFacingYaw;
     },
     setAgentPositionForQa: (agentId, x, z) => {
       squadController?.setAgentPositionForQa(agentId, { x, y: 0.93, z });

@@ -70,6 +70,15 @@ export class ThirdPersonCamera {
     this.initialized = false;
   }
 
+  /** QA/evidence only: pin a camera pose so before/after screenshots share the same framing. */
+  setPoseForQa(yaw: number, pitch: number, distance: number): void {
+    this.yaw = yaw;
+    this.pitch = MathUtils.clamp(pitch, MIN_CAMERA_PITCH, MAX_CAMERA_PITCH);
+    this.desiredDistance = MathUtils.clamp(distance, MIN_CAMERA_DISTANCE, MAX_CAMERA_DISTANCE);
+    this.smoothedDistance = this.desiredDistance;
+    this.initialized = false;
+  }
+
   resetFromStart(playerPosition: { x: number; y: number; z: number }, cameraPosition: { x: number; y: number; z: number }): void {
     const dx = cameraPosition.x - playerPosition.x;
     const dz = cameraPosition.z - playerPosition.z;

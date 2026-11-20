@@ -1,7 +1,9 @@
 import {
+  AdditiveBlending,
   BoxGeometry,
   ConeGeometry,
   CylinderGeometry,
+  DoubleSide,
   Group,
   Mesh,
   PlaneGeometry,
@@ -20,6 +22,9 @@ import type { PorterAndroidState } from "../../game/machines/machineTypes";
 import type { Ps1MaterialFactory } from "../materials/Ps1MaterialFactory";
 import { disposeObjectTree } from "./disposeObjectTree";
 import type { MissionWorldView } from "./missionWorldView";
+import { FLOODED_MARKET_LIGHTING } from "../app/sceneLighting";
+import { createMarketDressing } from "./createMarketDressing";
+import { applyWaterlineStain, applyWorldUv } from "./surfaceDetail";
 import type {
   CanaryRoleInstance,
   LoadedCanaryMissionAssetPack,
@@ -37,33 +42,38 @@ export function createFloodedMarket(
 ): MissionWorldView {
   const root = new Group();
   root.name = "phase-d-flooded-market";
-  const concrete = materials.create({ color: "#34413e", roughness: 0.94 });
-  const wall = materials.create({ color: "#5b675e", roughness: 0.9 });
-  const shelf = materials.create({ color: "#465047", metalness: 0.28, roughness: 0.78 });
+  const grime = materials.getSurfaceTexture("grime");
+  const ripple = materials.getSurfaceTexture("ripple");
+  const concrete = materials.create({ color: "#3b4541", roughness: 0.5, metalness: 0.15, map: grime });
+  const wall = materials.create({ color: "#5d6259", roughness: 0.86, map: grime, vertexColors: true });
+  const shelf = materials.create({ color: "#4d554c", metalness: 0.32, roughness: 0.66, map: grime, vertexColors: true });
+  // Dark, glossy flood water: lamps read as highlights on the surface instead of a flat teal glow.
   const water = materials.create({
-    color: "#0d3439",
-    emissive: "#08292d",
-    emissiveIntensity: 0.34,
-    metalness: 0.12,
-    roughness: 0.34,
+    color: "#0a2023",
+    emissive: "#020a0b",
+    emissiveIntensity: 1,
+    metalness: 0.4,
+    roughness: 0.14,
     transparent: true,
-    opacity: 0.76,
+    opacity: 0.56,
     depthWrite: false,
   });
   const waterSheen = materials.create({
-    color: "#2f7b80",
-    emissive: "#18575d",
-    emissiveIntensity: 0.42,
+    color: "#7fd8d0",
+    map: ripple,
     transparent: true,
-    opacity: 0.12,
+    opacity: 0.16,
     depthWrite: false,
-    roughness: 0.22,
+    blending: AdditiveBlending,
+    roughness: 0.3,
   });
   const amber = materials.createEmissive("#e6a85d", 0.9);
   const cyan = materials.createEmissive("#64ddd3", 0.95);
   const red = materials.createEmissive("#ef654f", 0.85);
   const violet = materials.createEmissive("#c286ef", 0.88);
   const dark = materials.create({ color: "#141d1d", roughness: 0.9 });
+  const dressing = createMarketDressing(materials);
+  root.add(dressing.root);
   const ivory = materials.create({ color: "#b8b18f", roughness: 0.88 });
   const bronze = materials.create({ color: "#735f3e", metalness: 0.34, roughness: 0.76 });
   const cameraOccluders: Object3D[] = [];
@@ -78,6 +88,8 @@ export function createFloodedMarket(
     );
     mesh.name = `market-${spec.id}`;
     mesh.position.set(spec.center.x, spec.center.y, spec.center.z);
+    applyWorldUv(mesh.geometry, spec.center, 2);
+    if (spec.surface !== "floor") applyWaterlineStain(mesh.geometry, spec.center.y, 0.55, 0.42);
     mesh.receiveShadow = true;
     mesh.castShadow = spec.surface !== "floor";
     root.add(mesh);
@@ -90,7 +102,8 @@ export function createFloodedMarket(
   floodPlane.rotation.x = -Math.PI / 2;
   floodPlane.position.y = 0.045;
   root.add(floodPlane);
-  const floodHighlight = new Mesh(new PlaneGeometry(9.8, 12.4, 6, 8), waterSheen);
+  const floodHighlight = new Mesh(new PlaneGeometry(13.2, 13.2, 6, 8), waterSheen);
+  applyWorldUv(floodHighlight.geometry, { x: 0, y: 0, z: 0 }, 2.6);
   floodHighlight.rotation.x = -Math.PI / 2;
   floodHighlight.position.set(0, 0.056, -0.2);
   floodHighlight.rotation.z = -0.07;
@@ -118,8 +131,8 @@ export function createFloodedMarket(
     root.add(ceilingStrip);
   }
 
-  const marketSign = new Mesh(new BoxGeometry(4.2, 0.85, 0.18), materials.createEmissive("#6b8d7e", 0.48));
-  marketSign.position.set(0, 2.55, -6.72);
+  const marketSign = new Mesh(new BoxGeometry(4.2, 0.62, 0.18), materials.createEmissive("#6b8d7e", 0.32));
+  marketSign.position.set(0, 3.15, -6.72);
   root.add(marketSign);
 
   for (const x of [-3.4, 0, 3.4]) {
@@ -148,7 +161,7 @@ export function createFloodedMarket(
     root.add(checkout, counter, locator);
   }
 
-  for (const x of [-2.5, 0, 2.5]) {
+  for (const x of [-3.1, -1.4, 3.1]) {
     const servicePanel = new Group();
     const housing = new Mesh(new BoxGeometry(1.5, 0.92, 0.18), dark);
     const fan = new Mesh(new TorusGeometry(0.31, 0.055, 6, 14), bronze);
@@ -331,21 +344,9 @@ export function createFloodedMarket(
     porterView.root.visible = false;
   }
   const canaryLockBeam = canaryViews
-    ? new Mesh(new BoxGeometry(0.055, 0.055, 1), materials.createEmissive("#ef745f", 1.15))
+    ? new Mesh(new BoxGeometry(0.07, 0.07, 1), materials.createEmissive("#ff4a36", 3.2))
     : null;
-  const canaryWideScan = canaryViews
-    ? new Mesh(
-        new BoxGeometry(3.4, 0.018, 4.4),
-        materials.create({
-          color: "#d9b56f",
-          emissive: "#9b7843",
-          emissiveIntensity: 0.35,
-          transparent: true,
-          opacity: 0.1,
-          depthWrite: false,
-        }),
-      )
-    : null;
+  const canaryWideScan = canaryViews ? createScanCone(materials) : null;
   if (canaryLockBeam) {
     canaryLockBeam.visible = false;
     root.add(canaryLockBeam);
@@ -408,6 +409,8 @@ export function createFloodedMarket(
       view.rotation.y = elapsedSeconds * 0.35;
       if (groundMarker?.visible) groundMarker.rotation.y = -elapsedSeconds * 0.18;
     }
+    dressing.animate(elapsedSeconds);
+    ripple.offset.set(elapsedSeconds * 0.018, elapsedSeconds * 0.011);
     extractionRing.rotation.z = elapsedSeconds * 0.18;
     extractionLight.intensity = 2.1 + Math.sin(elapsedSeconds * 3.2) * 0.4;
     floodPlane.position.y = 0.045 + Math.sin(elapsedSeconds * 0.8) * 0.008;
@@ -519,7 +522,7 @@ export function createFloodedMarket(
           if (scanOrigin) {
             canaryViews.watcher.root.updateMatrixWorld(true);
             scanOrigin.getWorldPosition(worldAnchor);
-            canaryWideScan.position.set(worldAnchor.x, worldAnchor.y - 0.72, worldAnchor.z - 2.1);
+            canaryWideScan.position.copy(worldAnchor);
             canaryWideScan.rotation.y = additional.facingYaw + Math.sin(elapsedSeconds * 0.85) * 0.46;
           }
         }
@@ -579,6 +582,11 @@ export function createFloodedMarket(
   return {
     root,
     cameraOccluders,
+    lighting: FLOODED_MARKET_LIGHTING,
+    setWaterReflection(enabled: boolean): void {
+      dressing.setReflection(enabled);
+      water.opacity = enabled ? 0.56 : 0.8;
+    },
     assetPackReadback: canaryAssetPack
       ? {
           mode: "canary-v1",
@@ -597,6 +605,7 @@ export function createFloodedMarket(
     update,
     dispose(): void {
       canaryAssetPack?.dispose();
+      dressing.dispose();
       disposeObjectTree(root);
     },
   };
@@ -607,7 +616,37 @@ interface DroneView {
   readonly rotor: Group;
   readonly contactHalo: Mesh;
   readonly scanBeam: Mesh;
-  readonly wideScan: Mesh | null;
+  readonly wideScan: Group | null;
+}
+
+/**
+ * Watcher surveillance drawn as an orange light cone (concept 09). Pivot sits at the scan
+ * origin; rotate the group around Y to sweep. Pure presentation of the existing scan state.
+ */
+function createScanCone(materials: Ps1MaterialFactory): Group {
+  const pivot = new Group();
+  pivot.name = "watcher-scan-cone";
+  const length = 3.9;
+  const geometry = new ConeGeometry(1.45, length, 14, 1, true);
+  geometry.translate(0, -length / 2, 0);
+  const cone = new Mesh(
+    geometry,
+    materials.create({
+      color: "#ffae52",
+      emissive: "#ff9a3c",
+      emissiveIntensity: 0.55,
+      transparent: true,
+      opacity: 0.13,
+      depthWrite: false,
+      side: DoubleSide,
+      blending: AdditiveBlending,
+    }),
+  );
+  // Aim the opening forward (-Z) and down toward the floor ahead of the watcher.
+  cone.rotation.x = -0.86;
+  cone.renderOrder = 2;
+  pivot.add(cone);
+  return pivot;
 }
 
 function createRouteChevron(material: Material): Group {
@@ -692,8 +731,8 @@ function createScoutDrone(materials: Ps1MaterialFactory): DroneView {
   contactHalo.position.y = 0.42;
   contactHalo.visible = false;
   const scanBeam = new Mesh(
-    new BoxGeometry(0.055, 0.055, 1),
-    materials.createEmissive("#ef745f", 1.15),
+    new BoxGeometry(0.07, 0.07, 1),
+    materials.createEmissive("#ff4a36", 3.2),
   );
   scanBeam.visible = false;
   root.add(hull, spine, optic, keel, rotor, contactHalo, scanBeam);
@@ -733,18 +772,8 @@ function createObservationDrone(materials: Ps1MaterialFactory): DroneView {
   contactHalo.visible = false;
   const scanBeam = new Mesh(new BoxGeometry(0.01, 0.01, 0.01), materials.createEmissive("#e0a35c", 0.2));
   scanBeam.visible = false;
-  const wideScan = new Mesh(
-    new BoxGeometry(3.4, 0.018, 4.4),
-    materials.create({
-      color: "#d9b56f",
-      emissive: "#9b7843",
-      emissiveIntensity: 0.35,
-      transparent: true,
-      opacity: 0.1,
-      depthWrite: false,
-    }),
-  );
-  wideScan.position.set(0, -0.72, -2.1);
+  const wideScan = createScanCone(materials);
+  wideScan.position.set(0, -0.08, -0.32);
   root.add(hull, canopy, keel, optic, rotor, contactHalo, scanBeam, wideScan);
   return { root, rotor, contactHalo, scanBeam, wideScan };
 }

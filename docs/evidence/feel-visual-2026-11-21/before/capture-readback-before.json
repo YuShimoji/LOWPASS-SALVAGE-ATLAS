@@ -1,0 +1,131 @@
+{
+  "label": "before",
+  "consoleErrors": [],
+  "readbacks": [
+    {
+      "shot": "ship-deck",
+      "label": "before",
+      "world": "ship",
+      "render": {
+        "drawCalls": 113,
+        "triangles": 2260,
+        "renderWidth": 1280,
+        "renderHeight": 720,
+        "sceneObjects": 105,
+        "geometries": 83,
+        "textures": 3,
+        "programs": 4,
+        "assetPackMode": "primitive",
+        "assetPackHash": null,
+        "assetLoadDurationMs": 0
+      },
+      "camera": {
+        "desiredDistance": 4.4,
+        "effectiveDistance": 3.6606875413981586,
+        "occlusionActive": true,
+        "yaw": -0.22,
+        "pitch": 0.3
+      }
+    },
+    {
+      "shot": "ship-start-hud",
+      "label": "before",
+      "world": "ship",
+      "render": {
+        "drawCalls": 111,
+        "triangles": 2236,
+        "renderWidth": 1280,
+        "renderHeight": 720,
+        "sceneObjects": 105,
+        "geometries": 83,
+        "textures": 3,
+        "programs": 4,
+        "assetPackMode": "primitive",
+        "assetPackHash": null,
+        "assetLoadDurationMs": 0
+      },
+      "camera": {
+        "desiredDistance": 4.1,
+        "effectiveDistance": 3.7714326158827034,
+        "occlusionActive": true,
+        "yaw": 0,
+        "pitch": 0.28
+      }
+    },
+    {
+      "shot": "market-keyframe-primitive",
+      "label": "before",
+      "world": "mission",
+      "render": {
+        "drawCalls": 249,
+        "triangles": 6920,
+        "renderWidth": 1280,
+        "renderHeight": 720,
+        "sceneObjects": 278,
+        "geometries": 214,
+        "textures": 3,
+        "programs": 3,
+        "assetPackMode": "primitive",
+        "assetPackHash": null,
+        "assetLoadDurationMs": 0
+      },
+      "camera": {
+        "desiredDistance": 3,
+        "effectiveDistance": 3.107468373229815,
+        "occlusionActive": false,
+        "yaw": 0.1,
+        "pitch": 0.06
+      }
+    },
+    {
+      "shot": "market-keyframe-canary",
+      "label": "before",
+      "world": "mission",
+      "render": {
+        "drawCalls": 273,
+        "triangles": 7300,
+        "renderWidth": 1280,
+        "renderHeight": 720,
+        "sceneObjects": 329,
+        "geometries": 195,
+        "textures": 3,
+        "programs": 4,
+        "assetPackMode": "canary-v1",
+        "assetPackHash": "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+        "assetLoadDurationMs": 435.70000000298023
+      },
+      "camera": {
+        "desiredDistance": 3,
+        "effectiveDistance": 3.107466896051472,
+        "occlusionActive": false,
+        "yaw": 0.1,
+        "pitch": 0.06
+      }
+    },
+    {
+      "shot": "market-start-hud-canary",
+      "label": "before",
+      "world": "mission",
+      "render": {
+        "drawCalls": 273,
+        "triangles": 7236,
+        "renderWidth": 1280,
+        "renderHeight": 720,
+        "sceneObjects": 329,
+        "geometries": 188,
+        "textures": 3,
+        "programs": 4,
+        "assetPackMode": "canary-v1",
+        "assetPackHash": "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+        "assetLoadDurationMs": 544.0999999940395
+      },
+      "camera": {
+        "desiredDistance": 4.1,
+        "effectiveDistance": 4.492122230905879,
+        "occlusionActive": false,
+        "yaw": 0.14601225771127538,
+        "pitch": 0.5857741761521881
+      }
+    }
+  ]
+}

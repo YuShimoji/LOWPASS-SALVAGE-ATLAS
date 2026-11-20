@@ -6,6 +6,8 @@ import {
   Fog,
   HemisphereLight,
   PCFShadowMap,
+  Object3D,
+  PointLight,
   SRGBColorSpace,
   Vector2,
   Vector3,
@@ -20,7 +22,15 @@ import { disposeObjectTree } from "../objects/disposeObjectTree";
 import { interpolatePlayerPosition } from "../adapters/renderBridge";
 import { ThirdPersonCamera } from "./ThirdPersonCamera";
 import { Scene } from "three";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+import { VignetteShader } from "three/addons/shaders/VignetteShader.js";
 import { GateFeedbackAudio } from "../audio/GateFeedbackAudio";
+import { DEFAULT_SCENE_LIGHTING, type SceneLightingProfile } from "./sceneLighting";
+import { chooseRenderTier, type RenderTier } from "./renderTier";
 
 export interface RenderDiagnostics {
   drawCalls: number;
@@ -34,6 +44,15 @@ export interface RenderDiagnostics {
   assetPackMode: "primitive" | "canary-v1";
   assetPackHash: string | null;
   assetLoadDurationMs: number;
+  /** "reduced" drops presentation-only cost (post chain, reflection, decorative lamps, shadows). */
+  renderTier: RenderTier;
+  rendererName: string;
+}
+
+function readRendererName(renderer: WebGLRenderer): string {
+  const gl = renderer.getContext();
+  const info = gl.getExtension("WEBGL_debug_renderer_info");
+  return String(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER) ?? "");
 }
 
 export class RenderSystem {
@@ -52,6 +71,18 @@ export class RenderSystem {
   private lastGateScanRevision = -1;
   private lastLowResolution: boolean | null = null;
   private disposed = false;
+  private readonly ambient = new AmbientLight();
+  private readonly hemisphere = new HemisphereLight();
+  private readonly key = new DirectionalLight();
+  private readonly fill = new DirectionalLight();
+  private readonly characterLight = new PointLight("#ffffff", 0, 4.8, 2);
+  private readonly characterLightOffset = new Vector3();
+  private readonly composer: EffectComposer;
+  private readonly bloomPass: UnrealBloomPass;
+  private readonly vignettePass: ShaderPass;
+  private activeLightingId = "";
+  private readonly renderTier: RenderTier;
+  private readonly rendererName: string;
 
   constructor(
     private readonly mount: HTMLElement,
@@ -66,34 +97,38 @@ export class RenderSystem {
     this.canvas.tabIndex = 0;
     this.renderer.outputColorSpace = SRGBColorSpace;
     this.renderer.toneMapping = ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.18;
-    this.renderer.shadowMap.enabled = true;
+    this.rendererName = readRendererName(this.renderer);
+    this.renderTier = chooseRenderTier(this.rendererName, new URLSearchParams(window.location.search).get("render"));
+    this.renderer.shadowMap.enabled = this.renderTier === "full";
     this.renderer.shadowMap.type = PCFShadowMap;
-    this.renderer.setClearColor(new Color("#07171a"));
+    // Draw calls are summed over the scene pass and the post passes of one frame.
+    this.renderer.info.autoReset = false;
 
-    this.scene.background = new Color("#07171a");
+    this.scene.background = new Color();
     this.scene.fog = this.fog;
     const initialShip = this.ship;
     if (!initialShip) throw new Error("Ship view failed to initialize");
     this.scene.add(initialShip.root, this.avatar);
+    this.applyTierToWorld(initialShip.root);
 
-    const ambient = new AmbientLight(0x8aa5a1, 1.05);
-    this.scene.add(ambient);
-    const environment = new HemisphereLight(0xa4cfca, 0x231c15, 1.55);
-    this.scene.add(environment);
-    const key = new DirectionalLight(0xffddb2, 3.1);
-    key.position.set(3, 8, 4);
-    key.castShadow = true;
-    key.shadow.mapSize.set(1024, 1024);
-    key.shadow.camera.left = -9;
-    key.shadow.camera.right = 9;
-    key.shadow.camera.top = 7;
-    key.shadow.camera.bottom = -11;
-    key.shadow.bias = -0.00035;
-    this.scene.add(key);
-    const floodFill = new DirectionalLight(0x70bcc2, 1.4);
-    floodFill.position.set(-6, 4, -5);
-    this.scene.add(floodFill);
+    this.key.castShadow = true;
+    this.key.shadow.mapSize.set(1024, 1024);
+    this.key.shadow.camera.left = -9;
+    this.key.shadow.camera.right = 9;
+    this.key.shadow.camera.top = 7;
+    this.key.shadow.camera.bottom = -11;
+    this.key.shadow.bias = -0.00035;
+    this.scene.add(this.ambient, this.hemisphere, this.key, this.fill, this.characterLight);
+
+    // Post chain (three.js 0.185 addons): HDR scene -> bloom on emissive lamps -> vignette -> tone map + sRGB.
+    this.composer = new EffectComposer(this.renderer);
+    this.composer.addPass(new RenderPass(this.scene, this.cameraRig.camera));
+    this.bloomPass = new UnrealBloomPass(new Vector2(1280, 720), 0.5, 0.4, 0.8);
+    this.composer.addPass(this.bloomPass);
+    this.vignettePass = new ShaderPass(VignetteShader);
+    this.composer.addPass(this.vignettePass);
+    this.composer.addPass(new OutputPass());
+    this.applyLighting(initialShip.lighting ?? DEFAULT_SCENE_LIGHTING);
 
     this.mount.prepend(this.canvas);
     window.addEventListener("resize", this.handleResize);
@@ -122,6 +157,8 @@ export class RenderSystem {
     this.removeCurrentWorld();
     this.missionView = view;
     this.scene.add(view.root);
+    this.applyTierToWorld(view.root);
+    this.applyLighting(view.lighting ?? DEFAULT_SCENE_LIGHTING);
     if (cameraStart) this.cameraRig.resetFromStart(cameraStart.playerPosition, cameraStart.cameraPosition);
     else this.cameraRig.reset();
   }
@@ -130,6 +167,8 @@ export class RenderSystem {
     this.removeCurrentWorld();
     this.ship = createShipInterior(this.materials);
     this.scene.add(this.ship.root);
+    this.applyTierToWorld(this.ship.root);
+    this.applyLighting(this.ship.lighting ?? DEFAULT_SCENE_LIGHTING);
     this.cameraRig.reset();
   }
 
@@ -144,6 +183,11 @@ export class RenderSystem {
     this.avatar.rotation.y = state.player.facingYaw;
     const cameraOccluders = this.missionView?.cameraOccluders ?? this.ship?.cameraOccluders ?? [];
     this.cameraRig.update(this.interpolatedPlayer, frameSeconds, cameraOccluders);
+    // Keep the character light between camera and character, above head height.
+    this.characterLightOffset.subVectors(this.cameraRig.camera.position, this.interpolatedPlayer).setY(0);
+    if (this.characterLightOffset.lengthSq() > 0.0001) this.characterLightOffset.setLength(1.1);
+    this.characterLight.position.copy(this.interpolatedPlayer).add(this.characterLightOffset);
+    this.characterLight.position.y += 1.35;
     const gateScan = state.expedition.gateScan;
     if (gateScan && gateScan.revision !== this.lastGateScanRevision) {
       this.lastGateScanRevision = gateScan.revision;
@@ -165,7 +209,9 @@ export class RenderSystem {
           : null,
       );
     }
-    this.renderer.render(this.scene, this.cameraRig.camera);
+    this.renderer.info.reset();
+    if (state.settings.postEffects && this.renderTier === "full") this.composer.render(frameSeconds);
+    else this.renderer.render(this.scene, this.cameraRig.camera);
   }
 
   getDiagnostics(): RenderDiagnostics {
@@ -186,6 +232,8 @@ export class RenderSystem {
       assetPackMode: this.missionView?.assetPackReadback.mode ?? "primitive",
       assetPackHash: this.missionView?.assetPackReadback.exactHash ?? null,
       assetLoadDurationMs: this.missionView?.assetPackReadback.loadDurationMs ?? 0,
+      renderTier: this.renderTier,
+      rendererName: this.rendererName,
     };
   }
 
@@ -195,6 +243,9 @@ export class RenderSystem {
     window.removeEventListener("resize", this.handleResize);
     this.canvas.removeEventListener("webglcontextlost", this.handleContextLost);
     this.canvas.removeEventListener("webglcontextrestored", this.handleContextRestored);
+    this.composer.dispose();
+    this.bloomPass.dispose();
+    this.vignettePass.dispose();
     this.renderer.dispose();
     this.gateAudio.dispose();
     this.removeCurrentWorld();
@@ -217,9 +268,48 @@ export class RenderSystem {
     }
   }
 
+  private applyLighting(profile: SceneLightingProfile): void {
+    if (profile.id === this.activeLightingId) return;
+    this.activeLightingId = profile.id;
+    (this.scene.background as Color).set(profile.background);
+    this.renderer.setClearColor(profile.background);
+    this.fog.color.set(profile.fog.color);
+    this.fog.near = profile.fog.near;
+    this.fog.far = profile.fog.far;
+    this.renderer.toneMappingExposure = profile.exposure;
+    this.ambient.color.set(profile.ambient.color);
+    this.ambient.intensity = profile.ambient.intensity;
+    this.hemisphere.color.set(profile.hemisphere.sky);
+    this.hemisphere.groundColor.set(profile.hemisphere.ground);
+    this.hemisphere.intensity = profile.hemisphere.intensity;
+    this.key.color.set(profile.key.color);
+    this.key.intensity = profile.key.intensity;
+    this.key.position.set(...profile.key.position);
+    this.fill.color.set(profile.fill.color);
+    this.fill.intensity = profile.fill.intensity;
+    this.fill.position.set(...profile.fill.position);
+    this.characterLight.color.set(profile.character.color);
+    this.characterLight.intensity = profile.character.intensity;
+    this.bloomPass.strength = profile.bloom.strength;
+    this.bloomPass.radius = profile.bloom.radius;
+    this.bloomPass.threshold = profile.bloom.threshold;
+    const vignetteUniforms = this.vignettePass.uniforms as Record<string, { value: number }>;
+    if (vignetteUniforms.offset) vignetteUniforms.offset.value = profile.vignette.offset;
+    if (vignetteUniforms.darkness) vignetteUniforms.darkness.value = profile.vignette.darkness;
+  }
+
+  /** Reduced tier hides lamps tagged `userData.decorative`; gameplay feedback lights stay. */
+  private applyTierToWorld(root: Object3D): void {
+    if (this.renderTier === "full") return;
+    root.traverse((object) => {
+      if ((object as PointLight).isPointLight && object.userData.decorative === true) object.visible = false;
+    });
+  }
+
   private applySettings(settings: VisualSettings): void {
     this.scene.fog = settings.distanceFog ? this.fog : null;
     this.materials.updateSettings(settings);
+    this.missionView?.setWaterReflection?.(settings.waterReflection && this.renderTier === "full");
     if (this.lastLowResolution !== settings.lowResolution) {
       this.lastLowResolution = settings.lowResolution;
       this.resize();
@@ -230,10 +320,12 @@ export class RenderSystem {
     if (this.disposed) return;
     const width = Math.max(this.mount.clientWidth, window.innerWidth, 1);
     const height = Math.max(this.mount.clientHeight, window.innerHeight, 1);
-    const resolutionScale = this.lastLowResolution === false ? 1 : 0.62;
+    const resolutionScale = this.lastLowResolution === false && this.renderTier === "full" ? 1 : 0.62;
     const pixelRatio = Math.min(window.devicePixelRatio, 1.5) * resolutionScale;
     this.renderer.setPixelRatio(pixelRatio);
     this.renderer.setSize(width, height, true);
+    this.composer.setPixelRatio(pixelRatio);
+    this.composer.setSize(width, height);
     this.cameraRig.resize(width, height);
     this.renderer.getDrawingBufferSize(this.drawingBufferSize);
     this.materials.updateResolution(this.drawingBufferSize.x, this.drawingBufferSize.y);

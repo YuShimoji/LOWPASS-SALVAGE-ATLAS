@@ -113,6 +113,8 @@ export class Hud {
     this.addSetting(settingsList, "distanceFog", "距離フォグ", initialSettings.distanceFog);
     this.addSetting(settingsList, "vertexSnap", "頂点スナップ", initialSettings.vertexSnap);
     this.addSetting(settingsList, "dithering", "ディザリング", initialSettings.dithering);
+    this.addSetting(settingsList, "waterReflection", "水面の反射", initialSettings.waterReflection);
+    this.addSetting(settingsList, "postEffects", "発光・周辺減光", initialSettings.postEffects);
 
     this.root.querySelector("[data-pause]")?.addEventListener("click", this.callbacks.onPauseToggle);
     this.root.querySelector("[data-resume]")?.addEventListener("click", this.callbacks.onPauseToggle);
