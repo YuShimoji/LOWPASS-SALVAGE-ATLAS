@@ -26,6 +26,11 @@ export interface HudDiagnostics {
   dom: DomDiagnostics;
 }
 
+export interface HudOptions {
+  /** Show the diagnostics panel at start (QA builds via ?qa=1). F1 toggles it either way. */
+  readonly diagnosticsVisible?: boolean;
+}
+
 export interface HudCallbacks {
   onPauseToggle(): void;
   onVisualSetting<K extends keyof VisualSettings>(key: K, value: VisualSettings[K]): void;
@@ -44,30 +49,29 @@ export class Hud {
   private gateScanRevision = -1;
   private noticeTimer = 0;
   private gateScanTimer = 0;
-  private debugVisible = true;
+  private lastPrompt: string | null = null;
+  private debugVisible: boolean;
 
   constructor(
     mount: HTMLElement,
     initialSettings: VisualSettings,
     private readonly callbacks: HudCallbacks,
+    options: HudOptions = {},
   ) {
+    this.debugVisible = options.diagnosticsVisible ?? false;
     this.root.className = "ui-layer";
     this.root.innerHTML = `
-      <header class="brand-chip" aria-label="Game title">
-        <span class="brand-kicker">PHASE G / SECURITY CELL</span>
-        <strong>LOWPASS</strong><span class="brand-subtitle">SALVAGE ATLAS</span>
-      </header>
       <section class="objective-chip" aria-label="Current objective">
-        <span>現在目標</span>
+        <span>目標</span>
         <strong data-objective>出撃コンソールで遠征編成を確定する</strong>
       </section>
       <section class="status-chip" aria-label="Current status">
-        <span data-status>DRAFT · 18/28U</span>
+        <span data-status>積載 18 / 28</span>
         <button type="button" data-pause aria-label="設定を開く">Ⅱ</button>
       </section>
       <div class="reticle" aria-hidden="true"></div>
       <aside class="controls-hint">
-        <span>WASD</span> 移動　<span>RIGHT DRAG</span> CAMERA　<span>WHEEL</span> DISTANCE　<span>E</span> 操作　<span>F1</span> 診断
+        <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移動</span><span>右ドラッグ 視点</span><span>ホイール 距離</span><span><kbd>E</kbd> 調べる</span><span><kbd>F1</kbd> 診断</span>
       </aside>
     `;
 
@@ -91,13 +95,14 @@ export class Hud {
 
     this.debug.className = "debug-hud";
     this.debug.setAttribute("aria-label", "Debug diagnostics");
+    this.debug.hidden = !this.debugVisible;
     this.root.append(this.debug);
 
     this.pauseOverlay.className = "pause-overlay";
     this.pauseOverlay.setAttribute("aria-hidden", "true");
     this.pauseOverlay.innerHTML = `
       <div class="pause-panel" role="dialog" aria-modal="true" aria-labelledby="pause-title">
-        <span class="panel-kicker">SHIPBOARD DISPLAY</span>
+        <span class="panel-kicker">表示設定</span>
         <h2 id="pause-title">一時停止 / 表示設定</h2>
         <p>演出は個別に無効化できます。ゲームルールには影響しません。</p>
         <div class="settings-list"></div>
@@ -122,16 +127,18 @@ export class Hud {
 
   update(state: GameState, diagnostics: HudDiagnostics): void {
     const interactionPrompt = state.runtime.mode === "playing" ? state.interaction.prompt : null;
-    this.prompt.textContent = interactionPrompt ?? "";
+    this.renderPrompt(interactionPrompt);
     this.prompt.classList.toggle("is-visible", interactionPrompt !== null);
     if (state.world.mode === "mission-loading") {
-      this.status.textContent = "MISSION · LOADING";
+      this.status.textContent = "降下中";
       this.objective.textContent = "固定探索マップへ降下する";
     } else if (state.world.mode === "mission" && diagnostics.mission && state.expedition.confirmedManifest) {
       const squad = state.mission.squad;
       this.status.textContent = squad
-        ? `CTRL ${squad.control.controlledAgentId.toUpperCase()} · LEAD ${squad.control.fieldLeadAgentId.toUpperCase()}`
-        : `TEAM ${state.expedition.confirmedManifest.selectedAgentIds.length} · GEAR ${state.expedition.confirmedManifest.items.length}`;
+        ? squad.control.controlledAgentId === squad.control.fieldLeadAgentId
+          ? `操作中 ${crewCallsign(squad.control.controlledAgentId)}`
+          : `操作中 ${crewCallsign(squad.control.controlledAgentId)} · 指揮 ${crewCallsign(squad.control.fieldLeadAgentId)}`
+        : `隊員 ${state.expedition.confirmedManifest.selectedAgentIds.length} · 装備 ${state.expedition.confirmedManifest.items.length}`;
       const contractRecovered = diagnostics.worldContract
         ? Math.min(
             diagnostics.worldContract.objectiveCount,
@@ -145,8 +152,8 @@ export class Hud {
           : `全契約完了 · 任意サルベージ ${diagnostics.mission.securedResources}点`;
     } else {
       this.status.textContent = state.expedition.confirmedManifest
-        ? `MANIFEST · ${state.expedition.confirmedManifest.totalCapacityUnits}/28U · RUN ${state.world.completedExpeditions}`
-        : `DRAFT · ${diagnostics.expedition.capacity.usedUnits}/28U`;
+        ? `出撃準備完了 · 積載 ${state.expedition.confirmedManifest.totalCapacityUnits} / 28`
+        : `積載 ${diagnostics.expedition.capacity.usedUnits} / 28`;
       this.objective.textContent = state.expedition.confirmedManifest
         ? "確定マニフェストから固定遠征を開始する"
         : "出撃コンソールで遠征編成を確定する";
@@ -167,7 +174,7 @@ export class Hud {
       const { player, runtime } = state;
       const { render, physics, input, camera, cart } = diagnostics;
       this.debug.textContent = [
-        "PHASE G DIAGNOSTICS  [F1]",
+        "DIAGNOSTICS  [F1]",
         `WORLD ${state.world.mode.toUpperCase()}  RUNS ${state.world.completedExpeditions}`,
         `FPS ${diagnostics.fps.toFixed(0).padStart(3)}  FIXED 60Hz  TICK ${runtime.tick}`,
         `POS ${format(player.position.x)}  ${format(player.position.y)}  ${format(player.position.z)}`,
@@ -242,7 +249,7 @@ export class Hud {
       : evaluation.violations.map((violation) => violation.message).join(" / ");
     this.gateScan.replaceChildren();
     const kicker = document.createElement("span");
-    kicker.textContent = evaluation.accepted ? "GATE AUTHORIZED" : "GATE REJECTED";
+    kicker.textContent = evaluation.accepted ? "ゲート通過可" : "ゲート通過不可";
     const title = document.createElement("strong");
     title.textContent = label;
     const detail = document.createElement("small");
@@ -252,6 +259,24 @@ export class Hud {
     this.gateScan.classList.toggle("is-rejected", !evaluation.accepted);
     this.gateScan.classList.add("is-visible");
     this.gateScanTimer = window.setTimeout(() => this.gateScan.classList.remove("is-visible"), 3600);
+  }
+
+  /** Render "E  ラベル" prompts as a keycap plus text; other prompts stay plain text. */
+  private renderPrompt(prompt: string | null): void {
+    if (prompt === this.lastPrompt) return;
+    this.lastPrompt = prompt;
+    this.prompt.replaceChildren();
+    if (!prompt) return;
+    const match = /^([A-Z0-9]{1,3})\s+(.+)$/.exec(prompt);
+    if (!match) {
+      this.prompt.textContent = prompt;
+      return;
+    }
+    const key = document.createElement("kbd");
+    key.textContent = match[1] ?? "";
+    const label = document.createElement("span");
+    label.textContent = match[2] ?? "";
+    this.prompt.append(key, label);
   }
 
   private addSetting(
@@ -271,6 +296,12 @@ export class Hud {
     row.append(text, input);
     container.append(row);
   }
+}
+
+const CREW_CALLSIGNS: Record<string, string> = { player: "Rook", mara: "Mara", ito: "Ito" };
+
+function crewCallsign(id: string): string {
+  return CREW_CALLSIGNS[id] ?? id;
 }
 
 function format(value: number): string {

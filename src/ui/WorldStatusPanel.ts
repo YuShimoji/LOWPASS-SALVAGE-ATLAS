@@ -10,7 +10,7 @@ export class WorldStatusPanel {
     this.root.dataset.diagnosticCategory = "persistent-hud";
     this.root.innerHTML = `
       <details>
-        <summary>WORLD MEMORY <strong data-world-visit>VISIT 0</strong></summary>
+        <summary>世界の記録 <strong data-world-visit>訪問 0</strong></summary>
         <div class="world-status-body" data-world-status></div>
         <button type="button" class="world-reset-button" data-world-reset>開発用: 世界状態を初期化</button>
       </details>
@@ -22,7 +22,7 @@ export class WorldStatusPanel {
   update(state: PersistedWorldState, definition: WorldDefinition, visible: boolean): void {
     this.root.classList.toggle("is-visible", visible);
     const visit = this.root.querySelector<HTMLElement>("[data-world-visit]");
-    if (visit) visit.textContent = `VISIT ${state.visitCount}`;
+    if (visit) visit.textContent = `訪問 ${state.visitCount}`;
     const body = this.root.querySelector<HTMLElement>("[data-world-status]");
     if (!body) return;
     const active = getActiveContract(state, definition);
@@ -37,14 +37,14 @@ export class WorldStatusPanel {
       : "全契約完了";
     body.innerHTML = `
       <dl>
-        <div><dt>ACTIVE CONTRACT</dt><dd>${escapeHtml(active?.definition.label ?? "なし")} · ${progress}</dd></div>
-        <div><dt>FRIENDLY CONTACTS</dt><dd>${relation.length}</dd></div>
-        <div><dt>OPEN ROUTES</dt><dd>${opened.length}</dd></div>
-        <div><dt>LEFT EQUIPMENT</dt><dd>${state.leftBehindEquipment.length}</dd></div>
-        <div><dt>EVIDENCE</dt><dd>${evidence.length}</dd></div>
-        <div><dt>SHIP DOCUMENTS</dt><dd>${escapeHtml(documents || "NONE")}</dd></div>
-        <div><dt>LAST OUTCOME</dt><dd>${state.lastOutcome?.toUpperCase() ?? "NONE"}</dd></div>
-        <div><dt>SECURITY POSTURE</dt><dd>${state.securityState.posture.toUpperCase()} · CONTACTS ${state.securityState.confirmedContactVisitCount}</dd></div>
+        <div><dt>進行中の契約</dt><dd>${escapeHtml(active?.definition.label ?? "なし")} · ${progress}</dd></div>
+        <div><dt>友好的な機械</dt><dd>${relation.length}</dd></div>
+        <div><dt>開いた経路</dt><dd>${opened.length}</dd></div>
+        <div><dt>置いてきた装備</dt><dd>${state.leftBehindEquipment.length}</dd></div>
+        <div><dt>手がかり</dt><dd>${evidence.length}</dd></div>
+        <div><dt>船内の資料</dt><dd>${escapeHtml(documents || "なし")}</dd></div>
+        <div><dt>前回の結果</dt><dd>${state.lastOutcome ? (OUTCOME_LABELS[state.lastOutcome] ?? state.lastOutcome) : "なし"}</dd></div>
+        <div><dt>警備の態勢</dt><dd>${POSTURE_LABELS[state.securityState.posture] ?? state.securityState.posture} · 接触 ${state.securityState.confirmedContactVisitCount} 回</dd></div>
       </dl>
     `;
   }
@@ -53,6 +53,9 @@ export class WorldStatusPanel {
     this.root.remove();
   }
 }
+
+const OUTCOME_LABELS: Record<string, string> = { complete: "回収完了", partial: "一部回収", aborted: "撤収" };
+const POSTURE_LABELS: Record<string, string> = { routine: "通常", watchful: "警戒" };
 
 function escapeHtml(value: string): string {
   return value.replace(

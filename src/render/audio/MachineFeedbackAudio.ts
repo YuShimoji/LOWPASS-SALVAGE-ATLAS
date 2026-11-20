@@ -48,7 +48,7 @@ export class MachineFeedbackAudio {
     if (!context) return false;
     this.lastCueAtSeconds.set(cueId, elapsedSeconds);
     this.playDefinition(context, definition);
-    this.onCaption(cueId, definition.label);
+    this.onCaption(cueId, definition.caption);
     return true;
   }
 

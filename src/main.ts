@@ -261,7 +261,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
   const hud = new Hud(root, state.settings, {
     onPauseToggle: () => setModal(state.ui.activeModal === "settings" ? "none" : "settings"),
     onVisualSetting: updateVisualSetting,
-  });
+  }, { diagnosticsVisible: query.has("qa") });
   const semanticCaption = new SemanticCaptionOverlay(root);
   const squadAudio = new SquadFeedbackAudio(audioEnabled);
   resultPanel = new MissionResultPanel(root, () => void returnToShip());
@@ -404,15 +404,15 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     for (const itemId of leftIds) state.inventory.itemLocations[itemId] = { kind: "ship-inventory" };
     state.world.completedExpeditions = 0;
     worldStatusPanel.update(persistedWorldState, FLOODED_MARKET_WORLD, true);
-    simulation.setNotice("WORLD MEMORY RESET // 入力・音声・描画設定は保持されました");
+    simulation.setNotice("世界の記録を初期化しました（入力・音声・描画設定はそのまま）");
   };
   const worldStatusPanel = new WorldStatusPanel(root, () => void resetWorldState(true));
   if (worldLoad.status === "corrupt") {
     console.error(`WORLD_STATE_LOAD_CORRUPT // ${worldLoad.diagnostic}`);
-    simulation.setNotice(`WORLD MEMORY SAFE MODE // ${worldLoad.diagnostic}`);
+    simulation.setNotice(`世界の記録を読み込めませんでした（安全モード）: ${worldLoad.diagnostic}`);
   } else if (worldLoad.status === "loaded" && persistedWorldState.visitCount > 0) {
     simulation.setNotice(
-      `WORLD MEMORY RESTORED // VISIT ${persistedWorldState.visitCount} · REV ${persistedWorldState.revision}`,
+      `前回の続きから · 訪問 ${persistedWorldState.visitCount} 回目`,
     );
   }
 
@@ -1217,8 +1217,8 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       state.runtime.mode = "playing";
       simulation.setNotice(
         worldVisit.friendlyPorter
-          ? `LINK RECOGNIZED // PORTER FRIENDLY · VISIT ${persistedWorldState.visitCount + 1}`
-          : `降下完了 // ${insertionPlan.mode.toUpperCase()} · TEAM ${manifest.selectedAgentIds.length} · GEAR ${manifest.items.length}`,
+          ? `荷役機がこちらを覚えている · 訪問 ${persistedWorldState.visitCount + 1} 回目`
+          : `降下完了 · 隊員 ${manifest.selectedAgentIds.length} · 装備 ${manifest.items.length}`,
       );
       for (const diagnostic of worldVisit.diagnostics) console.warn(diagnostic);
     } catch (error) {
@@ -1312,7 +1312,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
       resultPanel?.hide();
       simulation.setModal("none");
       simulation.setNotice(
-        `船内へ帰還しました // ${state.mission.lastResult.outcome.toUpperCase()} · VISIT ${persistedWorldState.visitCount} · WORLD REV ${persistedWorldState.revision}`,
+        `船内へ帰還しました · ${MISSION_OUTCOME_LABELS[state.mission.lastResult.outcome] ?? state.mission.lastResult.outcome} · 訪問 ${persistedWorldState.visitCount} 回`,
       );
     } catch (error) {
       nextPhysics?.dispose();
@@ -1555,7 +1555,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
             const sharedRevision = threatController.state.securityCell?.sharedContactRevision ?? 0;
             if (sharedRevision > handledSharedContactRevision) {
               if (handledSharedContactRevision === 0) {
-                simulation.setNotice("HOSTILE MESH DETECTED // CONTACT SHARED · 2 SECURITY NODES · TASKS DIVERGED");
+                simulation.setNotice("警備網が連携した — 2機が別々に動き出す");
                 machineAudio?.playHostileShareTransmit();
                 machineAudio?.playHostileShareReceive();
               }
@@ -1880,3 +1880,5 @@ const RAW_QA_CONTROLS = [
   ["porter-carry", "QA PORTER CARRY"],
   ["extract", "QA 抽出地点"],
 ] as const;
+
+const MISSION_OUTCOME_LABELS: Record<string, string> = { complete: "回収完了", partial: "一部回収", aborted: "撤収" };

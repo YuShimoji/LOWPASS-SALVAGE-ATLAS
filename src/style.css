@@ -9,9 +9,10 @@
   --ui-line: rgba(158, 189, 169, 0.36);
   color: #dde6d6;
   background: #091114;
-  font-family: "Courier New", "Yu Gothic UI", monospace;
+  /* Windows-bundled faces only (no network fonts): Bahnschrift for Latin/digits, BIZ UDGothic for Japanese. */
+  font-family: "Bahnschrift", "BIZ UDGothic", "Yu Gothic UI", "Segoe UI", system-ui, sans-serif;
   font-synthesis: none;
-  text-rendering: optimizeSpeed;
+  text-rendering: optimizeLegibility;
 }
 
 * {
@@ -69,13 +70,13 @@ select {
   grid-column: 2;
   grid-row: 2;
   color: var(--ui-amber);
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .squad-summary-kicker {
   grid-column: 1 / -1;
   color: var(--ui-muted);
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.12em;
 }
 
@@ -100,7 +101,7 @@ select {
 .squad-panel-header {
   padding: 2px 2px 8px;
   color: var(--ui-muted);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.09em;
 }
 
@@ -119,12 +120,12 @@ select {
 .squad-agent small,
 .squad-agent label {
   color: var(--ui-muted);
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .squad-agent p {
   margin: 5px 0;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .squad-agent b {
@@ -154,7 +155,7 @@ select {
   padding: 5px 2px;
   color: #b9ccc1;
   background: #111d1c;
-  font-size: 8px;
+  font-size: 11px;
   cursor: pointer;
 }
 
@@ -170,7 +171,7 @@ select {
   flex-direction: column;
   border: 1px solid #33473f;
   padding: 7px;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .squad-report-strip span,
@@ -195,7 +196,7 @@ select {
 .squad-feedback {
   margin: 7px 0 0;
   color: var(--ui-muted);
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .squad-feedback code {
@@ -217,14 +218,14 @@ select {
   grid-column: 1 / -1;
   margin: 0;
   color: var(--ui-amber);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .manifest-launch-options label {
   display: grid;
   gap: 4px;
   color: var(--ui-muted);
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .manifest-launch-options select,
@@ -276,10 +277,9 @@ select {
 .interaction-prompt,
 .system-notice {
   position: absolute;
-  border: 1px solid rgba(158, 189, 169, 0.36);
-  background: rgba(8, 16, 18, 0.83);
-  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.36);
-  backdrop-filter: blur(2px);
+  border: 1px solid rgba(160, 200, 185, 0.22);
+  background: rgba(6, 12, 13, 0.62);
+  backdrop-filter: blur(3px);
 }
 
 .brand-chip {
@@ -301,46 +301,51 @@ select {
 .brand-kicker {
   grid-column: 1 / -1;
   color: #7ea495;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.14em;
 }
 
 .brand-subtitle {
   color: #9faf9f;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.12em;
 }
 
 .objective-chip {
-  top: 89px;
-  left: 24px;
-  max-width: min(360px, calc(100vw - 48px));
-  padding: 8px 11px;
+  top: 24px;
+  left: 28px;
+  max-width: min(440px, calc(100vw - 56px));
+  border-width: 0 0 0 3px;
+  border-color: var(--ui-amber);
+  padding: 10px 16px 11px 14px;
+  background: linear-gradient(90deg, rgba(6, 12, 13, 0.66), rgba(6, 12, 13, 0));
+  backdrop-filter: none;
 }
 
 .objective-chip span {
   display: block;
   margin-bottom: 3px;
-  color: #7ea495;
-  font-size: 9px;
+  color: var(--ui-amber);
+  font-size: 12px;
   letter-spacing: 0.13em;
 }
 
 .objective-chip strong {
-  font-size: 12px;
+  font-size: 17px;
   font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .status-chip {
-  top: 22px;
-  right: 24px;
+  top: 24px;
+  right: 28px;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 6px 7px 6px 11px;
-  color: #a8c4b4;
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  color: #d9e6dc;
+  font-size: 14px;
+  letter-spacing: 0.04em;
 }
 
 .status-chip button,
@@ -353,8 +358,8 @@ select {
 }
 
 .status-chip button {
-  width: 28px;
-  height: 24px;
+  width: 32px;
+  height: 30px;
 }
 
 .reticle {
@@ -368,29 +373,54 @@ select {
 }
 
 .controls-hint {
-  bottom: 22px;
-  left: 24px;
-  padding: 7px 10px;
-  color: rgba(197, 211, 199, 0.72);
-  font-size: 9px;
+  bottom: 24px;
+  left: 28px;
+  display: flex;
+  gap: 16px;
+  border: 0;
+  padding: 0;
+  color: rgba(205, 218, 208, 0.78);
+  background: none;
+  backdrop-filter: none;
+  font-size: 13px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   animation: hint-fade 12s 1 forwards;
 }
 
-.controls-hint span {
-  color: #e2bc77;
+.controls-hint kbd,
+.interaction-prompt kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  margin-right: 2px;
+  border: 1px solid currentColor;
+  border-bottom-width: 3px;
+  padding: 0 5px;
+  font: 700 12px/1 "Bahnschrift", "Segoe UI", sans-serif;
 }
 
 .interaction-prompt {
-  bottom: 42px;
+  bottom: 96px;
   left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   min-width: 210px;
   padding: 9px 16px;
-  color: #f0d18f;
-  font-size: 12px;
+  color: #f2ecdf;
+  font-size: 16px;
   text-align: center;
   opacity: 0;
   transform: translate(-50%, 8px);
   transition: opacity 120ms linear, transform 120ms linear;
+}
+
+.interaction-prompt kbd {
+  min-width: 26px;
+  height: 26px;
+  font-size: 14px;
 }
 
 .interaction-prompt.is-visible {
@@ -401,10 +431,10 @@ select {
 .system-notice {
   top: 24px;
   left: 50%;
-  max-width: min(500px, calc(100vw - 48px));
-  padding: 8px 13px;
-  color: #abd5c3;
-  font-size: 10px;
+  max-width: min(520px, calc(100vw - 48px));
+  padding: 8px 16px;
+  color: #cfe6dc;
+  font-size: 14px;
   letter-spacing: 0.04em;
   opacity: 0;
   transform: translate(-50%, -8px);
@@ -428,7 +458,7 @@ select {
   margin: 0;
   padding: 9px 11px;
   color: #92b8a7;
-  font: 9px/1.45 "Courier New", monospace;
+  font: 11px/1.45 "Consolas", "Courier New", monospace;
   white-space: pre;
 }
 
@@ -461,7 +491,7 @@ select {
 
 .panel-kicker {
   color: #719887;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.16em;
 }
 
@@ -475,7 +505,7 @@ select {
 .pause-panel p {
   margin: 0 0 18px;
   color: #9daf9f;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.6;
 }
 
@@ -590,7 +620,7 @@ input:focus-visible {
 }
 
 .gate-scan-feedback span {
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.16em;
 }
 
@@ -602,7 +632,7 @@ input:focus-visible {
 
 .gate-scan-feedback small {
   color: #b5c2b6;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.45;
 }
 
@@ -677,7 +707,7 @@ input:focus-visible {
   right: 62px;
   bottom: 8px;
   color: #586e63;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.13em;
 }
 
@@ -719,7 +749,7 @@ input:focus-visible {
 .capacity-readout span,
 .capacity-readout small {
   color: var(--ui-muted);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.12em;
 }
 
@@ -780,7 +810,7 @@ input:focus-visible {
   height: 20px;
   color: #0d1616;
   background: var(--ui-amber);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -788,7 +818,7 @@ input:focus-visible {
 .manifest-loadouts h3 {
   margin: 0;
   color: #c8d5c9;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.08em;
 }
@@ -821,7 +851,7 @@ input:focus-visible {
 }
 
 .crew-card strong {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
 }
 
@@ -832,7 +862,7 @@ input:focus-visible {
 .manifest-loadout small {
   display: block;
   color: #7f9689;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .crew-toggle,
@@ -842,7 +872,7 @@ input:focus-visible {
   justify-content: space-between;
   gap: 7px;
   color: #9eafa1;
-  font-size: 9px;
+  font-size: 12px;
   cursor: pointer;
 }
 
@@ -891,7 +921,7 @@ input:focus-visible {
 .loadout-column header span,
 .manifest-loadout header span {
   color: var(--ui-cyan);
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.1em;
 }
 
@@ -910,7 +940,7 @@ input:focus-visible {
   gap: 6px;
   border-bottom: 1px solid #24362f;
   padding: 8px;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .loadout-column button,
@@ -919,14 +949,14 @@ input:focus-visible {
   padding: 4px 6px;
   color: #cad7cb;
   background: #22312d;
-  font-size: 9px;
+  font-size: 12px;
   cursor: pointer;
 }
 
 .empty-loadout,
 .empty-state {
   color: #657a6e;
-  font-size: 10px;
+  font-size: 12px;
   font-style: italic;
 }
 
@@ -948,7 +978,7 @@ input:focus-visible {
 .inventory-item strong {
   display: block;
   color: #d6ded2;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .assignment-actions {
@@ -960,7 +990,7 @@ input:focus-visible {
 
 .assignment-actions em {
   color: #6f8077;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .expedition-footer {
@@ -987,26 +1017,26 @@ input:focus-visible {
 
 .validation-block strong {
   color: #aebdaf;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.06em;
 }
 
 .validation-block p {
   margin: 4px 0 0;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .validation-block li {
   margin-top: 4px;
   color: #e1aaa0;
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1.35;
 }
 
 .validation-block code {
   display: block;
   color: var(--ui-danger);
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .validation-block.is-clear {
@@ -1027,7 +1057,7 @@ input:focus-visible {
 
 .confirm-zone span {
   color: var(--ui-muted);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.12em;
   text-align: right;
 }
@@ -1081,7 +1111,7 @@ input:focus-visible {
 
 .manifest-meta dt {
   color: var(--ui-muted);
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.12em;
 }
 
@@ -1089,7 +1119,7 @@ input:focus-visible {
   overflow-wrap: anywhere;
   margin: 4px 0 0;
   color: #d7e0d3;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .manifest-loadouts {
@@ -1111,13 +1141,13 @@ input:focus-visible {
 .manifest-loadout li {
   border-bottom: 1px solid #273a32;
   padding: 7px 8px;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .manifest-note {
   margin: 16px 18px;
   color: #8fa095;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -1181,7 +1211,7 @@ input:focus-visible {
 
 .mission-result-frame p {
   color: #aab9ae;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.6;
 }
 
@@ -1206,15 +1236,17 @@ input:focus-visible {
 .semantic-cue-caption {
   position: fixed;
   left: 50%;
-  bottom: 86px;
+  top: 92px;
   z-index: 18;
-  max-width: min(520px, calc(100vw - 32px));
-  border: 1px solid rgba(231, 195, 124, 0.72);
-  padding: 8px 14px;
-  color: #f1d8a3;
-  background: rgba(8, 16, 18, 0.94);
-  font-size: 12px;
-  letter-spacing: 0.08em;
+  max-width: min(560px, calc(100vw - 32px));
+  border: 0;
+  border-top: 1px solid rgba(255, 128, 104, 0.6);
+  border-bottom: 1px solid rgba(255, 128, 104, 0.6);
+  padding: 8px 20px;
+  color: #ffe2d8;
+  background: rgba(36, 10, 6, 0.6);
+  font-size: 17px;
+  letter-spacing: 0.04em;
   pointer-events: none;
   opacity: 0;
   transform: translate(-50%, 8px);
@@ -1445,7 +1477,7 @@ input:focus-visible {
   padding: 8px;
   color: #90a69b;
   background: #091110;
-  font: 9px/1.45 "Courier New", monospace;
+  font: 11px/1.45 "Consolas", "Courier New", monospace;
   white-space: pre-wrap;
 }
 
@@ -1542,8 +1574,8 @@ input:focus-visible {
   width: min(330px, calc(100vw - 48px));
   border: 1px solid #40564d;
   color: #9fb0a5;
-  background: rgba(7, 15, 16, 0.9);
-  font: 9px/1.45 "Courier New", monospace;
+  background: rgba(7, 15, 16, 0.82);
+  font: 12px/1.5 "Bahnschrift", "BIZ UDGothic", "Yu Gothic UI", "Segoe UI", system-ui, sans-serif;
 }
 
 .world-status-panel.is-visible {

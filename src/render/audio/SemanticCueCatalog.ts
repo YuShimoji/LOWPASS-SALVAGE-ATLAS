@@ -24,7 +24,10 @@ export type SemanticAudioState = "enabled" | "suspended" | "muted";
 
 export interface SemanticCueDefinition {
   readonly id: SemanticCueId;
+  /** Developer/QA label (QA buttons, audit readback). Not shown to players. */
   readonly label: string;
+  /** Player-facing subtitle shown when the cue plays. */
+  readonly caption: string;
   readonly fromHz: number;
   readonly toHz: number;
   readonly durationSeconds: number;
@@ -33,6 +36,29 @@ export interface SemanticCueDefinition {
   readonly pulses: number;
   readonly rateLimitSeconds: number;
 }
+
+export const SEMANTIC_CUE_CAPTIONS: Record<SemanticCueId, string> = {
+  "watcher-contact": "監視機に捕捉された",
+  "share-transmit": "敵機が位置を送信している",
+  "share-receive": "敵機が位置を受け取った",
+  "needle-reacquired": "ニードルに再び捕捉された",
+  "lock-on-warning": "ロックオンされている",
+  "interference-pulse": "妨害パルス",
+  "reinforcement-accepted": "敵の増援が合流した",
+  "cautious-transition": "警備網が様子を見ている",
+  "outnumbered-transition": "警備網が劣勢と判断した",
+  "cell-disengage": "警備網が引き上げていく",
+  "relay-sabotage-start": "中継器が妨害されている",
+  "relay-disabled": "中継器が止まった",
+  "relay-restarted": "中継器が復旧した",
+  "porter-authenticated": "荷役機の認証が通った",
+  "porter-command-accepted": "荷役機が指示を受けた",
+  "porter-carry-accepted": "荷役機が運搬を始めた",
+  "porter-path-failed": "荷役機が進路を見つけられない",
+  "porter-gate-rejected": "荷役機がゲートで止められた",
+  "flare-deployed": "フレアを投げた",
+  "flare-observed": "敵がフレアに反応した"
+};
 
 export const SEMANTIC_CUE_INVENTORY: readonly SemanticCueDefinition[] = [
   cue("watcher-contact", "WATCHER CONTACT DETECTED", 620, 820, 0.13, 0.045, "sine"),
@@ -68,5 +94,6 @@ function cue(
   pulses = 1,
   rateLimitSeconds = 0.22,
 ): SemanticCueDefinition {
-  return { id, label, fromHz, toHz, durationSeconds, peakGain, waveform, pulses, rateLimitSeconds };
+  return { id, label, caption: SEMANTIC_CUE_CAPTIONS[id], fromHz, toHz, durationSeconds, peakGain, waveform, pulses, rateLimitSeconds };
 }
+

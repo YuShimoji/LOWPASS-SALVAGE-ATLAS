@@ -1,0 +1,141 @@
+{
+  "label": "after-c",
+  "consoleErrors": [],
+  "readbacks": [
+    {
+      "shot": "ship-deck",
+      "label": "after-c",
+      "world": "ship",
+      "render": {
+        "drawCalls": 137,
+        "triangles": 2709,
+        "renderWidth": 1280,
+        "renderHeight": 720,
+        "sceneObjects": 121,
+        "geometries": 95,
+        "textures": 18,
+        "programs": 21,
+        "assetPackMode": "primitive",
+        "assetPackHash": null,
+        "assetLoadDurationMs": 0,
+        "renderTier": "full",
+        "rendererName": "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "camera": {
+        "desiredDistance": 4.4,
+        "effectiveDistance": 3.6607000316087115,
+        "occlusionActive": true,
+        "yaw": -0.22,
+        "pitch": 0.3
+      }
+    },
+    {
+      "shot": "ship-start-hud",
+      "label": "after-c",
+      "world": "ship",
+      "render": {
+        "drawCalls": 132,
+        "triangles": 2633,
+        "renderWidth": 1280,
+        "renderHeight": 720,
+        "sceneObjects": 121,
+        "geometries": 95,
+        "textures": 18,
+        "programs": 21,
+        "assetPackMode": "primitive",
+        "assetPackHash": null,
+        "assetLoadDurationMs": 0,
+        "renderTier": "full",
+        "rendererName": "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "camera": {
+        "desiredDistance": 4.1,
+        "effectiveDistance": 3.7714326158827034,
+        "occlusionActive": true,
+        "yaw": 0,
+        "pitch": 0.28
+      }
+    },
+    {
+      "shot": "market-keyframe-primitive",
+      "label": "after-c",
+      "world": "mission",
+      "render": {
+        "drawCalls": 497,
+        "triangles": 19589,
+        "renderWidth": 1280,
+        "renderHeight": 720,
+        "sceneObjects": 314,
+        "geometries": 241,
+        "textures": 20,
+        "programs": 26,
+        "assetPackMode": "primitive",
+        "assetPackHash": null,
+        "assetLoadDurationMs": 0,
+        "renderTier": "full",
+        "rendererName": "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "camera": {
+        "desiredDistance": 3,
+        "effectiveDistance": 3.107468362714227,
+        "occlusionActive": false,
+        "yaw": 0.1,
+        "pitch": 0.06
+      }
+    },
+    {
+      "shot": "market-keyframe-canary",
+      "label": "after-c",
+      "world": "mission",
+      "render": {
+        "drawCalls": 501,
+        "triangles": 19277,
+        "renderWidth": 1280,
+        "renderHeight": 720,
+        "sceneObjects": 366,
+        "geometries": 222,
+        "textures": 20,
+        "programs": 27,
+        "assetPackMode": "canary-v1",
+        "assetPackHash": "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+        "assetLoadDurationMs": 1562.3999999985099,
+        "renderTier": "full",
+        "rendererName": "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "camera": {
+        "desiredDistance": 3,
+        "effectiveDistance": 3.107468362714227,
+        "occlusionActive": false,
+        "yaw": 0.1,
+        "pitch": 0.06
+      }
+    },
+    {
+      "shot": "market-start-hud-canary",
+      "label": "after-c",
+      "world": "mission",
+      "render": {
+        "drawCalls": 504,
+        "triangles": 18509,
+        "renderWidth": 1280,
+        "renderHeight": 720,
+        "sceneObjects": 366,
+        "geometries": 222,
+        "textures": 20,
+        "programs": 27,
+        "assetPackMode": "canary-v1",
+        "assetPackHash": "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+        "assetLoadDurationMs": 1739.2000000029802,
+        "renderTier": "full",
+        "rendererName": "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "camera": {
+        "desiredDistance": 4.1,
+        "effectiveDistance": 4.554862120161354,
+        "occlusionActive": false,
+        "yaw": 0,
+        "pitch": 0.72
+      }
+    }
+  ]
+}

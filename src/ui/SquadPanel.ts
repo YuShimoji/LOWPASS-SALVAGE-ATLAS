@@ -72,9 +72,9 @@ export class SquadPanel {
     const interferenceRemaining = Math.max(0, (state.interferenceUntilByAgentId[controlled?.id ?? ""] ?? 0) - view.elapsedSeconds);
     this.root.classList.toggle("has-threat", Boolean(threatContact));
     this.summary.innerHTML = `
-      <span class="squad-summary-kicker">SQUAD / ${connectedCount} LINKED</span>
-      <strong>${escapeHtml(controlled?.id.toUpperCase() ?? "UNKNOWN")}</strong>
-      <span>${lockOnControlled ? `△ LOCK-ON ${Math.round(view.threat.drone.lockOnProgress * 100)}%` : interferenceRemaining > 0 ? `◇ INTERFERENCE ${interferenceRemaining.toFixed(1)}s` : threatContact ? `CONTACT ${threatContact.freshness.toUpperCase()}` : rally.achieved ? "CREW LINKED" : rally.active ? `RALLY ${Math.round(rally.progress * 100)}%` : "STABLE"}</span>
+      <span class="squad-summary-kicker">分隊 · ${connectedCount}名と通信中</span>
+      <strong>${escapeHtml(SQUAD_CALLSIGNS[controlled?.id ?? ""] ?? controlled?.id ?? "不明")}</strong>
+      <span>${lockOnControlled ? `△ ロックオン ${Math.round(view.threat.drone.lockOnProgress * 100)}%` : interferenceRemaining > 0 ? `◇ 妨害 ${interferenceRemaining.toFixed(1)}秒` : threatContact ? (threatContact.freshness === "live" ? "敵を視認中" : "敵の最終位置") : rally.achieved ? "合流済み" : rally.active ? `合流 ${Math.round(rally.progress * 100)}%` : "異常なし"}</span>
     `;
 
     const revisionKey = [
@@ -205,3 +205,5 @@ function escapeHtml(value: string): string {
     (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character] ?? character,
   );
 }
+
+const SQUAD_CALLSIGNS: Record<string, string> = { player: "Rook", mara: "Mara", ito: "Ito" };

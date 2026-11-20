@@ -131,7 +131,7 @@ try {
   cdp.on("Runtime.exceptionThrown", (params) => consoleErrors.push(params.exceptionDetails?.text ?? "exception"));
 
   for (const shot of SHOTS) {
-    await navigate(`${baseUrl}?qa=1&security-posture=watchful&asset-mode=${shot.mode}&audio=muted&render=full`);
+    await navigate(`${baseUrl}?${shot.hud ? "" : "qa=1&"}security-posture=watchful&asset-mode=${shot.mode}&audio=muted&render=full`);
     await waitForExpression("Boolean(window.__LOWPASS_DEBUG__)", 20_000);
     if (await cdp.evaluate("window.__LOWPASS_DEBUG__.snapshot().world.mode") === "ship") {
       await cdp.evaluate("window.__LOWPASS_DEBUG__.resetWorldStateForQa()", true);
