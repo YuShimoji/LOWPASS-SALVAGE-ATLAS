@@ -1,6 +1,6 @@
 # Project Context
 
-更新日: 2026-08-04 JST
+更新日: 2026-11-21 JST
 
 ## North star
 
@@ -20,9 +20,9 @@ Fieldは暗い放棄施設だけに限定しません。人が不在でも通常
 | accepted runtime / evidence tip | `c9c9cdc16268c60995cf82499dc59ca277d4f1ba` |
 | canonical refs | live `origin/feat/phase-g-guided-qa-canary-v1` と `origin/project/frontier`。静的SHAよりfetch後readbackを優先 |
 | automated acceptance | 34 files / 203 tests、build / external build、Guided Audit 22 / 22、audio 20 / 20、24 A/B、3 lifecycle PASS |
-| 人間感覚レビュー | `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING` |
+| 人間感覚レビュー | Phase Gのcueは `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING`。2026-11-21に本人が「操作周り・画面がチープ過ぎる」と指摘（[観測と原因](evidence/restart-2026-11-21-feel-visual/README.md)） |
 | Canary consumer | `DECLARED` project-scoped rights、LOWPASS production利用承認、外部build同梱可 |
-| 次の開発候補 | Phase H1「契約・証拠・再訪判断の因果深化」。technical unlockのみ、owner承認前は未実装 |
+| 次の開発候補 | 「操作・画面品質」（案A操作感・B画面・C HUD）と、Phase H1「契約・証拠・再訪判断の因果深化」。順序は本人判断待ちで、AIの推奨は操作・画面品質が先。どちらも未実装 |
 | 受入の正本 | `README.md`、`PROJECT_HANDOFF.md`、本文書、`docs/supervising-ai-report.md`、`docs/decision-log.md` |
 
 local `d2683ee` とremote `f3ea109` の候補選定は完了しました。以降の2026-07-28 candidate比較は履歴であり、remote bounded repairや正本選定を再び停止条件にしません。Exact procedural Canaryのrights/production昇格は2026-08-04に完了しました。Phase H、main merge、deploy、releaseは未実施です。
@@ -56,23 +56,7 @@ local `d2683ee` とremote `f3ea109` の候補選定は完了しました。以�
 - semantic cueと字幕はstate eventの投影で、Security Cell判断を所有しない。常時Porter pulseは使わず、認証・搬送遷移などの意味eventだけをrate-limitして鳴らす
 - `AssetPackRegistry` はprimitive / canary-v1を選択し、Canary GLBはmission chunkで遅延loadする。5 visual adapterはsimulation stateを真実源に保ち、失敗時はprimitiveへfallbackする
 
-## 2026-07-28 Phase G UX Closure
-
-- 人間確認済みのmovement、wheel zoom、cart、Watcher / Needle appearanceはPASSとして保持した
-- canvas右drag yaw / pitch、clamp、click threshold、modal / QA exclusion、Pointer Lock fallback、wheel / Gamepad regressionを自動固定した。physical Gamepadは未接続
-- Guided QAはraw button列をdrawerへ置き換え、孤立復帰の目的、before / expected / actual、現在状態を表示する。raw controlは削除せず折り畳んだ
-- one-click Guided Auditはwatchful開始からflare fact失効まで22 / 22 PASS、timeout 0、duplicate 0
-- semantic audioは20 cue、AudioContext状態、単独試聴、同時字幕を提供し、waveform / peak / duration / distinctness / mute / resume / rate-limitを自動監査した。Porterは意味event-onlyで周期pulseを持たない
-- CGAWのproducer commit `5d33ba89f141303072e2bc782c8f54302c6fd572`、exact GLB SHA-256 `54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102`、manifest SHA-256 `9b2e9b87805456f72ca66fd0e4915bff1b23c1c4f4f4c6e7052fdfb4c8ee9f05` を検証し、決定論的importを追加した
-- rightsは `DECLARED`、LOWPASS project-scoped、distribution承認済み。UV、low-resolution texture、Blender headless、独立human rubricは未完了だが、exact procedural packのproduction利用は承認済み
-- A/B 24枚、contact sheet、console / performance readback、3 lifecycleを [`evidence/phase-g-closure/`](evidence/phase-g-closure/) へ保存した
-- Phase H、WorldState schema、Security Cell規則、contract進捗は変更していない
-
-## 2026-07-26 playability recovery
-
-Gate G-Aは `GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` で中断されました。確認した構造的欠陥は、ArrowLeft / ArrowRightの欠落と、aliasをlogical action単位のSetで保持していたため片方のkeyupが残る物理キーのactionを解除し得ることです。実機報告時のW不反応そのものを旧buildで再捕捉できていないため、推測で単一原因へ断定せず、F1診断と物理key stateへの変更で観測可能性と正しさを同時に回復しました。
-
-現在はWASD、矢印、alias混用、Shift、blur / visibility / modal / editable target clear、pointer lock拒否時のkeyboard移動、Gamepad標準mapping、wheel zoom、push-cart、積載・抽出、UI resource解放が自動・ブラウザ証拠を持ちます。Security Cellの状態所有、WorldState V2、migration、settlement、ItemLocation、敵知識、圧力予算と感覚調整値は変更していません。
+2026-07-26 playability recovery、2026-07-28 Phase G UX Closure、2026-07-27 snapshotは [`status-history.md`](status-history.md) へ原文のまま移した。
 
 ## フェーズ履歴
 
@@ -113,17 +97,3 @@ Gate G-Aは `GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` で中断されました�
 - portableなのはtracked source、tests、Canary copy、registry / manifest、artifacts、evidence、正本文書。`node_modules`、`dist`、`.serena`、IndexedDB、音量設定、Vite / Chrome processは端末ローカル
 - human sensory reviewはdeferred / non-blocking。physical Gamepad、remote CI、PR review、main統合、deploy、releaseは未完了またはowner gate。Exact procedural Canaryのrights/production asset gateは完了
 - Phase H1はtechnical unlockのみ。完全Promptのowner承認前に実装しない。V2 schema、static / persisted境界、WorldState / ItemLocation / settlement / Security knowledge authorityを維持する
-
-### 2026-07-27 snapshot（履歴）
-
-- 2026-07-27に `git fetch --prune --tags origin` を実施した。現branch `fix/phase-g-playability-recovery` のHEADとupstreamはともに `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`、ahead / behindは0 / 0で、取り込むremote commitがないためpullは不要だった
-- fetch前のworktreeはcleanで、staged / unstaged / untrackedは0件、進行中のmerge / rebase / cherry-pick等もなかった。ゲーム実装、manifest、lockfile、保持中のreview成果物に差分はない
-- 現branchは `origin/feat/phase-g-security-cell` より2commit先、`origin/main` より16commit先である。これは現在のrecovery履歴であり、main統合やPhase G受入を意味しない
-- Node `v24.13.0` / npm `11.6.2` で `npm ls --depth=0`、型検査、28ファイル176テスト、production build、`git diff --check` を再確認した
-- 同一HEADを既存Vite serverで `http://localhost:5173/?qa=1&security-posture=watchful` から開き、scene描画、固定60 Hz、console error 0を確認した。既知のRapier警告だけが残る
-- Windows上のplain `npm run dev` は今回 `[::1]:5173` にbindし、`127.0.0.1` では接続できなかった。再現可能な正規コマンドは `npm run dev -- --host 127.0.0.1` とする。これは端末の名前解決・listener境界で、ゲーム描画障害ではない
-- portableな状態はtracked source、lockfile、正本文書、remote branchである。`node_modules`、`dist`、`.serena`、IndexedDB、実行中Vite processはignoredまたは端末ローカルで、commit対象・remote証拠にしない
-- V1→V2 browser migrationと3visit resource計測は同じ `6df8ba0` の2026-07-23証跡を参照する。物理GamepadとミュートなしGate G-Aは未検証のまま
-- Vite大容量warningとRapier初期化warningは既知・非ブロッキング。警告隠しは行わない
-- PR更新、main統合、deploy、release、rights判断は未実施でオーナー所有。現在のbottleneckは `GATE_G_A_RETEST_REQUIRED` だけで、次の具体手はコードを変えずミュートなし人間評価を最初から1回行うこと
-- 最短コマンド、残作業のpurpose / effect / requirements / state / owner / nextはルート `PROJECT_HANDOFF.md` を参照する

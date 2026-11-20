@@ -1,6 +1,6 @@
 # LOWPASS: SALVAGE ATLAS — 再開引き継ぎ
 
-更新日: 2026-11-16 JST
+更新日: 2026-11-21 JST
 
 ## 現在地
 
@@ -9,6 +9,7 @@ Phase G（2026-07-29）の分類と、2026-08-04のCanary承認を引き継ぎ�
 - `PHASE_G_CANONICAL_RECONCILIATION_GREEN`。`LOCAL_CANDIDATE_LINEAGE_ADOPTED`。`REMOTE_GREEN_BASELINE_SUPERSEDED`。
 - `CANARY_RIGHTS_FAIL_CLOSED`。`LOWPASS_CANARY_PROJECT_SCOPED_PRODUCTION_APPROVED`。
 - `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING`。`PHASE_H1_IMPLEMENTATION_UNLOCKED`。
+- 2026-11-21: 本人が「特に操作周り・画面がチープ過ぎるのが気懸かり」と指摘した。`dfd99e1` の現物観測と原因の所在は [`docs/evidence/restart-2026-11-21-feel-visual/`](docs/evidence/restart-2026-11-21-feel-visual/README.md)。次の集中セッションの主題は本人の判断待ち（下の「次の開発判断」）。
 
 `PHASE_H1_IMPLEMENTATION_UNLOCKED` は技術的な開始可能性だけを示し、実装承認ではありません。Exact procedural Canaryのproject-scoped rights/production利用は承認済みです。Phase H、main merge、deploy、releaseは未実施です。
 ### Canonical identity
@@ -32,22 +33,7 @@ Phase G（2026-07-29）の分類と、2026-08-04のCanary承認を引き継ぎ�
 - UV / texture / Blender headlessと独立human rubricは未完了だが、ownerはこのexact procedural packのproduction利用を承認した。standalone再配布、一般第三者再利用、PR/main、release/deploy/publicationはこの判断に含まない。
 
 merge前監査は [`artifacts/reconciliation/phase-g-canonical-v2/`](artifacts/reconciliation/phase-g-canonical-v2/) にあり、merge base、両側commit、range-diff、file分類、4 gap、競合12件のfile-specific resolutionを保存しています。repository全体のours / theirs、force push、rebase、resetは使っていません。
-### 2026-07-29に閉じた4 acceptance gap（Canary 承認前）
-
-1. Porter音は周期pulseを廃止し、auth、command accepted、carry accepted、path failure、gate rejected等の意味eventだけをrate-limit、mute、caption付きで発火する。 Guided Auditは22段階を独立判定し、Watcher direct detectionからflare fact expiryまで、expected / actual、tick、duration、revision、result、failure reasonを残す。
-2. Canary rightsは `NOASSERTION` / `internalOnly: true` / `distributionApproved: false` をregistryとmanifestの両方で型・一致検査し、欠落・矛盾・external distributionではprimitiveへfail-closed fallbackする。external buildへ内部GLBを含めない。 固定seed、watchful、1280×720、固定cameraで6状態 × primitive / Canary × PS1 OFF / ONの24条件を再生成した。
-### 2026-07-29 の Fresh acceptance（Canary 承認前）
-
-Dドライブのrepository外worktreeでfresh checkout → `npm ci` を行い、次を確認しました。Cドライブ一時領域は最初のprocess crashとENOSPCで使用できず、生成途中の一時`node_modules`だけを除去してDドライブで再実行しました。main worktreeの`node_modules`やユーザーデータは変更していません。
-| Gate | 結果 |
-| --- | --- |
-| 依存・型・テスト | `npm ci` / `npm ls --depth=0` PASS、55 packages added、0 vulnerabilities。typecheck PASS。Vitest 34 files / 202 tests PASS |
-| production / external build | PASS、79 modules、既知の500 kB warningのみ。externalはCanary GLB / internal asset 0件 |
-| Guided Audit / semantic audio audit | 22 / 22、timeout 0、duplicate 0。audio 20 / 20 |
-| browser / A/B | console error 0、unhandled rejection 0、external request 0。24 screenshots、contact sheet、index、readback PASS |
-| lifecycle | 3 ship→mission→ship。scene 60、geometry 47、texture 3、program 4、draw calls 66、DOM 238、HUD 41で全cycle一定 |
-| rights fallback | external contextでrequested Canary、active primitive、structured reasonを確認 |
-| source cleanliness | fresh側の差分は再生成したtracked evidenceだけ。source、manifest、lockfile差分0。`git diff --check` PASS |
+2026-07-29に閉じた4 acceptance gapとFresh acceptanceの表は [`docs/status-history.md`](docs/status-history.md) へ原文のまま移した。
 
 ローカル技術greenはhuman sensory、remote CI、PR review、main統合、rights承認、production、公開完了を意味しません。
 ### 再現
@@ -80,6 +66,7 @@ portableなのはtracked source、tests、import済みCanary、registry / manife
 | 目的 | 効果 | 必要条件 | 現在状態 | owner | 次の動き |
 | --- | --- | --- | --- | --- | --- |
 | Phase G人間感覚レビュー | cueの音量・音色・疲労感と最終game feelを製品判断できる | ミュートなしdesktop、観察メモ | deferred / non-blocking。自動受入を止めない | human game design / UX | 問題が実観測された場合だけG-TUNE sliceを提案する |
+| 操作・画面品質 | 移動・向き・キャラの動き、照明・材質・HUDの安っぽさを解消する | 見た目の目標とPS1風表現の扱いの本人判断、市場1画角のラフ、通常Chrome 60fpsでの本人確認 | 2026-11-21に原因の所在と案A/B/Cを整理。実装未着手 | 本人（方向・受入）／実装担当 | 主題に選ばれたら聞き取り項目から始める |
 | Draft PR #4 review | canonical Phase Gをmain統合前に人間レビューできる | remote checks、review方針、rollback判断 | Draft維持。ready / mergeは未許可 | owner / reviewer | reviewを行い、ready化・mergeは別承認する |
 | Authority Guard PR #3 | live frontierと静的snapshotの優先関係を維持する | `origin/project/frontier` readback、docs-only guard | readyのまま維持、merge未許可 | owner / reviewer | frontier drift時だけCURRENT_FRONTIERを更新する |
 | Phase H1開始判断 | 契約・証拠・再訪判断の因果を1 sliceへ限定する | accepted canonical base、完全Prompt、目的・受入・非対象・停止条件の明示承認 | technical unlock、実装未開始 | owner / supervising AI | 本報告の次Promptを明示承認してから開始する |
@@ -94,7 +81,10 @@ portableなのはtracked source、tests、import済みCanary、registry / manife
 3. [`docs/evidence/phase-g-closure/`](docs/evidence/phase-g-closure/) で2026-07-29のguided / audio / browser / rights readback、24条件contact sheet、3 lifecycleを読む。
 4. code変更を始める前に `npm ls --depth=0`、typecheck、全Vitest、build、diff checkを再実行する。fresh acceptanceは上記SHA-bound証拠として扱う。
 5. Phase Gの距離、delay、scan、lock、pressure、音量・文言を観測なしに調整しない。Phase Hは完全Promptのowner承認前に開始しない。 PR ready化、merge、tag、deploy、release、access / public visibility、rights昇格はそれぞれ別gateとする。
+6. 操作・画面品質を主題にする場合は、[聞き取り項目](docs/evidence/restart-2026-11-21-feel-visual/README.md)を最初に本人へ出し、見た目の目標が決まる前に照明・材質を作り込まない。手触りはClaude desktopの内蔵ブラウザ（12〜26fps）で判定しない。
 
 ## 次の開発判断
 
-Phase G canonical reconciliationの技術blockerはありません。次の唯一の製品開発候補はPhase H1「契約・証拠・再訪判断の因果深化」です。既存V2 schemaとstatic definition / persisted state境界を維持し、帰還済みevidenceを次訪問のrouteまたはsupport差へ1つだけ結び付け、ブラウザで因果を説明できることを受入条件にします。第2world、途中再開、敵追加、WorldState migration、契約大量追加を同時に行いません。
+Phase G canonical reconciliationの技術blockerはありません。次の集中セッションの主題は、2026-11-21の本人指摘を受けた「操作・画面品質」（[案と聞き取り項目](docs/evidence/restart-2026-11-21-feel-visual/README.md)）と、Phase H1の2候補で、どちらを先にするかは本人が決めます。AIの推奨は操作・画面品質が先です（本人の懸念が直接そこにあり、H1の因果を見せる画面もHUD・照明の改善に依存するため）。
+
+Phase H1「契約・証拠・再訪判断の因果深化」の条件は次のとおりです。既存V2 schemaとstatic definition / persisted state境界を維持し、帰還済みevidenceを次訪問のrouteまたはsupport差へ1つだけ結び付け、ブラウザで因果を説明できることを受入条件にします。第2world、途中再開、敵追加、WorldState migration、契約大量追加を同時に行いません。

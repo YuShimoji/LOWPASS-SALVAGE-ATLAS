@@ -22,6 +22,7 @@ Gate G-Aは感覚評価の結論を出す前に `GATE_G_A_BLOCKED_BY_PLAYABILITY
 
 | 候補 | 期待する価値 | 着手条件 | 主な危険 | 状態 |
 | --- | --- | --- | --- | --- |
+| 操作・画面品質 | 2026-11-21の本人指摘「操作周り・画面がチープ」を、操作感A・画面B・HUD Cの薄い縦切りで解消する | 見た目の目標とPS1風表現の扱いを本人が決める。[観測と原因](evidence/restart-2026-11-21-feel-visual/README.md) | 目標未確定のまま照明・材質を作り込む、ルール・Security Cellへ波及させる | 本人の順序判断待ち・未実装 |
 | Phase G tuning closeout | 観測された音量・音色・game feel問題だけを限定修正 | 任意の人間感覚レビューで具体的blocking/tuning事実がある | 構造変更をtuning名目で混ぜる | deferred / trigger待ち |
 | 契約と証拠の因果深化 | 継続世界の選択と再訪理由を強める | 完全Prompt、owner承認、既存V2で表現可能な1判断 | content量だけ増え、判断が増えない | Phase H1第一候補・未実装 |
 | Security Cell authoring definition | 別の作者定義世界でも役割セルを再利用する | 第2世界が承認され、hard-code重複が実在する | 早すぎる抽象化、敵数の暗黙増加 | 条件付き候補 |
@@ -54,6 +55,7 @@ Gate G-Aは感覚評価の結論を出す前に `GATE_G_A_BLOCKED_BY_PLAYABILITY
 - cautiousで新規攻撃を始める、outnumberedでもtokenを保持する
 - Phase Hで契約、新世界、途中再開、敵追加を同時実装する
 - 自動テスト結果から音量、シルエット、game feelをacceptedと推論する
+- 低fps（Claude desktopの内蔵ブラウザで12〜26fps）の画面で移動・カメラの手触りを判定する
 
 ## Phase H selection question
 
