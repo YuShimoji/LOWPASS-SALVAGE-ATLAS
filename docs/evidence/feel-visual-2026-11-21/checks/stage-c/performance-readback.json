@@ -14,21 +14,23 @@
       "cycle": 1,
       "world": "ship",
       "render": {
-        "drawCalls": 66,
-        "triangles": 1468,
+        "drawCalls": 84,
+        "triangles": 1834,
         "renderWidth": 793,
         "renderHeight": 446,
-        "sceneObjects": 60,
-        "geometries": 47,
-        "textures": 3,
-        "programs": 4,
+        "sceneObjects": 121,
+        "geometries": 91,
+        "textures": 4,
+        "programs": 6,
         "assetPackMode": "primitive",
         "assetPackHash": null,
-        "assetLoadDurationMs": 0
+        "assetLoadDurationMs": 0,
+        "renderTier": "reduced",
+        "rendererName": "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11)"
       },
       "dom": {
-        "totalNodes": 238,
-        "persistentHudNodes": 41,
+        "totalNodes": 246,
+        "persistentHudNodes": 49,
         "modalNodes": 0,
         "transientFeedbackNodes": 0,
         "resultHistoryNodes": 0
@@ -38,21 +40,23 @@
       "cycle": 2,
       "world": "ship",
       "render": {
-        "drawCalls": 66,
-        "triangles": 1468,
+        "drawCalls": 84,
+        "triangles": 1834,
         "renderWidth": 793,
         "renderHeight": 446,
-        "sceneObjects": 60,
-        "geometries": 47,
-        "textures": 3,
-        "programs": 4,
+        "sceneObjects": 121,
+        "geometries": 91,
+        "textures": 4,
+        "programs": 6,
         "assetPackMode": "primitive",
         "assetPackHash": null,
-        "assetLoadDurationMs": 0
+        "assetLoadDurationMs": 0,
+        "renderTier": "reduced",
+        "rendererName": "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11)"
       },
       "dom": {
-        "totalNodes": 238,
-        "persistentHudNodes": 41,
+        "totalNodes": 246,
+        "persistentHudNodes": 49,
         "modalNodes": 0,
         "transientFeedbackNodes": 0,
         "resultHistoryNodes": 0
@@ -62,21 +66,23 @@
       "cycle": 3,
       "world": "ship",
       "render": {
-        "drawCalls": 66,
-        "triangles": 1468,
+        "drawCalls": 84,
+        "triangles": 1834,
         "renderWidth": 793,
         "renderHeight": 446,
-        "sceneObjects": 60,
-        "geometries": 47,
-        "textures": 3,
-        "programs": 4,
+        "sceneObjects": 121,
+        "geometries": 91,
+        "textures": 4,
+        "programs": 6,
         "assetPackMode": "primitive",
         "assetPackHash": null,
-        "assetLoadDurationMs": 0
+        "assetLoadDurationMs": 0,
+        "renderTier": "reduced",
+        "rendererName": "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11)"
       },
       "dom": {
-        "totalNodes": 238,
-        "persistentHudNodes": 41,
+        "totalNodes": 246,
+        "persistentHudNodes": 49,
         "modalNodes": 0,
         "transientFeedbackNodes": 0,
         "resultHistoryNodes": 0
@@ -91,12 +97,12 @@
       "canary": null
     },
     "guided": {
-      "tick": 1555,
-      "elapsedSeconds": 25.916666666666476,
+      "tick": 1733,
+      "elapsedSeconds": 28.883333333332974,
       "world": "mission",
       "controlledAgent": "player",
       "playerIsolationState": "isolated",
-      "alliedPresence": 1,
+      "alliedPresence": 0,
       "hostilePresence": 1.5,
       "presenceBand": "predatory",
       "watcherTask": "patrol",
@@ -116,14 +122,14 @@
       ],
       "sharedFactKinds": [],
       "revisions": {
-        "runtimeTick": 1555,
-        "blackboard": 95,
-        "sharedContact": 75,
-        "needleTransition": 58,
+        "runtimeTick": 1733,
+        "blackboard": 99,
+        "sharedContact": 74,
+        "needleTransition": 69,
         "watcherTransition": 0,
-        "communication": 122,
-        "squadFeedback": 5,
-        "interference": 0
+        "communication": 134,
+        "squadFeedback": 6,
+        "interference": 1
       },
       "duplicateEventCount": 0
     },
@@ -135,17 +141,19 @@
         "collisionCount": 1
       },
       "render": {
-        "drawCalls": 52,
-        "triangles": 1074,
+        "drawCalls": 65,
+        "triangles": 3810,
         "renderWidth": 793,
         "renderHeight": 446,
-        "sceneObjects": 104,
-        "geometries": 66,
-        "textures": 3,
-        "programs": 3,
+        "sceneObjects": 320,
+        "geometries": 166,
+        "textures": 4,
+        "programs": 8,
         "assetPackMode": "primitive",
         "assetPackHash": null,
-        "assetLoadDurationMs": 0
+        "assetLoadDurationMs": 0,
+        "renderTier": "reduced",
+        "rendererName": "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11)"
       },
       "input": {
         "heldCodes": [],
@@ -166,9 +174,9 @@
       },
       "camera": {
         "desiredDistance": 4.1,
-        "effectiveDistance": 4.492122238527085,
+        "effectiveDistance": 4.492122222953692,
         "occlusionActive": false,
-        "yaw": -0.14601225771127538,
+        "yaw": 0.14601225771127538,
         "pitch": 0.5857741761521881
       },
       "cart": {
@@ -183,22 +191,22 @@
         "collisionBlocked": false
       },
       "dom": {
-        "totalNodes": 315,
-        "persistentHudNodes": 121,
+        "totalNodes": 323,
+        "persistentHudNodes": 129,
         "modalNodes": 0,
         "transientFeedbackNodes": 0,
         "resultHistoryNodes": 0
       },
-      "communicationRevision": 122,
+      "communicationRevision": 134,
       "threat": {
         "activeDroneCount": 2,
         "mode": "patrol",
-        "transitionRevision": 58,
-        "reportRevision": 54,
-        "deliveryRevision": 71,
+        "transitionRevision": 69,
+        "reportRevision": 62,
+        "deliveryRevision": 82,
         "pendingReportCount": 2,
         "firstRetreatAnalysisRevision": 1,
-        "interferenceRevision": 0,
+        "interferenceRevision": 1,
         "securityPosture": "watchful",
         "securityCellId": "security-cell:flooded-market-01",
         "hostileLinkQuality": 0,

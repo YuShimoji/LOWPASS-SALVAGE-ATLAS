@@ -13,6 +13,6 @@
     "canaryMode": "PASS",
     "exactHash": "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
     "threeCycles": "PASS",
-    "rightsFallback": "PASS"
+    "externalCanary": "PASS"
   }
 }
