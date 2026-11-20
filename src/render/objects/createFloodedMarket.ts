@@ -25,6 +25,7 @@ import type { MissionWorldView } from "./missionWorldView";
 import { FLOODED_MARKET_LIGHTING } from "../app/sceneLighting";
 import { createMarketDressing } from "./createMarketDressing";
 import { applyWaterlineStain, applyWorldUv } from "./surfaceDetail";
+import { createCrewFigure, type CrewFigure } from "./crewFigure";
 import type {
   CanaryRoleInstance,
   LoadedCanaryMissionAssetPack,
@@ -275,12 +276,13 @@ export function createFloodedMarket(
   cart.name = "mission-shopping-cart";
   root.add(cart);
 
-  const crewViews = new Map<string, Group>();
+  const crewViews = new Map<string, CrewView>();
   manifest.selectedAgentIds.forEach((crewId) => {
     const crew = createCrewMarker(materials, crewId, manifest.items.filter((item) => item.assignedAgentId === crewId).length);
-    root.add(crew);
+    root.add(crew.root);
     crewViews.set(crewId, crew);
   });
+  let lastCrewElapsed: number | null = null;
 
   const relayViews = new Map<string, Group>();
   const relayIds = new Set([
@@ -416,12 +418,21 @@ export function createFloodedMarket(
     floodPlane.position.y = 0.045 + Math.sin(elapsedSeconds * 0.8) * 0.008;
     floodHighlight.position.x = Math.sin(elapsedSeconds * 0.18) * 0.12;
     floodHighlight.position.z = -0.2 + Math.cos(elapsedSeconds * 0.14) * 0.1;
+    const crewFrameSeconds = lastCrewElapsed === null ? 0 : Math.max(0, elapsedSeconds - lastCrewElapsed);
+    lastCrewElapsed = elapsedSeconds;
     for (const [crewId, view] of crewViews) {
       const agent = activeSquad.agents[crewId];
-      view.visible = Boolean(agent && activeSquad.control.controlledAgentId !== crewId);
+      const visible = Boolean(agent && activeSquad.control.controlledAgentId !== crewId);
+      if (visible && !view.root.visible) view.primed = false;
+      view.root.visible = visible;
       if (agent) {
-        view.position.set(agent.position.x, 0, agent.position.z);
-        view.rotation.y = agent.facingYaw;
+        const speed = view.primed && crewFrameSeconds > 0
+          ? Math.min(Math.hypot(agent.position.x - view.root.position.x, agent.position.z - view.root.position.z) / crewFrameSeconds, 6)
+          : 0;
+        if (!view.primed) view.figure.snapYaw(agent.facingYaw);
+        view.primed = true;
+        view.root.position.set(agent.position.x, 0, agent.position.z);
+        view.figure.animate(crewFrameSeconds, speed, agent.facingYaw);
       }
     }
     for (const [relayId, view] of relayViews) {
@@ -918,35 +929,26 @@ function createCart(materials: Ps1MaterialFactory): Group {
   return cart;
 }
 
-function createCrewMarker(materials: Ps1MaterialFactory, id: string, equipmentCount: number): Group {
-  const crew = new Group();
-  crew.name = `selected-crew-${id}`;
-  const suit = materials.create({ color: id === "mara" ? "#8b674f" : id === "ito" ? "#607a7b" : "#aa925d" });
-  const armor = materials.create({ color: "#c2b991", roughness: 0.88 });
-  const dark = materials.create({ color: "#151e20", roughness: 0.88 });
-  const visor = materials.createEmissive("#70ddd3", 0.76);
-  const body = new Mesh(new BoxGeometry(0.58, 0.72, 0.4), suit);
-  body.position.y = 0.88;
-  const chest = new Mesh(new BoxGeometry(0.4, 0.28, 0.07), armor);
-  chest.position.set(0, 0.92, -0.235);
-  const head = new Mesh(new CylinderGeometry(0.23, 0.25, 0.36, 6), dark);
-  head.position.y = 1.48;
-  const face = new Mesh(new BoxGeometry(0.3, 0.11, 0.05), visor);
-  face.position.set(0, 1.49, -0.25);
-  const pack = new Mesh(new BoxGeometry(0.44, 0.54, 0.22), dark);
-  pack.position.set(0, 0.92, 0.3);
-  crew.add(body, chest, head, face, pack);
-  for (const side of [-1, 1]) {
-    const arm = new Mesh(new BoxGeometry(0.16, 0.58, 0.2), suit);
-    arm.position.set(side * 0.39, 0.82, 0);
-    const leg = new Mesh(new BoxGeometry(0.2, 0.62, 0.24), dark);
-    leg.position.set(side * 0.16, 0.32, 0);
-    crew.add(arm, leg);
-  }
+interface CrewView {
+  readonly root: Group;
+  readonly figure: CrewFigure;
+  primed: boolean;
+}
+
+const CREW_ROLES: Record<string, "lead" | "breacher" | "signal"> = { mara: "breacher", ito: "signal" };
+
+function createCrewMarker(materials: Ps1MaterialFactory, id: string, equipmentCount: number): CrewView {
+  const root = new Group();
+  root.name = `selected-crew-${id}`;
+  const figure = createCrewFigure(materials, CREW_ROLES[id] ?? "lead");
+  // The figure origin is the capsule center (feet at -0.81); markers stand on the floor.
+  figure.root.position.y = 0.81;
+  root.add(figure.root);
+  const gear = materials.create({ color: "#b58c4f" });
   for (let index = 0; index < equipmentCount; index += 1) {
-    const equipment = new Mesh(new BoxGeometry(0.16, 0.2, 0.14), materials.create({ color: "#b58c4f" }));
-    equipment.position.set(-0.2 + index * 0.2, 0.82, -0.29);
-    crew.add(equipment);
+    const equipment = new Mesh(new BoxGeometry(0.14, 0.18, 0.12), gear);
+    equipment.position.set(-0.16 + index * 0.16, 0.62, -0.26);
+    figure.root.children[0]?.add(equipment);
   }
-  return crew;
+  return { root, figure, primed: false };
 }

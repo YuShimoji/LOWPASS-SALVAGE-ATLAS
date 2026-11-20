@@ -22,7 +22,7 @@ Fieldは暗い放棄施設だけに限定しません。人が不在でも通常
 | automated acceptance | 34 files / 203 tests、build / external build、Guided Audit 22 / 22、audio 20 / 20、24 A/B、3 lifecycle PASS |
 | 人間感覚レビュー | Phase Gのcueは `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING`。2026-11-21に本人が「操作周り・画面がチープ過ぎる」と指摘（[観測と原因](evidence/restart-2026-11-21-feel-visual/README.md)） |
 | Canary consumer | `DECLARED` project-scoped rights、LOWPASS production利用承認、外部build同梱可 |
-| 次の開発候補 | 「操作・画面品質」（A操作感・B画面・C HUD）を先に行う（2026-11-21本人決定）。基準画像は `visual-overhaul-v1` 01・02・03・09。その後にPhase H1。どちらも未実装 |
+| 次の開発候補 | 「操作・画面品質」（A操作感・B画面・C HUD）は2026-11-21に実装し `project/frontier` へpush済み、見た目と手触りは本人の採否待ち（[記録と確認手順](evidence/feel-visual-2026-11-21/README.md)）。その後にPhase H1（未実装） |
 | 受入の正本 | `README.md`、`PROJECT_HANDOFF.md`、本文書、`docs/supervising-ai-report.md`、`docs/decision-log.md` |
 
 local `d2683ee` とremote `f3ea109` の候補選定は完了しました。以降の2026-07-28 candidate比較は履歴であり、remote bounded repairや正本選定を再び停止条件にしません。Exact procedural Canaryのrights/production昇格は2026-08-04に完了しました。Phase H、main merge、deploy、releaseは未実施です。

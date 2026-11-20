@@ -15,7 +15,7 @@ import {
 } from "three";
 import type { GameState, VisualSettings } from "../../game/simulation/GameState";
 import { Ps1MaterialFactory } from "../materials/Ps1MaterialFactory";
-import { createPlayerAvatar } from "../objects/createPlayerAvatar";
+import { createCrewFigure } from "../objects/crewFigure";
 import { createShipInterior, type ShipInteriorView } from "../objects/createShipInterior";
 import type { MissionWorldView } from "../objects/missionWorldView";
 import { disposeObjectTree } from "../objects/disposeObjectTree";
@@ -61,7 +61,9 @@ export class RenderSystem {
   private readonly scene = new Scene();
   private readonly renderer: WebGLRenderer;
   private readonly materials = new Ps1MaterialFactory();
-  private readonly avatar = createPlayerAvatar(this.materials);
+  private readonly avatar = createCrewFigure(this.materials, "lead");
+  private readonly lastAvatarPosition = new Vector3();
+  private avatarSpeedPrimed = false;
   private ship: ShipInteriorView | null = createShipInterior(this.materials);
   private missionView: MissionWorldView | null = null;
   private readonly interpolatedPlayer = new Vector3();
@@ -108,7 +110,7 @@ export class RenderSystem {
     this.scene.fog = this.fog;
     const initialShip = this.ship;
     if (!initialShip) throw new Error("Ship view failed to initialize");
-    this.scene.add(initialShip.root, this.avatar);
+    this.scene.add(initialShip.root, this.avatar.root);
     this.applyTierToWorld(initialShip.root);
 
     this.key.castShadow = true;
@@ -159,6 +161,7 @@ export class RenderSystem {
     this.scene.add(view.root);
     this.applyTierToWorld(view.root);
     this.applyLighting(view.lighting ?? DEFAULT_SCENE_LIGHTING);
+    this.avatarSpeedPrimed = false;
     if (cameraStart) this.cameraRig.resetFromStart(cameraStart.playerPosition, cameraStart.cameraPosition);
     else this.cameraRig.reset();
   }
@@ -169,18 +172,27 @@ export class RenderSystem {
     this.scene.add(this.ship.root);
     this.applyTierToWorld(this.ship.root);
     this.applyLighting(this.ship.lighting ?? DEFAULT_SCENE_LIGHTING);
+    this.avatarSpeedPrimed = false;
     this.cameraRig.reset();
   }
 
   rebindControlledAgent(): void {
+    this.avatarSpeedPrimed = false;
     this.cameraRig.reset();
   }
 
   render(state: GameState, interpolationAlpha: number, frameSeconds: number): void {
     this.applySettings(state.settings);
     interpolatePlayerPosition(state.player, interpolationAlpha, this.interpolatedPlayer);
-    this.avatar.position.copy(this.interpolatedPlayer);
-    this.avatar.rotation.y = state.player.facingYaw;
+    this.avatar.root.position.copy(this.interpolatedPlayer);
+    // Walk cycle reads rendered planar speed; teleports are capped so they do not spike the stride.
+    const avatarSpeed = this.avatarSpeedPrimed && frameSeconds > 0
+      ? Math.min(Math.hypot(this.interpolatedPlayer.x - this.lastAvatarPosition.x, this.interpolatedPlayer.z - this.lastAvatarPosition.z) / frameSeconds, 6)
+      : 0;
+    if (!this.avatarSpeedPrimed) this.avatar.snapYaw(state.player.facingYaw);
+    this.avatarSpeedPrimed = true;
+    this.lastAvatarPosition.copy(this.interpolatedPlayer);
+    this.avatar.animate(frameSeconds, avatarSpeed, state.player.facingYaw);
     const cameraOccluders = this.missionView?.cameraOccluders ?? this.ship?.cameraOccluders ?? [];
     this.cameraRig.update(this.interpolatedPlayer, frameSeconds, cameraOccluders);
     // Keep the character light between camera and character, above head height.
@@ -249,8 +261,8 @@ export class RenderSystem {
     this.renderer.dispose();
     this.gateAudio.dispose();
     this.removeCurrentWorld();
-    this.scene.remove(this.avatar);
-    disposeObjectTree(this.avatar);
+    this.scene.remove(this.avatar.root);
+    disposeObjectTree(this.avatar.root);
     this.materials.dispose();
     this.canvas.remove();
   }

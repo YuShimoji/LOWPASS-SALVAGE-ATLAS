@@ -6,6 +6,7 @@ import {
   MAX_CAMERA_DISTANCE,
   MIN_CAMERA_PITCH,
   MIN_CAMERA_DISTANCE,
+  MISSION_START_MAX_PITCH,
   ThirdPersonCamera,
 } from "./ThirdPersonCamera";
 
@@ -66,5 +67,13 @@ describe("ThirdPersonCamera zoom", () => {
     expect(rig.getDiagnostics().pitch).toBe(MAX_CAMERA_PITCH);
     rig.applyLookDelta(0, 10_000);
     expect(rig.getDiagnostics().pitch).toBe(MIN_CAMERA_PITCH);
+  });
+
+  it("keeps a high authored start camera at shoulder height", () => {
+    const rig = new ThirdPersonCamera();
+    rig.resetFromStart({ x: 0, y: 0.93, z: 0 }, { x: 0, y: 6, z: 2 });
+    expect(rig.getDiagnostics().pitch).toBe(MISSION_START_MAX_PITCH);
+    rig.resetFromStart({ x: 0, y: 0.93, z: 0 }, { x: 0, y: 2.2, z: 4 });
+    expect(rig.getDiagnostics().pitch).toBeLessThan(MISSION_START_MAX_PITCH);
   });
 });

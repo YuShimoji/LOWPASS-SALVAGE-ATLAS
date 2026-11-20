@@ -66,7 +66,7 @@ portableなのはtracked source、tests、import済みCanary、registry / manife
 | 目的 | 効果 | 必要条件 | 現在状態 | owner | 次の動き |
 | --- | --- | --- | --- | --- | --- |
 | Phase G人間感覚レビュー | cueの音量・音色・疲労感と最終game feelを製品判断できる | ミュートなしdesktop、観察メモ | deferred / non-blocking。自動受入を止めない | human game design / UX | 問題が実観測された場合だけG-TUNE sliceを提案する |
-| 操作・画面品質 | 移動・向き・キャラの動き、照明・材質・HUDの安っぽさを解消する | 基準画像 `visual-overhaul-v1` 01・02・03・09、市場と船内の固定画角、HUDのラフ、通常Chrome 60fpsでの本人確認 | 2026-11-21に本人が先行を決定。原因の所在・設計の基準・進め方を整理済み、実装未着手 | 本人（見た目と手触りの採否）／実装担当 | 次の集中セッションで「進め方」の1から始める |
+| 操作・画面品質 | 移動・向き・キャラの動き、照明・材質・HUDの安っぽさを解消する | 基準画像 `visual-overhaul-v1` 01・02・03・09、通常Chrome 60fpsでの本人確認 | B画面・C HUD・A操作感を実装し `project/frontier` へpush済み。自動検査は通過、見た目と手触りは本人の採否待ち（[記録と確認手順](docs/evidence/feel-visual-2026-11-21/README.md)） | 本人（見た目と手触りの採否）／実装担当 | 本人が通常Chromeで確認し、違和感を操作ごとに返す。返却があれば調整sliceを切る |
 | Draft PR #4 review | canonical Phase Gをmain統合前に人間レビューできる | remote checks、review方針、rollback判断 | Draft維持。ready / mergeは未許可 | owner / reviewer | reviewを行い、ready化・mergeは別承認する |
 | Authority Guard PR #3 | live frontierと静的snapshotの優先関係を維持する | `origin/project/frontier` readback、docs-only guard | readyのまま維持、merge未許可 | owner / reviewer | frontier drift時だけCURRENT_FRONTIERを更新する |
 | Phase H1開始判断 | 契約・証拠・再訪判断の因果を1 sliceへ限定する | accepted canonical base、完全Prompt、目的・受入・非対象・停止条件の明示承認 | technical unlock、実装未開始 | owner / supervising AI | 本報告の次Promptを明示承認してから開始する |
@@ -81,10 +81,10 @@ portableなのはtracked source、tests、import済みCanary、registry / manife
 3. [`docs/evidence/phase-g-closure/`](docs/evidence/phase-g-closure/) で2026-07-29のguided / audio / browser / rights readback、24条件contact sheet、3 lifecycleを読む。
 4. code変更を始める前に `npm ls --depth=0`、typecheck、全Vitest、build、diff checkを再実行する。fresh acceptanceは上記SHA-bound証拠として扱う。
 5. Phase Gの距離、delay、scan、lock、pressure、音量・文言を観測なしに調整しない。Phase Hは完全Promptのowner承認前に開始しない。 PR ready化、merge、tag、deploy、release、access / public visibility、rights昇格はそれぞれ別gateとする。
-6. 次の集中セッションは操作・画面品質から始める。[進め方](docs/evidence/restart-2026-11-21-feel-visual/README.md)の1（基準画像01と同じ構図の画角を決めて現状を撮る）から着手し、HUDは実装前にラフを本人へ見せる。手触りはClaude desktopの内蔵ブラウザ（12〜26fps）で判定しない。
+6. 操作・画面品質は実装済みで本人の採否待ち。[記録と確認手順](docs/evidence/feel-visual-2026-11-21/README.md)の前後比較と本人の返却を読んでから調整する。手触りはClaude desktopの内蔵ブラウザ（12〜26fps）で判定しない。ソフトウェア描画では軽い描画（`renderTier: reduced`）に自動で切り替わる。
 
 ## 次の開発判断
 
-Phase G canonical reconciliationの技術blockerはありません。2026-11-21に本人が「操作・画面品質」をPhase H1より先にすると決めました。次の集中セッションは[進め方](docs/evidence/restart-2026-11-21-feel-visual/README.md)に従い、B画面・C HUD・A操作感を進めます。Phase H1はその後の候補です。
+Phase G canonical reconciliationの技術blockerはありません。2026-11-21に本人が「操作・画面品質」をPhase H1より先にすると決め、同日にB画面・C HUD・A操作感を実装しました（[記録](docs/evidence/feel-visual-2026-11-21/README.md)）。見た目と手触りの本人確認が次の判断点で、Phase H1はその後の候補です。
 
 Phase H1「契約・証拠・再訪判断の因果深化」の条件は次のとおりです。既存V2 schemaとstatic definition / persisted state境界を維持し、帰還済みevidenceを次訪問のrouteまたはsupport差へ1つだけ結び付け、ブラウザで因果を説明できることを受入条件にします。第2world、途中再開、敵追加、WorldState migration、契約大量追加を同時に行いません。
