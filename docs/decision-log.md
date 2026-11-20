@@ -2,6 +2,13 @@
 
 この文書は確定済みの設計判断だけを記録します。検討中の案は `idea-ledger.md`、実装・検証の詳細は `README.md` に置きます。
 
+## 2026-11-21 — 操作・画面品質をPhase H1より先にし、既存conceptを見た目の基準にする
+
+- 決定: 次の集中セッションは「操作・画面品質」（A操作感・B画面・C HUD）をPhase H1より先に行う。現行の浸水市場と船内は `docs/concept-art/visual-overhaul-v1/` の01・02・03・09を見た目の基準にする
+- authority: 本人原文「操作・画面品質を先に。理想的にはコンセプトアートなどデザイン駆動が欲しいですが推奨で良いです。」順序は本人の決定。基準画像の選定、PS1既定値の維持、右ドラッグ維持、HUDを減らし状態を画面内の光で伝える方針は、AIの推奨を本人が委任で受け入れたもの
+- 理由: 本人の懸念が操作と画面に直接ある。原因は照明・材質・密度・アニメーション・HUD文字にあり（[観測と原因](evidence/restart-2026-11-21-feel-visual/README.md)）、既存concept画像で比較の基準をすぐ置ける
+- 帰結: 2026-08-04の「field visualを明るい無人街まで拡張する」は維持し、暗さは浸水市場のfield固有条件に留める。ゲームルール、Security Cell、保存、`ItemLocation` は変更しない。見た目の最終的な採否は実画面を見た本人が決め、concept画像のproduction asset承認は含まない
+
 ## 2026-08-04 — Procedural CanaryをLOWPASS project-scoped productionへ昇格する
 
 - 決定: `lowpass-readability-canary-v1`を`LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1`の範囲で`DECLARED`とし、LOWPASS gameの開発・保守・build・同gameの配布へ使用できるproduction packとして承認する
