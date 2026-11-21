@@ -13,10 +13,10 @@ import {
 describe("ThirdPersonCamera zoom", () => {
   it("applies yaw and pitch look deltas and clamps pitch", () => {
     const rig = new ThirdPersonCamera();
-    rig.applyLookDelta(2400, -100_000);
+    rig.applyLookDelta(2400, 100_000);
     expect(rig.getDiagnostics().yaw).toBeLessThan(-6);
     expect(rig.getDiagnostics().pitch).toBe(MAX_CAMERA_PITCH);
-    rig.applyLookDelta(0, 100_000);
+    rig.applyLookDelta(0, -100_000);
     expect(rig.getDiagnostics().pitch).toBe(MIN_CAMERA_PITCH);
   });
 
@@ -63,10 +63,19 @@ describe("ThirdPersonCamera zoom", () => {
 
   it("clamps right-drag and gamepad look deltas to the supported pitch", () => {
     const rig = new ThirdPersonCamera();
-    rig.applyLookDelta(0, -10_000);
-    expect(rig.getDiagnostics().pitch).toBe(MAX_CAMERA_PITCH);
     rig.applyLookDelta(0, 10_000);
+    expect(rig.getDiagnostics().pitch).toBe(MAX_CAMERA_PITCH);
+    rig.applyLookDelta(0, -10_000);
     expect(rig.getDiagnostics().pitch).toBe(MIN_CAMERA_PITCH);
+  });
+
+  it("looks up when the pointer or stick moves up", () => {
+    const rig = new ThirdPersonCamera();
+    const start = rig.getDiagnostics().pitch;
+    rig.applyLookDelta(0, -40);
+    expect(rig.getDiagnostics().pitch).toBeLessThan(start);
+    rig.applyLookDelta(0, 80);
+    expect(rig.getDiagnostics().pitch).toBeGreaterThan(start);
   });
 
   it("keeps a high authored start camera at shoulder height", () => {

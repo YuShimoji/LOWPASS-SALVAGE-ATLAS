@@ -33,7 +33,8 @@ export class ThirdPersonCamera {
 
   applyLookDelta(deltaX: number, deltaY: number): void {
     this.yaw -= deltaX * 0.0026;
-    this.pitch = MathUtils.clamp(this.pitch - deltaY * 0.0021, MIN_CAMERA_PITCH, MAX_CAMERA_PITCH);
+    // Moving the mouse or stick up looks up: the camera drops behind the shoulder (lower pitch).
+    this.pitch = MathUtils.clamp(this.pitch + deltaY * 0.0021, MIN_CAMERA_PITCH, MAX_CAMERA_PITCH);
   }
 
   getYaw(): number {
