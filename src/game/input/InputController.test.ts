@@ -144,6 +144,20 @@ describe("InputController keyboard physical state", () => {
     fixture.controller.dispose();
   });
 
+  it("curves the walking direction when a second key joins, leaving raw input for the cart", () => {
+    const fixture = createController();
+    fixture.window.dispatchEvent(keyboardEvent("keydown", "KeyW"));
+    expect(fixture.controller.sampleMovement(0).worldZ).toBeCloseTo(-1);
+    fixture.window.dispatchEvent(keyboardEvent("keydown", "KeyD"));
+    const turning = fixture.controller.sampleMovement(0);
+    expect(turning.rawX).toBeCloseTo(Math.SQRT1_2);
+    expect(turning.worldX).toBeGreaterThan(0);
+    expect(turning.worldX).toBeLessThan(Math.SQRT1_2 - 0.1);
+    for (let frame = 0; frame < 30; frame += 1) fixture.controller.sampleMovement(0);
+    expect(fixture.controller.sampleMovement(0).worldX).toBeCloseTo(Math.SQRT1_2);
+    fixture.controller.dispose();
+  });
+
   it("keeps forward active when one of two aliases is released", () => {
     const fixture = createController();
     fixture.window.dispatchEvent(keyboardEvent("keydown", "KeyW"));

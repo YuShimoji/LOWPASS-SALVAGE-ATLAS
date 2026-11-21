@@ -1425,7 +1425,7 @@ async function bootstrap(root: HTMLElement): Promise<void> {
     const currentPhysics = physics;
     if (state.runtime.mode === "playing" && currentPhysics) {
       const result = fixedStep.advance(frameSeconds, (dt) => {
-        const movement = activeInput.sampleMovement(activeRenderSystem.cameraRig.getYaw());
+        const movement = activeInput.sampleMovement(activeRenderSystem.cameraRig.getYaw(), dt);
         const previousPlayerPosition = { ...state.player.position };
         let cartPairPhysics: ReturnType<PhysicsWorld["stepCharacter"]> | null = null;
         const cartStep = missionController?.state.cartAttached

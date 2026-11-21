@@ -6,7 +6,8 @@
 | --- | --- | --- | --- | --- | --- |
 | stage-b | 182ac54 | 22/22 PASS | なし（accumulationDelta 全0） | 0 | 正式スクリプトそのまま |
 | stage-c | eae3a28 | 22/22 PASS | なし（accumulationDelta 全0） | 0 | 下の注記 |
-| stage-a | A段の commit（このファイルと同じ commit） | 22/22 PASS | なし（accumulationDelta 全0） | 0 | stage-c と同じ（読み込み最長 28秒） |
+| stage-a | 47bf6f0 | 22/22 PASS | なし（accumulationDelta 全0） | 0 | stage-c と同じ（読み込み最長 28秒） |
+| stage-a-direction | 移動方向の補間の commit（このファイルと同じ commit） | 22/22 PASS | なし（accumulationDelta 全0） | 0 | stage-c と同じ。正式スクリプトは後始末の `EBUSY` で止まり、元の例外は隠れて未確認（写しでの読み込み最長 33秒） |
 
 ## stage-c・stage-a の実行経路
 

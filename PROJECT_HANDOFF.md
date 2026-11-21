@@ -81,7 +81,7 @@ portableなのはtracked source、tests、import済みCanary、registry / manife
 3. [`docs/evidence/phase-g-closure/`](docs/evidence/phase-g-closure/) で2026-07-29のguided / audio / browser / rights readback、24条件contact sheet、3 lifecycleを読む。
 4. code変更を始める前に `npm ls --depth=0`、typecheck、全Vitest、build、diff checkを再実行する。fresh acceptanceは上記SHA-bound証拠として扱う。
 5. Phase Gの距離、delay、scan、lock、pressure、音量・文言を観測なしに調整しない。Phase Hは完全Promptのowner承認前に開始しない。 PR ready化、merge、tag、deploy、release、access / public visibility、rights昇格はそれぞれ別gateとする。
-6. 操作・画面品質は実装済みで本人の採否待ち。[記録と確認手順](docs/evidence/feel-visual-2026-11-21/README.md)の前後比較と本人の返却を読んでから調整する。本人の返却「カメラの上下がかなり違和感ある」は、視点の上下を反転（上へ動かすと見上げる）して反映済み。手触りはClaude desktopの内蔵ブラウザ（12〜26fps）で判定しない。ソフトウェア描画では軽い描画（`renderTier: reduced`）に自動で切り替わる。
+6. 操作・画面品質は実装済みで本人の採否待ち。[記録と確認手順](docs/evidence/feel-visual-2026-11-21/README.md)の前後比較と本人の返却を読んでから調整する。本人の返却「カメラの上下がかなり違和感ある」は、視点の上下を反転（上へ動かすと見上げる）して反映済み。「移動が8方向になっているため違和感があります」は、キーボードの移動方向を押し替え時に滑らかに回す形で反映済み。手触りはClaude desktopの内蔵ブラウザ（12〜26fps）で判定しない。ソフトウェア描画では軽い描画（`renderTier: reduced`）に自動で切り替わる。
 
 ## 次の開発判断
 

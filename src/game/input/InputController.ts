@@ -1,4 +1,5 @@
 import { KEY_BINDINGS, type FrameCommands, type InputAction, type MovementIntent } from "./InputActions";
+import { steerInputDirection, type PlanarInput } from "./movementDirection";
 
 type LookHandler = (deltaX: number, deltaY: number) => void;
 
@@ -74,6 +75,7 @@ export class InputController {
   private lastRawY = 0;
   private lastWorldX = 0;
   private lastWorldZ = 0;
+  private steeredInput: PlanarInput | null = null;
   private actualDisplacementX = 0;
   private actualDisplacementZ = 0;
   private activeDevice: ActiveInputDevice = "none";
@@ -103,7 +105,7 @@ export class InputController {
     this.canvas.addEventListener("contextmenu", this.handleContextMenu);
   }
 
-  sampleMovement(cameraYaw: number): MovementIntent {
+  sampleMovement(cameraYaw: number, dt = 1 / 60): MovementIntent {
     const actions = this.resolveHeldActions();
     const keyboardX = Number(actions.has("move-right")) - Number(actions.has("move-left"));
     const keyboardY = Number(actions.has("move-forward")) - Number(actions.has("move-backward"));
@@ -115,8 +117,14 @@ export class InputController {
     const sin = Math.sin(cameraYaw);
     const cos = Math.cos(cameraYaw);
     const worldInputAllowed = this.options.isWorldInputAllowed();
-    const worldX = worldInputAllowed ? normalizedStrafe * cos - normalizedForward * sin : 0;
-    const worldZ = worldInputAllowed ? -normalizedStrafe * sin - normalizedForward * cos : 0;
+    // Walking direction swings smoothly between keyboard directions; an analog stick already gives any angle.
+    // rawX/rawY stay unsmoothed because cart steering reads them directly.
+    const target = { x: normalizedStrafe, y: normalizedForward };
+    const stickActive = this.gamepadRawX !== 0 || this.gamepadRawY !== 0;
+    const steered = worldInputAllowed && !stickActive ? steerInputDirection(this.steeredInput, target, dt) : target;
+    this.steeredInput = worldInputAllowed ? steered : null;
+    const worldX = worldInputAllowed ? steered.x * cos - steered.y * sin : 0;
+    const worldZ = worldInputAllowed ? -steered.x * sin - steered.y * cos : 0;
     this.lastRawX = worldInputAllowed ? normalizedStrafe : 0;
     this.lastRawY = worldInputAllowed ? normalizedForward : 0;
     this.lastWorldX = worldX;
@@ -157,6 +165,7 @@ export class InputController {
     this.lastRawY = 0;
     this.lastWorldX = 0;
     this.lastWorldZ = 0;
+    this.steeredInput = null;
   }
 
   recordActualDisplacement(x: number, z: number): void {
