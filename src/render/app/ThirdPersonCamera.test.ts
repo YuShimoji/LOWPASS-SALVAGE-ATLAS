@@ -2,12 +2,24 @@ import { BoxGeometry, Mesh, MeshBasicMaterial, Vector3 } from "three";
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_CAMERA_DISTANCE,
+  MAX_CAMERA_PITCH,
   MAX_CAMERA_DISTANCE,
+  MIN_CAMERA_PITCH,
   MIN_CAMERA_DISTANCE,
+  MISSION_START_MAX_PITCH,
   ThirdPersonCamera,
 } from "./ThirdPersonCamera";
 
 describe("ThirdPersonCamera zoom", () => {
+  it("applies yaw and pitch look deltas and clamps pitch", () => {
+    const rig = new ThirdPersonCamera();
+    rig.applyLookDelta(2400, 100_000);
+    expect(rig.getDiagnostics().yaw).toBeLessThan(-6);
+    expect(rig.getDiagnostics().pitch).toBe(MAX_CAMERA_PITCH);
+    rig.applyLookDelta(0, -100_000);
+    expect(rig.getDiagnostics().pitch).toBe(MIN_CAMERA_PITCH);
+  });
+
   it("zooms with wheel input and clamps to the supported range", () => {
     const rig = new ThirdPersonCamera();
     rig.applyWheelZoom(-10_000);
@@ -47,5 +59,30 @@ describe("ThirdPersonCamera zoom", () => {
     expect(obstructed.desiredDistance).toBe(desired);
     wall.geometry.dispose();
     wall.material.dispose();
+  });
+
+  it("clamps right-drag and gamepad look deltas to the supported pitch", () => {
+    const rig = new ThirdPersonCamera();
+    rig.applyLookDelta(0, 10_000);
+    expect(rig.getDiagnostics().pitch).toBe(MAX_CAMERA_PITCH);
+    rig.applyLookDelta(0, -10_000);
+    expect(rig.getDiagnostics().pitch).toBe(MIN_CAMERA_PITCH);
+  });
+
+  it("looks up when the pointer or stick moves up", () => {
+    const rig = new ThirdPersonCamera();
+    const start = rig.getDiagnostics().pitch;
+    rig.applyLookDelta(0, -40);
+    expect(rig.getDiagnostics().pitch).toBeLessThan(start);
+    rig.applyLookDelta(0, 80);
+    expect(rig.getDiagnostics().pitch).toBeGreaterThan(start);
+  });
+
+  it("keeps a high authored start camera at shoulder height", () => {
+    const rig = new ThirdPersonCamera();
+    rig.resetFromStart({ x: 0, y: 0.93, z: 0 }, { x: 0, y: 6, z: 2 });
+    expect(rig.getDiagnostics().pitch).toBe(MISSION_START_MAX_PITCH);
+    rig.resetFromStart({ x: 0, y: 0.93, z: 0 }, { x: 0, y: 2.2, z: 4 });
+    expect(rig.getDiagnostics().pitch).toBeLessThan(MISSION_START_MAX_PITCH);
   });
 });

@@ -1,158 +1,90 @@
 # LOWPASS: SALVAGE ATLAS — 再開引き継ぎ
 
-更新日: 2026-07-27
+更新日: 2026-11-21 JST
 
 ## 現在地
 
-- 現行branch: `fix/phase-g-playability-recovery`
-- 分岐元: `756e54b0e54a7b4b6fee7da2a0d5bed47f01a5a3`
-- playability recovery実装基準: `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`、件名 `fix: restore playable movement camera and cart controls`
-- Phase G実装commit: `6df8ba0621baf8976fc56373863cf57565cc12ba`
-- Phase F保全tag: `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a`
-- Phase G到達点: Security Cellの技術実装は維持。感覚受入はplayability baselineで中断され、未受入
-- playability到達点: keyboard alias、Arrow左右、Gamepad API、wheel zoom、決定論的push-cart、F1診断、UI resource解放
-- 2026-07-27再検証: 依存、型、28ファイル176テスト、build、diffをPASS。同一runtime基準のscene描画、固定60 Hz、console error 0を確認
-- upstream: `origin/fix/phase-g-playability-recovery`。同期監査時HEAD `a3b5e73` と0 / 0で、remoteから取り込むcommitなし
-- remote Phase G branch: `origin/feat/phase-g-security-cell` としてpush済み
-- remote Phase F tag: `phase-f-world-persistence` としてpush済み
-- 次の必須gate: `GATE_G_A_RETEST_REQUIRED`。Phase Gミュートなし人間受入を最初から再実施
-- recovery branch、Phase G branch、Phase F tag: remote取得可能
-- PR更新、main統合、deploy、release: 未実施
-- Security Cellの距離、共有delay、scan、音、文言: 変更なし
-- Phase H: 未開始
-- portable境界: tracked source / lockfile / authority docs / remote refs。`node_modules`、`dist`、`.serena`、IndexedDB、実行中Viteは端末ローカル
-- worktree: 2026-07-27同期監査開始時clean。ゲームコード、manifest、lockfile、untracked、review成果物の差分なし
+Phase G（2026-07-29）の分類と、2026-08-04のCanary承認を引き継ぎます。
 
-監修役AIは最初に [`docs/supervising-ai-report.md`](docs/supervising-ai-report.md) の2026-07-27節を読み、playability technical PASSとPhase G human acceptance未実施を分離してください。2026-07-26以前の節は履歴証拠です。
+- `PHASE_G_CANONICAL_RECONCILIATION_GREEN`。`LOCAL_CANDIDATE_LINEAGE_ADOPTED`。`REMOTE_GREEN_BASELINE_SUPERSEDED`。
+- `CANARY_RIGHTS_FAIL_CLOSED`。`LOWPASS_CANARY_PROJECT_SCOPED_PRODUCTION_APPROVED`。
+- `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING`。`PHASE_H1_IMPLEMENTATION_UNLOCKED`。
+- 2026-11-21: 本人が「特に操作周り・画面がチープ過ぎるのが気懸かり」と指摘し、同日「操作・画面品質を先に」と決めた。見た目の基準は既存concept（[決定](docs/decision-log.md)）、現物観測・原因・進め方は [`docs/evidence/restart-2026-11-21-feel-visual/`](docs/evidence/restart-2026-11-21-feel-visual/README.md)。
 
-## 2026-07-27 sync / restart audit
-
-- `git fetch --prune --tags origin`: PASS
-- branch / upstream: `fix/phase-g-playability-recovery` / `origin/fix/phase-g-playability-recovery`
-- fetch時HEAD / upstream: `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90` / 同一
-- ahead / behind: `0 / 0`。behind-onlyではなく取り込み対象0件だったためpullは実行していない
-- fetch前state: staged 0、unstaged 0、untracked 0、進行中Git operation 0
-- ignored / local-only: `node_modules`、build後の`dist`、`.serena`、browser IndexedDB、ユーザー起動中のVite process
-- `npm ls --depth=0`: PASS
-- `npm run typecheck`: PASS
-- `npm test -- --run`: PASS、28 files / 176 tests
-- `npm run build`: PASS、Vite 8.1.5 / 69 modules。既知のlarge chunk warningのみ
-- `git diff --check`: PASS
-- browser runtime: `http://localhost:5173/?qa=1&security-posture=watchful` でscene描画、固定60 Hz、console error 0。既知のRapier warningのみ
-
-plain `npm run dev` はこのWindows端末では `[::1]:5173` にbindしました。その状態で `127.0.0.1` を開くと接続できず、黒画面または到達不能に見えます。再現時は `npm run dev -- --host 127.0.0.1` を使い、`http://127.0.0.1:5173/` を開いてください。plain起動済みなら `http://localhost:5173/` で同じsceneを確認できます。これは端末ローカルのlistener境界であり、Vite設定やゲームコードは変更していません。
-
-## 2026-07-26 recoveryの再現
-
-```powershell
-npm ls --depth=0
-npm run typecheck
-npm test -- --run
-npm run build
-git diff --check
-npm run dev -- --host 127.0.0.1
-```
-
-QA URLは `http://127.0.0.1:5173/?qa=1&audio=muted` です。F1を開き、held codes、actions、raw/world movement、focus、modal、pointer lock、displacement、device、pads、camera、cartを確認します。実移動を先に確認し、積載・抽出の短縮だけ `QA CART→COIL` / `QA CART→EXTRACT` を使います。人間Gate G-Aでは `audio=muted` を外し、既存watchful手順を最初から実行してください。
-
-物理Gamepadは未接続でした。mock testはPASSですが、物理controllerの操作感と完全menu navigationは未受入です。
-
-## remote状態
-
-| ref | remote値 | localとの関係 |
+`PHASE_H1_IMPLEMENTATION_UNLOCKED` は技術的な開始可能性だけを示し、実装承認ではありません。Exact procedural Canaryのproject-scoped rights/production利用は承認済みです。Phase H、main merge、deploy、releaseは未実施です。
+### Canonical identity
+| 項目 | 確定値 | 意味 |
 | --- | --- | --- |
-| `origin/fix/phase-g-playability-recovery` | `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`（同期監査時） | 現branchと0 / 0。recoveryのremote基準 |
-| `origin/main` | `c5ae3b9a168eb81c41886aab93699980be4c90df` | local `main` と0 / 0 |
-| `origin/feat/phase-f-world-persistence` | `d25a9c04c277d5d4728904a11429f45413599a83` | 現branchが8commit先行、local Phase F branchが2commit先行 |
-| `origin/feat/phase-g-security-cell` | `71ae93cd43d9b64614404448b97ebf4bf12fe40e` | 現branchが2commit先行 |
-| remote `phase-f-world-persistence` tag | `1e98860597ac940ff8d47505a5b00736d852c43a` | local tagと同一 |
+| implementation source | local `d2683ee` lineage | Phase G Closureの意味論を採用した系統 |
+| preserved remote baseline | `f3ea10949a908236adad1d2106ff0634804fc4bd` | build可能なgreen baselineだがacceptance-equivalentではない |
+| no-force merge | `65fb21f992d9b2d8f933c343f1b2ab766311bbe2` | local / remote両方を親に持つ `merge: reconcile canonical Phase G candidate` |
+| corrective runtime/evidence tip | `c9c9cdc16268c60995cf82499dc59ca277d4f1ba` | script末尾正規化とfresh importer portability修正を含む |
+| canonical local checkout | `project/frontier` | `origin/project/frontier` を追跡する |
+| canonical development refs | `origin/feat/phase-g-guided-qa-canary-v1`、`origin/project/frontier` | 本文書を含む最終commitへ通常fast-forwardし、live ref readbackを正とする |
+| Phase F保全 | `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a` | 既存tagを変更しない |
+| exact Canary source | CGAW `5d33ba89f141303072e2bc782c8f54302c6fd572` | declared-rights supply contract |
+| exact GLB SHA-256 | `54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102` | import / registry / fresh acceptanceで一致 |
+| exact manifest SHA-256 | `9b2e9b87805456f72ca66fd0e4915bff1b23c1c4f4f4c6e7052fdfb4c8ee9f05` | rights/source identityを含むproducer manifest |
+| rights | `LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1` | LOWPASS game development/build/distribution only |
+### 統合した成果と検証
 
-2026-07-25に再確認したdraft PR [#1](https://github.com/YuShimoji/LOWPASS-SALVAGE-ATLAS/pull/1) はOPEN / DRAFT / mergeableで、Phase C〜Fを `main` へ向けています。headは `d25a9c0`、checksは0件で、Phase Gは含みません。
+- Canaryは`DECLARED`、`internalOnly: false`、`distributionApproved: true`へ移行した。importerはproducer manifest byte identityとrights readbackを追加検証する。external buildはCanaryを同梱し、GLB hashとproject-scoped rightsをbuild後に検証する。
+- ビジュアル改善とCanaryの2026-08-04承認を `07bd94b` から取り込み、Phase Cの `ceaadd9` から抽出地点のRaw QA補助を現行実装へ移植。2026-11-16に `npm ci`、34 files / 203 tests、typecheck、通常・外部向けbuildを確認した。ChromeでGuided Audit 22/22、24条件の画面、3回の出撃・帰還、外部向けCanary選択を確認し、console error・unhandled rejection・外部通信はいずれも0件。
+- UV / texture / Blender headlessと独立human rubricは未完了だが、ownerはこのexact procedural packのproduction利用を承認した。standalone再配布、一般第三者再利用、PR/main、release/deploy/publicationはこの判断に含まない。
 
-## 最短再開
+merge前監査は [`artifacts/reconciliation/phase-g-canonical-v2/`](artifacts/reconciliation/phase-g-canonical-v2/) にあり、merge base、両側commit、range-diff、file分類、4 gap、競合12件のfile-specific resolutionを保存しています。repository全体のours / theirs、force push、rebase、resetは使っていません。
+2026-07-29に閉じた4 acceptance gapとFresh acceptanceの表は [`docs/status-history.md`](docs/status-history.md) へ原文のまま移した。
+
+ローカル技術greenはhuman sensory、remote CI、PR review、main統合、rights承認、production、公開完了を意味しません。
+### 再現
 
 ```powershell
-git status -sb
-git rev-parse HEAD
-git show-ref --verify refs/tags/phase-f-world-persistence
-git fetch --prune --tags origin
-git rev-list --left-right --count HEAD...origin/fix/phase-g-playability-recovery
+npm ci
 npm ls --depth=0
 npm run typecheck
 npm test -- --run
 npm run build
-git diff --check
+npm run build:external
+npm run evidence:phase-g -- node_modules/.cache/lowpass-frontier-verification
 npm run dev -- --host 127.0.0.1
 ```
 
-期待値:
+- primitive: `http://127.0.0.1:5173/?qa=1&security-posture=watchful&asset-mode=primitive` ／ Canary: `http://127.0.0.1:5173/?qa=1&security-posture=watchful&asset-mode=canary-v1`
+- `Run full guided audit` で22段階、`Advanced / Raw Controls` で20 cue、asset selection、fallback reasonを確認する。 plain `npm run dev` が `[::1]` のみにbindした場合は `localhost` を使うか、上の明示hostコマンドで再起動する。
 
-- branch: `fix/phase-g-playability-recovery`
-- gameplay/runtime基準: `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`
-- implementation ancestor: `6df8ba0621baf8976fc56373863cf57565cc12ba`
-- divergence: 現branchと同名upstreamは0 / 0
-- tests: 28 files / 176 tests
-- build: initial 2,914.05 kB / gzip 1,022.12 kB
-- Security Cell dynamic chunk: 44.38 kB / gzip 11.89 kB
-
-QA URLは `http://127.0.0.1:5173/?qa=1&audio=muted` です。訪問限定構成は `&security-posture=routine` / `watchful` を使えます。音の人間評価では `audio=muted` を外します。npm操作は直列で実行します。
-
-## 2026-07-25 historical live verification
-
-- `git fetch --prune --tags origin`: PASS
-- `git pull --ff-only --prune origin feat/phase-g-security-cell`: PASS、`Already up to date`
-- 現branch vs remote Phase G: `0 / 0`
-- local `main` vs `origin/main`: `0 / 0`
-- local Phase F branch vs remote Phase F: `2 / 0`
-- 現branch vs remote Phase F: `6 / 0`
-- GitHub repository: public / default `main` / archived=false
-- Node `v24.13.0`
-- npm `11.6.2`
-- `npm ls --depth=0`: PASS
-- `npm run typecheck`: PASS
-- `npm test -- --run`: PASS、26 files / 151 tests
-- `npm run build`: PASS、69 modules
-- `git diff --check`: PASS
-- `http://127.0.0.1:5173/?qa=1&audio=muted`: HTTP 200
-- HTML title / module entry: PASS
-- smoke後server停止 / 5173番port解放: PASS
-
-今回browser gameplayは再実施していません。V1→V2、routine→watchful、敵cell分業、presence、grace、`partial → complete → aborted`、resource / DOM復帰は、同じPhase G implementation commitを使用したREADMEの2026-07-23証跡を正本とします。`6df8ba0..HEAD` の3commitは引継ぎ文書だけで、ゲーム実装差分はありません。
+portableなのはtracked source、tests、import済みCanary、registry / manifest、reconciliation artifacts、closure evidence、正本文書です。`node_modules`、`dist`、`.serena`、IndexedDB save、音量設定、実行中Vite、Chrome profileは端末ローカルで、remote受入証拠にしません。
 
 ## Phase Gの実装境界
 
-- V2はV1全fieldと永続security summaryだけを保存する
-- runtime位置、task、lock、cooldown、local/shared knowledgeを保存しない
-- routineはneedle 1機、watchfulはneedle + watcherの固定2機
-- 確認contactは帰還settlementだけで永続化する
-- enemyは直接観測または敵linkで共有済みのfactだけを使う
-- watcherはobserve / overwatch、needleは再視認後interdict / sabotage
-- simultaneous lock / interdict / relay sabotageは各1、interference後graceは4秒
-- cautiousは新規攻撃保留、outnumberedは全攻撃解除・共通退避
-- `ItemLocation`、revision、settlement冪等性、dynamic import、disposeを維持する
-- HP、死亡、射撃、無制限敵、偽通信、音声模倣を導入しない
+- V2はV1全fieldと永続security summaryだけを保存する。runtime位置、task、lock、cooldown、local/shared knowledgeを保存しない。
+- routineはneedle 1機、watchfulはneedle + watcherの固定2機。確認contactは帰還settlementだけで永続化する。
+- enemyは直接観測または敵linkで共有済みのfactだけを使う。watcherはobserve / overwatch、needleは再視認後interdict / sabotage。
+- simultaneous lock / interdict / relay sabotageは各1、interference後graceは4秒。cautiousは新規攻撃保留、outnumberedは全攻撃解除・共通退避。
+- `ItemLocation`、revision、settlement冪等性、dynamic import、disposeを維持する。HP、死亡、射撃、無制限敵、偽通信、音声模倣を導入しない。
 
 ## 残作業
-
-| 目的 | 効果 | 要件 | 状態 | 担当 | 次の一手 |
+| 目的 | 効果 | 必要条件 | 現在状態 | owner | 次の動き |
 | --- | --- | --- | --- | --- | --- |
-| Phase G感覚評価 | watcher、chirp、圧力、退避を製品判断する | ミュートなしdesktop、5観点、accepted/tuning/blocking | 技術検証済み・人間待ち | human game design / UX | Gate G-Aを1回実施 |
-| Phase H選定 | 次sliceを最大gapへ集中する | G-A結果、目的1文、受入、非対象、停止条件 | 未承認 | owner / supervising AI | 4候補から1案だけ承認 |
-| recovery remote portability | 別端末で操作復旧済み基準を取得可能にする | 同名branch、upstream、fetch/readback | 実装branchはremote取得可能。handoff更新は本作業で同期 | current operator | docs commit後にnormal pushし0 / 0をreadback |
-| draft PR #1 | Phase C〜Fをreview可能にする | human review、CI方針、merge / rollback | OPEN / DRAFT / mergeable | owner / reviewer | G-A後に維持・更新・分離を判断 |
-| CI | local gateをPR上で再現する | typecheck/test/build workflow | 未設定 | repo owner | merge方針時に導入判断 |
-| device performance | Vite warningの実影響を判断する | cold/warm/revisit、frame、memory実測 | warningのみ・非ブロッキング | performance | 問題端末で計測 |
-| Rapier warning | 既知warningを安全に解消する | dependency/API互換、物理回帰 | 非ブロッキング | dependency maintenance | 更新専用sliceで扱う |
-| rights / assets | 製品assetを合法・予算内で導入する | provenance、license、budget、collision proxy | primitive段階 | owner / art | major loop凍結後に審査 |
-| deploy / release | 外部配布する | review、rights、quality、target、rollback承認 | 未許可 | owner only | 現段階では実施しない |
+| Phase G人間感覚レビュー | cueの音量・音色・疲労感と最終game feelを製品判断できる | ミュートなしdesktop、観察メモ | deferred / non-blocking。自動受入を止めない | human game design / UX | 問題が実観測された場合だけG-TUNE sliceを提案する |
+| 操作・画面品質 | 移動・向き・キャラの動き、照明・材質・HUDの安っぽさを解消する | 基準画像 `visual-overhaul-v1` 01・02・03・09、通常Chrome 60fpsでの本人確認 | B画面・C HUD・A操作感を実装し `project/frontier` へpush済み。自動検査は通過、見た目と手触りは本人の採否待ち（[記録と確認手順](docs/evidence/feel-visual-2026-11-21/README.md)） | 本人（見た目と手触りの採否）／実装担当 | 本人が通常Chromeで確認し、違和感を操作ごとに返す。返却があれば調整sliceを切る |
+| Draft PR #4 review | canonical Phase Gをmain統合前に人間レビューできる | remote checks、review方針、rollback判断 | Draft維持。ready / mergeは未許可 | owner / reviewer | reviewを行い、ready化・mergeは別承認する |
+| Authority Guard PR #3 | live frontierと静的snapshotの優先関係を維持する | `origin/project/frontier` readback、docs-only guard | readyのまま維持、merge未許可 | owner / reviewer | frontier drift時だけCURRENT_FRONTIERを更新する |
+| Phase H1開始判断 | 契約・証拠・再訪判断の因果を1 sliceへ限定する | accepted canonical base、完全Prompt、目的・受入・非対象・停止条件の明示承認 | technical unlock、実装未開始 | owner / supervising AI | 本報告の次Promptを明示承認してから開始する |
+| Canary texture / independent rubric | 承認済みprocedural packのvisual depthを上げる | UV / texture tool、performance budget、比較rubric | rights / production利用承認済み、flat material / texture 0 | asset / art owner | 1 assetだけでtexture/LOD thin sliceを切る |
+| device / performance | physical Gamepadと大容量warningの実影響を判断する | 実機、cold / warm / revisit計測 | mock controller green、物理Gamepad未確認、warning非ブロッキング | QA / performance | 問題端末がある場合だけ専用計測sliceを作る |
+| deploy / release | 製品を外部配布する | review、rights、品質、target、rollbackの明示承認 | 未許可 | owner only | 現段階では実施しない |
 
-## 次のAIの開始順
+## 次のAIが最初に行うこと
 
-1. 本文書、`docs/supervising-ai-report.md`、`docs/project-context.md`、README Phase G節を読む。
-2. `fix/phase-g-playability-recovery` のclean state、HEAD、同名upstream、Phase F tag、remote divergenceを確認する。
-3. 人間のGate G-Aメモを探す。
-4. メモがなければ音量、scan、距離、delayを最終調整しない。
-5. blockingならPhase Gだけを修正する。acceptedならPhase Hを1目的だけ仕様化する。
-6. 追加push、PR、merge、deploy、releaseは個別の明示権限を確認する。今回のbranch/tag pushは完了済み。
+1. `git fetch --prune --tags origin` 後、`origin/feat/phase-g-guided-qa-canary-v1` と `origin/project/frontier` が同一commitであることを確認する。
+2. そのlive HEADが `d2683ee` と `f3ea109` の双方を祖先に持ち、`65fb21f`、`bf6341b`、`c9c9cdc` を含むことを確認する。
+3. [`docs/evidence/phase-g-closure/`](docs/evidence/phase-g-closure/) で2026-07-29のguided / audio / browser / rights readback、24条件contact sheet、3 lifecycleを読む。
+4. code変更を始める前に `npm ls --depth=0`、typecheck、全Vitest、build、diff checkを再実行する。fresh acceptanceは上記SHA-bound証拠として扱う。
+5. Phase Gの距離、delay、scan、lock、pressure、音量・文言を観測なしに調整しない。Phase Hは完全Promptのowner承認前に開始しない。 PR ready化、merge、tag、deploy、release、access / public visibility、rights昇格はそれぞれ別gateとする。
+6. 操作・画面品質は実装済みで本人の採否待ち。[記録と確認手順](docs/evidence/feel-visual-2026-11-21/README.md)の前後比較と本人の返却を読んでから調整する。本人の返却「カメラの上下がかなり違和感ある」は、視点の上下を反転（上へ動かすと見上げる）して反映済み。「移動が8方向になっているため違和感があります」は、キーボードの移動方向を押し替え時に滑らかに回す形で反映済み。手触りはClaude desktopの内蔵ブラウザ（12〜26fps）で判定しない。ソフトウェア描画では軽い描画（`renderTier: reduced`）に自動で切り替わる。
 
-未解決の設計質問は、「Phase Gの人間評価で観測された最大gapを、次の1スライスでどのプレイヤー判断へ変えるか」です。現時点の第一候補は、契約・証拠・再訪判断の因果深化です。
+## 次の開発判断
+
+Phase G canonical reconciliationの技術blockerはありません。2026-11-21に本人が「操作・画面品質」をPhase H1より先にすると決め、同日にB画面・C HUD・A操作感を実装しました（[記録](docs/evidence/feel-visual-2026-11-21/README.md)）。見た目と手触りの本人確認が次の判断点で、Phase H1はその後の候補です。
+
+Phase H1「契約・証拠・再訪判断の因果深化」の条件は次のとおりです。既存V2 schemaとstatic definition / persisted state境界を維持し、帰還済みevidenceを次訪問のrouteまたはsupport差へ1つだけ結び付け、ブラウザで因果を説明できることを受入条件にします。第2world、途中再開、敵追加、WorldState migration、契約大量追加を同時に行いません。

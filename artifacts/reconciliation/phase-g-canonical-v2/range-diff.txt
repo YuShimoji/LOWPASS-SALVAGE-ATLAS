@@ -1,0 +1,9 @@
+local: 5db2000f2416aedb8d3f6eb9ec9cb61b7a50cae5
+remote: f3ea10949a908236adad1d2106ff0634804fc4bd
+merge-base: 52f0cf9db9f563963243e4954e48de9c448ec487
+
+1:  d2683ee < -:  ------- feat: close phase g guided review and integrate canary assets
+2:  ca423ec < -:  ------- docs: record divergent Phase G restart state
+3:  5db2000 < -:  ------- docs: recommend canonical Phase G candidate
+-:  ------- > 1:  42c8b8a fix: add camera orbit and guided phase g review
+-:  ------- > 2:  e1207b2 feat: integrate lowpass semantic canary assets

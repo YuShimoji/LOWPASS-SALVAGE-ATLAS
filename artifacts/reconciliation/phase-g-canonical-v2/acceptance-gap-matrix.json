@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "lowpass-phase-g-acceptance-gap-matrix-1.0.0",
+  "generatedAtIso": "2026-07-28T17:46:17.821Z",
+  "canonicalSelection": "LOCAL_D2683EE_LINEAGE",
+  "remoteClassification": "GREEN_BUT_NOT_ACCEPTANCE_EQUIVALENT",
+  "gaps": [
+    {
+      "id": "porter-periodic-pulse",
+      "localState": "Meaning-event cues only; no ambient or movement-periodic Porter pulse.",
+      "remoteState": "MachineFeedbackAudio emits porter.operational-pulse every 1.6 seconds while operational.",
+      "selectedState": "Keep local meaning-event-only semantics and explicit auth, carry, failure, rejection, mute, rate-limit, and caption coverage.",
+      "supportingFiles": [
+        "src/render/audio/MachineFeedbackAudio.ts",
+        "src/render/audio/SemanticCueCatalog.ts"
+      ],
+      "supportingTests": [
+        "src/render/audio/MachineFeedbackAudio.test.ts"
+      ],
+      "supportingArtifacts": [
+        "docs/evidence/phase-g-closure/phase-g-audio-audit.json"
+      ]
+    },
+    {
+      "id": "guided-audit-event-granularity",
+      "localState": "22-step event-granular Security Cell audit with timeout, duplicate, tick, duration, revision, expected, actual, result, and failure readback.",
+      "remoteState": "18-step controller-oriented flow; Security Cell share, reacquisition, lock, Presence, posture, sabotage, and flare expiry are not independent gates.",
+      "selectedState": "Keep and extend the local 22-step causal audit contract.",
+      "supportingFiles": [
+        "src/qa/GuidedPhaseGAudit.ts",
+        "src/ui/GuidedQaPanel.ts"
+      ],
+      "supportingTests": [
+        "src/qa/GuidedPhaseGAudit.test.ts",
+        "src/ui/GuidedQaPanel.test.ts"
+      ],
+      "supportingArtifacts": [
+        "docs/evidence/phase-g-closure/phase-g-guided-audit.json",
+        "docs/evidence/phase-g-closure/phase-g-guided-audit.html"
+      ]
+    },
+    {
+      "id": "rights-fail-closed",
+      "localState": "Registry requires NOASSERTION, internalOnly=true, and distributionApproved=false.",
+      "remoteState": "Manifest and readback preserve NOASSERTION, but runtime consumer lacks explicit internalOnly/distributionApproved fail-closed validation.",
+      "selectedState": "Keep local explicit rights flags, add distribution-context rejection, structured fallback warning, registry/manifest parity, and session continuation tests.",
+      "supportingFiles": [
+        "src/game/content/AssetPackRegistry.ts",
+        "src/game/content/generated/lowpassCanaryRegistry.json",
+        "public/assets/lowpass-canary-v1/rights-provenance.json"
+      ],
+      "supportingTests": [
+        "src/game/content/AssetPackRegistry.test.ts",
+        "tests/lowpassCanaryImporter.test.ts"
+      ],
+      "supportingArtifacts": [
+        "public/assets/lowpass-canary-v1/asset-consumer-readback.json",
+        "docs/evidence/phase-g-closure/primitive-canary-readback.json"
+      ]
+    },
+    {
+      "id": "six-state-four-condition-ab-evidence",
+      "localState": "Six named states across primitive/canary and PS1 OFF/ON: 24 screenshots plus contact sheet, index, and visual readback.",
+      "remoteState": "Four aggregate A/B screenshots plus contact sheet.",
+      "selectedState": "Regenerate all 24 local conditions from the reconciled canonical runtime with fixed seed, camera, posture, and viewport.",
+      "supportingFiles": [
+        "scripts/generate-phase-g-evidence.mjs"
+      ],
+      "supportingTests": [
+        "tests/CanaryMissionAssetPack.test.ts"
+      ],
+      "supportingArtifacts": [
+        "docs/evidence/phase-g-closure/primitive-canary-contact-sheet.png",
+        "docs/evidence/phase-g-closure/primitive-canary-index.html",
+        "docs/evidence/phase-g-closure/primitive-canary-readback.json",
+        "docs/evidence/phase-g-closure/screenshots"
+      ]
+    }
+  ]
+}

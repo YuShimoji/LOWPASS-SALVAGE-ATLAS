@@ -5,6 +5,7 @@ import { INITIAL_PLAYER_POSITION } from "../game/simulation/GameState";
 import { SHIP_COLLIDERS } from "../game/content/shipLayout";
 import type { Vec3 } from "../game/core/types";
 import type { KinematicObjectSpec, WorldColliderSpec } from "./physicsTypes";
+import { approachPlanarVelocity, type PlanarVelocity } from "./horizontalVelocity";
 
 const WALK_SPEED = 3.2;
 const SPRINT_SPEED = 5.1;
@@ -38,6 +39,7 @@ let rapierInitialization: Promise<void> | null = null;
 
 export class PhysicsWorld {
   private verticalVelocity = 0;
+  private planarVelocity: PlanarVelocity = { x: 0, z: 0 };
   private grounded = false;
   private collisionCount = 0;
 
@@ -127,14 +129,21 @@ export class PhysicsWorld {
   stepCharacter(input: MovementIntent, dt: number): PhysicsSnapshot {
     const speed = input.sprint ? SPRINT_SPEED : WALK_SPEED;
     this.verticalVelocity = this.grounded ? Math.min(this.verticalVelocity, -0.5) : this.verticalVelocity + GRAVITY * dt;
+    this.planarVelocity = approachPlanarVelocity(
+      this.planarVelocity,
+      { x: input.worldX * speed, z: input.worldZ * speed },
+      dt,
+    );
 
     const desired = {
-      x: input.worldX * speed * dt,
+      x: this.planarVelocity.x * dt,
       y: this.verticalVelocity * dt,
-      z: input.worldZ * speed * dt,
+      z: this.planarVelocity.z * dt,
     };
     this.characterController.computeColliderMovement(this.playerCollider, desired);
     const movement = this.characterController.computedMovement();
+    // Walls absorb the retained momentum, so pushing into a wall does not store speed for later.
+    if (dt > 0) this.planarVelocity = { x: movement.x / dt, z: movement.z / dt };
     const current = this.playerBody.translation();
 
     this.grounded = this.characterController.computedGrounded();
@@ -166,6 +175,7 @@ export class PhysicsWorld {
     operatorOffset: number,
     dt: number,
   ): KinematicCartPairStep {
+    this.planarVelocity = { x: 0, z: 0 };
     const body = this.kinematicBodies.get(id);
     const collider = this.kinematicColliders.get(id);
     if (!body || !collider) {
@@ -308,6 +318,7 @@ export class PhysicsWorld {
 
   teleportCharacter(position: Vec3): void {
     this.verticalVelocity = 0;
+    this.planarVelocity = { x: 0, z: 0 };
     this.grounded = false;
     this.playerBody.setTranslation(position, true);
     this.playerBody.setNextKinematicTranslation(position);

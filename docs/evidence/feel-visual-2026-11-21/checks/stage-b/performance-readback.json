@@ -1,0 +1,237 @@
+{
+  "schemaVersion": "phase-g-browser-lifecycle-2.0.0",
+  "result": "PASS",
+  "accumulationDelta": {
+    "sceneObjects": 0,
+    "geometries": 0,
+    "textures": 0,
+    "programs": 0,
+    "domNodes": 0
+  },
+  "lifecycleStable": true,
+  "cycles": [
+    {
+      "cycle": 1,
+      "world": "ship",
+      "render": {
+        "drawCalls": 84,
+        "triangles": 1834,
+        "renderWidth": 793,
+        "renderHeight": 446,
+        "sceneObjects": 121,
+        "geometries": 91,
+        "textures": 4,
+        "programs": 6,
+        "assetPackMode": "primitive",
+        "assetPackHash": null,
+        "assetLoadDurationMs": 0,
+        "renderTier": "reduced",
+        "rendererName": "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "dom": {
+        "totalNodes": 244,
+        "persistentHudNodes": 47,
+        "modalNodes": 0,
+        "transientFeedbackNodes": 0,
+        "resultHistoryNodes": 0
+      }
+    },
+    {
+      "cycle": 2,
+      "world": "ship",
+      "render": {
+        "drawCalls": 84,
+        "triangles": 1834,
+        "renderWidth": 793,
+        "renderHeight": 446,
+        "sceneObjects": 121,
+        "geometries": 91,
+        "textures": 4,
+        "programs": 6,
+        "assetPackMode": "primitive",
+        "assetPackHash": null,
+        "assetLoadDurationMs": 0,
+        "renderTier": "reduced",
+        "rendererName": "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "dom": {
+        "totalNodes": 244,
+        "persistentHudNodes": 47,
+        "modalNodes": 0,
+        "transientFeedbackNodes": 0,
+        "resultHistoryNodes": 0
+      }
+    },
+    {
+      "cycle": 3,
+      "world": "ship",
+      "render": {
+        "drawCalls": 84,
+        "triangles": 1834,
+        "renderWidth": 793,
+        "renderHeight": 446,
+        "sceneObjects": 121,
+        "geometries": 91,
+        "textures": 4,
+        "programs": 6,
+        "assetPackMode": "primitive",
+        "assetPackHash": null,
+        "assetLoadDurationMs": 0,
+        "renderTier": "reduced",
+        "rendererName": "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "dom": {
+        "totalNodes": 244,
+        "persistentHudNodes": 47,
+        "modalNodes": 0,
+        "transientFeedbackNodes": 0,
+        "resultHistoryNodes": 0
+      }
+    }
+  ],
+  "guidedDiagnostics": {
+    "asset": {
+      "requestedMode": "primitive",
+      "activeMode": "primitive",
+      "fallbackReason": null,
+      "canary": null
+    },
+    "guided": {
+      "tick": 1883,
+      "elapsedSeconds": 31.383333333332832,
+      "world": "mission",
+      "controlledAgent": "player",
+      "playerIsolationState": "isolated",
+      "alliedPresence": 0,
+      "hostilePresence": 1.5,
+      "presenceBand": "predatory",
+      "watcherTask": "patrol",
+      "needleTask": "patrol",
+      "hostileLinkState": "disconnected",
+      "relayState": "active",
+      "flareState": "observed",
+      "porterState": "friendly-idle",
+      "lockState": "inactive",
+      "interferenceState": "inactive",
+      "watcherLocalFactKinds": [
+        "agent-sighting",
+        "flare-sighting",
+        "friendly-machine-sighting",
+        "relay-sighting"
+      ],
+      "needleLocalFactKinds": [
+        "agent-sighting",
+        "friendly-machine-sighting"
+      ],
+      "sharedFactKinds": [],
+      "revisions": {
+        "runtimeTick": 1883,
+        "blackboard": 95,
+        "sharedContact": 71,
+        "needleTransition": 59,
+        "watcherTransition": 0,
+        "communication": 143,
+        "squadFeedback": 6,
+        "interference": 1
+      },
+      "duplicateEventCount": 0
+    },
+    "diagnostics": {
+      "world": "mission",
+      "physics": {
+        "rigidBodyCount": 2,
+        "colliderCount": 12,
+        "collisionCount": 1
+      },
+      "render": {
+        "drawCalls": 68,
+        "triangles": 3846,
+        "renderWidth": 793,
+        "renderHeight": 446,
+        "sceneObjects": 320,
+        "geometries": 162,
+        "textures": 4,
+        "programs": 8,
+        "assetPackMode": "primitive",
+        "assetPackHash": null,
+        "assetLoadDurationMs": 0,
+        "renderTier": "reduced",
+        "rendererName": "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "input": {
+        "heldCodes": [],
+        "resolvedActions": [],
+        "rawX": 0,
+        "rawY": 0,
+        "worldX": 0,
+        "worldZ": 0,
+        "focusedElement": "body",
+        "modalState": "none",
+        "pointerLocked": false,
+        "actualDisplacementX": 0,
+        "actualDisplacementZ": 0,
+        "actualDisplacement": 0,
+        "activeDevice": "none",
+        "connectedGamepads": [],
+        "rightDragActive": false
+      },
+      "camera": {
+        "desiredDistance": 4.1,
+        "effectiveDistance": 4.554889735155262,
+        "occlusionActive": false,
+        "yaw": 0,
+        "pitch": 0.72
+      },
+      "cart": {
+        "attached": false,
+        "position": {
+          "x": 2.2,
+          "y": 0.48,
+          "z": -1.4
+        },
+        "facingYaw": 0,
+        "speed": 0,
+        "collisionBlocked": false
+      },
+      "dom": {
+        "totalNodes": 321,
+        "persistentHudNodes": 127,
+        "modalNodes": 0,
+        "transientFeedbackNodes": 0,
+        "resultHistoryNodes": 0
+      },
+      "communicationRevision": 143,
+      "threat": {
+        "activeDroneCount": 2,
+        "mode": "patrol",
+        "transitionRevision": 59,
+        "reportRevision": 70,
+        "deliveryRevision": 94,
+        "pendingReportCount": 2,
+        "firstRetreatAnalysisRevision": 1,
+        "interferenceRevision": 1,
+        "securityPosture": "watchful",
+        "securityCellId": "security-cell:flooded-market-01",
+        "hostileLinkQuality": 0,
+        "sharedFactCount": 0,
+        "reservationCount": 0
+      },
+      "porter": {
+        "mode": "friendly-idle",
+        "authenticated": true,
+        "carriedItemId": null,
+        "gateEvaluationCodes": []
+      },
+      "persistence": {
+        "revision": 0,
+        "visitCount": 0,
+        "activeContractId": "contract-water-filters",
+        "recoveredUniqueItemIds": [],
+        "leftBehindEquipmentIds": [],
+        "openedTraversalIds": [],
+        "friendlyMachineIds": [],
+        "discoveredEvidenceIds": []
+      }
+    }
+  }
+}

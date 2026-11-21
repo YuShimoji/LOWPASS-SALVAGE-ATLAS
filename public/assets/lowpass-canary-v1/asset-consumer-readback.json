@@ -1,0 +1,38 @@
+{
+  "assetPackId": "lowpass-canary-v1",
+  "checks": {
+    "absolutePathsAbsent": true,
+    "distributionApproved": true,
+    "exactHash": true,
+    "finiteBounds": true,
+    "fiveAssets": true,
+    "fiveCollisionProxies": true,
+    "materialIds": true,
+    "nineAnchors": true,
+    "primitiveFallbackRequired": true,
+    "projectScopedRights": true,
+    "schemaVersion": true,
+    "stableNodes": true
+  },
+  "counts": {
+    "anchors": 9,
+    "assets": 5,
+    "collisionProxies": 5,
+    "materials": 10,
+    "meshes": 44,
+    "stableNodes": 50,
+    "triangles": 1068
+  },
+  "exactGlbSha256": "54b10bf450971139a9cfe8302f671d29bc37fda6f2631dbf5545ef69e1b4d102",
+  "rights": {
+    "distributionApproved": true,
+    "internalOnly": false,
+    "licenseId": "LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1",
+    "reviewLabel": "LOWPASS PROJECT USE APPROVED",
+    "rightsStatus": "DECLARED"
+  },
+  "schemaVersion": "lowpass-asset-consumer-readback-1.0.0",
+  "sourceCommit": "5d33ba89f141303072e2bc782c8f54302c6fd572",
+  "sourceContract": "lowpass-runtime-asset-pack-1.0.0",
+  "state": "LOWPASS_CANARY_IMPORTED_PROJECT_SCOPED_PRODUCTION"
+}

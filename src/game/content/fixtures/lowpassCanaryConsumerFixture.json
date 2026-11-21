@@ -1,0 +1,35 @@
+{
+  "assetPackId": "lowpass-canary-v1",
+  "primitiveFallbackRequired": true,
+  "requiredRoles": [
+    "allied-porter",
+    "field-terminal",
+    "hostile-needle",
+    "hostile-watcher",
+    "push-cart"
+  ],
+  "requiredSemanticBindings": {
+    "allied-porter": [
+      "socket-porter-interaction",
+      "socket-porter-carry",
+      "socket-porter-communication"
+    ],
+    "field-terminal": [
+      "socket-terminal-interaction",
+      "feature-terminal-screen"
+    ],
+    "hostile-needle": [
+      "socket-needle-scan-origin",
+      "socket-needle-lock-origin"
+    ],
+    "hostile-watcher": [
+      "socket-watcher-scan-origin",
+      "feature-watcher-visual-center"
+    ],
+    "push-cart": [
+      "socket-cart-handle",
+      "socket-cart-load"
+    ]
+  },
+  "schemaVersion": "lowpass-canary-consumer-fixture-1.0.0"
+}

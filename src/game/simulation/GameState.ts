@@ -16,6 +16,10 @@ export interface VisualSettings {
   distanceFog: boolean;
   vertexSnap: boolean;
   dithering: boolean;
+  /** Planar water reflection in flooded fields (presentation only). */
+  waterReflection: boolean;
+  /** Bloom and vignette post chain (presentation only). */
+  postEffects: boolean;
 }
 
 export interface PlayerState extends TransformState {
@@ -126,10 +130,12 @@ export function createInitialGameState(): GameState {
       activeModal: "none",
     },
     settings: {
-      lowResolution: true,
+      lowResolution: false,
       distanceFog: true,
       vertexSnap: true,
       dithering: true,
+      waterReflection: true,
+      postEffects: true,
     },
   };
 }

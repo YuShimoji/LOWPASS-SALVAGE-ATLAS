@@ -35,6 +35,15 @@ describe("PhysicsWorld", () => {
     expect(physics.getDiagnostics().collisionCount).toBeGreaterThan(0);
   });
 
+  it("ramps up to walk speed instead of jumping to it on the first step", async () => {
+    physics = await PhysicsWorld.create();
+    const first = physics.stepCharacter(FORWARD, 1 / 60);
+    expect(first.speed).toBeLessThan(1);
+    let snapshot = first;
+    for (let step = 0; step < 20; step += 1) snapshot = physics.stepCharacter(FORWARD, 1 / 60);
+    expect(snapshot.speed).toBeCloseTo(3.2, 1);
+  });
+
   it("uses the Rapier world query for clear and occluded threat sight lines", async () => {
     physics = await PhysicsWorld.create({
       initialPlayerPosition: { x: -3, y: 0.93, z: 0 },

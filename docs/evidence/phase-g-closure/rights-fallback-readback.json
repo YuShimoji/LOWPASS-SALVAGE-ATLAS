@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "phase-g-rights-fallback-readback-1.0.0",
+  "result": "PASS",
+  "distributionContext": "external-distribution",
+  "readback": {
+    "requestedMode": "canary-v1",
+    "activeMode": "primitive",
+    "fallbackReason": "CANARY_REGISTRY_INVALID // RIGHTS_EXTERNAL_DISTRIBUTION_BLOCKED",
+    "canary": null
+  },
+  "externalOutputAssetBoundary": "npm run build:external removes dist/assets/lowpass-canary-v1 and verifies no GLB remains"
+}

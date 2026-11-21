@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "lowpass-phase-g-conflict-resolution-1.0.0",
+  "mergeHead": "f3ea10949a908236adad1d2106ff0634804fc4bd",
+  "selectedLineage": "local d2683ee lineage",
+  "policy": "File-specific resolution only; no repository-wide ours/theirs application.",
+  "conflicts": [
+    {
+      "file": ".gitignore",
+      "conflictingContract": "local generated-evidence/cache boundary versus remote alternate output rules",
+      "selectedResolution": "retain local ignore boundary",
+      "rejectedAlternative": "remote ignore list replacement",
+      "regressionRisk": "generated evidence or local caches accidentally becoming portable",
+      "validation": "git status classification and staged-path audit"
+    },
+    {
+      "file": "docs/project-context.md",
+      "conflictingContract": "local acceptance-equivalent recommendation versus remote green-baseline report",
+      "selectedResolution": "retain local authority structure pending canonical rewrite",
+      "rejectedAlternative": "remote f3ea109 as acceptance-equivalent authority",
+      "regressionRisk": "split-brain Phase G state",
+      "validation": "canonical docs rewritten after merge commit"
+    },
+    {
+      "file": "docs/supervising-ai-report.md",
+      "conflictingContract": "local four-gap analysis versus remote bounded repair report",
+      "selectedResolution": "retain local report structure pending canonical rewrite",
+      "rejectedAlternative": "remote green report as final acceptance",
+      "regressionRisk": "supervisor resumes from superseded baseline",
+      "validation": "canonical docs rewritten after fresh acceptance"
+    },
+    {
+      "file": "package.json",
+      "conflictingContract": "local dependency/runtime surface versus remote evidence scripts",
+      "selectedResolution": "retain local dependencies and add only explicit external-build and evidence commands",
+      "rejectedAlternative": "wholesale remote manifest replacement",
+      "regressionRisk": "lockfile drift or dependency substitution",
+      "validation": "package-lock unchanged; npm ls, npm test, and builds pass"
+    },
+    {
+      "file": "scripts/import-lowpass-canary.mjs",
+      "conflictingContract": "exact CGAW import/hash plus explicit rights boundary versus remote importer variant",
+      "selectedResolution": "retain local exact-source importer and generate matching registry/manifest rights",
+      "rejectedAlternative": "remote importer without full runtime fail-closed parity",
+      "regressionRisk": "hash drift or distributable NOASSERTION asset",
+      "validation": "syntax check, exact runtime hash, registry tests, browser rights fallback"
+    },
+    {
+      "file": "src/game/input/InputController.test.ts",
+      "conflictingContract": "local Hybrid360 input coverage versus remote alternate camera/input tests",
+      "selectedResolution": "retain local input test contract",
+      "rejectedAlternative": "remote test replacement",
+      "regressionRisk": "mouse/gamepad regression hidden by test deletion",
+      "validation": "34 files / 202 tests pass; remote pitch-clamp test retained separately"
+    },
+    {
+      "file": "src/game/input/InputController.ts",
+      "conflictingContract": "local pointer-lock and right-drag camera input versus remote alternate mapping",
+      "selectedResolution": "retain local Hybrid360 input implementation",
+      "rejectedAlternative": "remote implementation replacement",
+      "regressionRisk": "loss of current playable camera controls",
+      "validation": "typecheck, input tests, production build"
+    },
+    {
+      "file": "src/main.ts",
+      "conflictingContract": "local WorldState V2, Guided QA, semantic event and Canary consumer composition versus remote alternate bootstrap",
+      "selectedResolution": "retain local composition and integrate command cue plus distribution-context fallback",
+      "rejectedAlternative": "remote bootstrap replacement",
+      "regressionRisk": "state authority, settlement, or acceptance evidence regression",
+      "validation": "Guided Audit PASS, three stable cycles, primitive/canary browser proof"
+    },
+    {
+      "file": "src/render/app/ThirdPersonCamera.ts",
+      "conflictingContract": "local Hybrid360 camera behavior versus remote camera variant",
+      "selectedResolution": "retain local camera implementation",
+      "rejectedAlternative": "remote implementation replacement",
+      "regressionRisk": "right-drag, pitch, zoom, or shoulder behavior change",
+      "validation": "local camera suite plus retained remote pitch-clamp test pass"
+    },
+    {
+      "file": "src/render/audio/MachineFeedbackAudio.ts",
+      "conflictingContract": "meaning-event cues versus remote 1.6-second Porter operational pulse",
+      "selectedResolution": "retain meaning-event semantics and add auth, command, carry, path-failure, and gate-rejection cues",
+      "rejectedAlternative": "periodic Porter pulse",
+      "regressionRisk": "fatiguing pulse or missing semantic feedback",
+      "validation": "20 distinct non-silent unclipped cues, rate-limit, mute, caption tests"
+    },
+    {
+      "file": "src/render/objects/createFloodedMarket.ts",
+      "conflictingContract": "local simulation-authoritative Canary visual adapter versus remote alternate asset composition",
+      "selectedResolution": "retain local visual adapter and exact registry bindings",
+      "rejectedAlternative": "remote object composition replacement",
+      "regressionRisk": "GLB transforms becoming gameplay authority",
+      "validation": "24-condition primitive/Canary A/B and exact hash browser proof"
+    },
+    {
+      "file": "src/style.css",
+      "conflictingContract": "local Phase G UX closure layout versus remote alternate QA/evidence styling",
+      "selectedResolution": "retain local UX closure styles",
+      "rejectedAlternative": "remote stylesheet replacement",
+      "regressionRisk": "QA drawer or gameplay HUD regression",
+      "validation": "24 screenshots, QA panel screenshot, production build"
+    }
+  ]
+}

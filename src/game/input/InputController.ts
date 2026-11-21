@@ -1,4 +1,5 @@
 import { KEY_BINDINGS, type FrameCommands, type InputAction, type MovementIntent } from "./InputActions";
+import { steerInputDirection, type PlanarInput } from "./movementDirection";
 
 type LookHandler = (deltaX: number, deltaY: number) => void;
 
@@ -9,6 +10,7 @@ export interface InputControllerOptions {
   readonly onWheelZoom: (deltaY: number) => void;
   readonly isWorldInputAllowed: () => boolean;
   readonly getModalState: () => string;
+  readonly isDragLookBlocked?: () => boolean;
 }
 
 export interface ConnectedGamepadDiagnostics {
@@ -32,6 +34,7 @@ export interface InputDiagnostics {
   readonly actualDisplacement: number;
   readonly activeDevice: ActiveInputDevice;
   readonly connectedGamepads: readonly ConnectedGamepadDiagnostics[];
+  readonly rightDragActive: boolean;
 }
 
 export interface ResolvedGamepadInput {
@@ -58,6 +61,7 @@ const MOVEMENT_ACTIONS = new Set<InputAction>([
 ]);
 const GAMEPAD_DEADZONE = 0.18;
 const GAMEPAD_LOOK_PIXELS_PER_SECOND = 680;
+export const RIGHT_DRAG_THRESHOLD_PIXELS = 4;
 
 export class InputController {
   private readonly heldCodes = new Set<string>();
@@ -71,9 +75,16 @@ export class InputController {
   private lastRawY = 0;
   private lastWorldX = 0;
   private lastWorldZ = 0;
+  private steeredInput: PlanarInput | null = null;
   private actualDisplacementX = 0;
   private actualDisplacementZ = 0;
   private activeDevice: ActiveInputDevice = "none";
+  private rightDragPointerId: number | null = null;
+  private rightDragStartX = 0;
+  private rightDragStartY = 0;
+  private rightDragLastX = 0;
+  private rightDragLastY = 0;
+  private rightDragActive = false;
   private disposed = false;
 
   constructor(
@@ -87,9 +98,14 @@ export class InputController {
     document.addEventListener("mousemove", this.handleMouseMove);
     this.canvas.addEventListener("click", this.handleCanvasClick);
     this.canvas.addEventListener("wheel", this.handleWheel, { passive: false });
+    this.canvas.addEventListener("pointerdown", this.handlePointerDown);
+    this.canvas.addEventListener("pointermove", this.handlePointerMove);
+    this.canvas.addEventListener("pointerup", this.handlePointerUp);
+    this.canvas.addEventListener("pointercancel", this.handlePointerUp);
+    this.canvas.addEventListener("contextmenu", this.handleContextMenu);
   }
 
-  sampleMovement(cameraYaw: number): MovementIntent {
+  sampleMovement(cameraYaw: number, dt = 1 / 60): MovementIntent {
     const actions = this.resolveHeldActions();
     const keyboardX = Number(actions.has("move-right")) - Number(actions.has("move-left"));
     const keyboardY = Number(actions.has("move-forward")) - Number(actions.has("move-backward"));
@@ -101,8 +117,14 @@ export class InputController {
     const sin = Math.sin(cameraYaw);
     const cos = Math.cos(cameraYaw);
     const worldInputAllowed = this.options.isWorldInputAllowed();
-    const worldX = worldInputAllowed ? normalizedStrafe * cos - normalizedForward * sin : 0;
-    const worldZ = worldInputAllowed ? -normalizedStrafe * sin - normalizedForward * cos : 0;
+    // Walking direction swings smoothly between keyboard directions; an analog stick already gives any angle.
+    // rawX/rawY stay unsmoothed because cart steering reads them directly.
+    const target = { x: normalizedStrafe, y: normalizedForward };
+    const stickActive = this.gamepadRawX !== 0 || this.gamepadRawY !== 0;
+    const steered = worldInputAllowed && !stickActive ? steerInputDirection(this.steeredInput, target, dt) : target;
+    this.steeredInput = worldInputAllowed ? steered : null;
+    const worldX = worldInputAllowed ? steered.x * cos - steered.y * sin : 0;
+    const worldZ = worldInputAllowed ? -steered.x * sin - steered.y * cos : 0;
     this.lastRawX = worldInputAllowed ? normalizedStrafe : 0;
     this.lastRawY = worldInputAllowed ? normalizedForward : 0;
     this.lastWorldX = worldX;
@@ -143,6 +165,7 @@ export class InputController {
     this.lastRawY = 0;
     this.lastWorldX = 0;
     this.lastWorldZ = 0;
+    this.steeredInput = null;
   }
 
   recordActualDisplacement(x: number, z: number): void {
@@ -166,6 +189,7 @@ export class InputController {
       actualDisplacement: Math.hypot(this.actualDisplacementX, this.actualDisplacementZ),
       activeDevice: this.activeDevice,
       connectedGamepads: this.connectedGamepads,
+      rightDragActive: this.rightDragActive,
     };
   }
 
@@ -179,6 +203,11 @@ export class InputController {
     document.removeEventListener("mousemove", this.handleMouseMove);
     this.canvas.removeEventListener("click", this.handleCanvasClick);
     this.canvas.removeEventListener("wheel", this.handleWheel);
+    this.canvas.removeEventListener("pointerdown", this.handlePointerDown);
+    this.canvas.removeEventListener("pointermove", this.handlePointerMove);
+    this.canvas.removeEventListener("pointerup", this.handlePointerUp);
+    this.canvas.removeEventListener("pointercancel", this.handlePointerUp);
+    this.canvas.removeEventListener("contextmenu", this.handleContextMenu);
   }
 
   private consume(action: InputAction): boolean {
@@ -213,7 +242,8 @@ export class InputController {
     }
   };
 
-  private readonly handleCanvasClick = (): void => {
+  private readonly handleCanvasClick = (event: MouseEvent): void => {
+    if (event.button !== 0) return;
     if (document.pointerLockElement !== this.canvas && this.options.isWorldInputAllowed()) {
       void this.canvas.requestPointerLock().catch(() => {
         // Embedded browsers and automation may reject pointer lock. The game
@@ -231,6 +261,58 @@ export class InputController {
     event.preventDefault();
     this.activeDevice = "mouse";
     this.options.onWheelZoom(event.deltaY);
+  };
+
+  private readonly handlePointerDown = (event: PointerEvent): void => {
+    if (
+      event.button !== 2
+      || document.pointerLockElement === this.canvas
+      || !this.options.isWorldInputAllowed()
+      || this.options.isDragLookBlocked?.()
+      || isEditableInputTarget(event.target)
+    ) return;
+    this.rightDragPointerId = event.pointerId;
+    this.rightDragStartX = event.clientX;
+    this.rightDragStartY = event.clientY;
+    this.rightDragLastX = event.clientX;
+    this.rightDragLastY = event.clientY;
+    this.rightDragActive = false;
+    this.canvas.setPointerCapture?.(event.pointerId);
+  };
+
+  private readonly handlePointerMove = (event: PointerEvent): void => {
+    if (
+      this.rightDragPointerId !== event.pointerId
+      || !this.options.isWorldInputAllowed()
+      || this.options.isDragLookBlocked?.()
+    ) return;
+    const totalDistance = Math.hypot(event.clientX - this.rightDragStartX, event.clientY - this.rightDragStartY);
+    if (!this.rightDragActive && totalDistance < RIGHT_DRAG_THRESHOLD_PIXELS) return;
+    const deltaX = event.clientX - this.rightDragLastX;
+    const deltaY = event.clientY - this.rightDragLastY;
+    this.rightDragLastX = event.clientX;
+    this.rightDragLastY = event.clientY;
+    if (!this.rightDragActive) {
+      this.rightDragActive = true;
+      this.rightDragLastX = event.clientX;
+      this.rightDragLastY = event.clientY;
+    }
+    if (deltaX === 0 && deltaY === 0) return;
+    event.preventDefault();
+    this.activeDevice = "mouse";
+    this.options.onLook(deltaX, deltaY);
+  };
+
+  private readonly handlePointerUp = (event: PointerEvent): void => {
+    if (this.rightDragPointerId !== event.pointerId) return;
+    if (this.rightDragActive) event.preventDefault();
+    this.canvas.releasePointerCapture?.(event.pointerId);
+    this.rightDragPointerId = null;
+    this.rightDragActive = false;
+  };
+
+  private readonly handleContextMenu = (event: MouseEvent): void => {
+    event.preventDefault();
   };
 
   private resolveHeldActions(): Set<InputAction> {

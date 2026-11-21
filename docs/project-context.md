@@ -1,27 +1,39 @@
 # Project Context
 
-更新日: 2026-07-27
+更新日: 2026-11-21 JST
 
 ## North star
 
 `LOWPASS: SALVAGE ATLAS` は、低忠実度3D表現の中で、隊員・装備・通信・非致死的機械生態系・継続世界を一貫した状態モデルとして扱うデスクトップブラウザ探索ゲームです。プレイヤーの判断と敵の判断を、各主体が実際に観測・共有できた情報から説明可能にし、帰還精算を通じて次の訪問へ残します。
 
-## Cockpit
+Fieldは暗い放棄施設だけに限定しません。人が不在でも通常機能と日常建築が残るoffice、building、shopping mall、station、housing、library、hotel、medical center、parking / logistics、school / community campusを正規の探索範囲とします。都市scaleのvisual基準は `docs/concept-art/field-expansion-v1/`、現行浸水marketの局所studyは `docs/concept-art/visual-overhaul-v1/` です。
+
+## Cockpit（2026-07-29正本）
 
 | 項目 | 現在値 |
 | --- | --- |
 | 軸 | 状態所有、限定知識、プレイヤー判断の整合性 |
-| レーン | 固定世界を反復訪問する非致死的探索垂直スライス |
-| 完了スライス | Phase G technical implementation。human sensory acceptanceは未完了 |
-| 作業ブランチ | `fix/phase-g-playability-recovery` |
-| Phase F保全 | tag `phase-f-world-persistence` → `1e98860597ac940ff8d47505a5b00736d852c43a` |
-| Phase G分岐元 | `4e3cdc66d357e8054d45e0a42c4f41f166087b20` |
-| Phase G実装 | `6df8ba0621baf8976fc56373863cf57565cc12ba`、件名 `feat: coordinate hostile machine security cells` |
-| recovery分岐元 | `756e54b0e54a7b4b6fee7da2a0d5bed47f01a5a3` |
-| recovery実装 | `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`、件名 `fix: restore playable movement camera and cart controls` |
-| remote状態 | `origin/fix/phase-g-playability-recovery` と0 / 0。PR、merge、deploy、release未実施 |
-| 次のゲート | `GATE_G_A_RETEST_REQUIRED`。Phase Gミュートなし人間受入を最初から再実施 |
-| 受入の正本 | `README.md` のPhase G検証結果、`PROJECT_HANDOFF.md`、`docs/supervising-ai-report.md` |
+| 完了スライス | Phase G canonical reconciliation。`PHASE_G_CANONICAL_RECONCILIATION_GREEN` |
+| canonical source | local `d2683ee` lineage adopted |
+| preserved baseline | remote `f3ea109`、`GREEN_BUT_NOT_ACCEPTANCE_EQUIVALENT` |
+| no-force merge | `65fb21f992d9b2d8f933c343f1b2ab766311bbe2`、両系統を祖先に持つ |
+| accepted runtime / evidence tip | `c9c9cdc16268c60995cf82499dc59ca277d4f1ba` |
+| canonical refs | live `origin/feat/phase-g-guided-qa-canary-v1` と `origin/project/frontier`。静的SHAよりfetch後readbackを優先 |
+| automated acceptance | 34 files / 203 tests、build / external build、Guided Audit 22 / 22、audio 20 / 20、24 A/B、3 lifecycle PASS |
+| 人間感覚レビュー | Phase Gのcueは `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING`。2026-11-21に本人が「操作周り・画面がチープ過ぎる」と指摘（[観測と原因](evidence/restart-2026-11-21-feel-visual/README.md)） |
+| Canary consumer | `DECLARED` project-scoped rights、LOWPASS production利用承認、外部build同梱可 |
+| 次の開発候補 | 「操作・画面品質」（A操作感・B画面・C HUD）は2026-11-21に実装し `project/frontier` へpush済み、見た目と手触りは本人の採否待ち（[記録と確認手順](evidence/feel-visual-2026-11-21/README.md)）。その後にPhase H1（未実装） |
+| 受入の正本 | `README.md`、`PROJECT_HANDOFF.md`、本文書、`docs/supervising-ai-report.md`、`docs/decision-log.md` |
+
+local `d2683ee` とremote `f3ea109` の候補選定は完了しました。以降の2026-07-28 candidate比較は履歴であり、remote bounded repairや正本選定を再び停止条件にしません。Exact procedural Canaryのrights/production昇格は2026-08-04に完了しました。Phase H、main merge、deploy、releaseは未実施です。
+
+## 2026-08-04 visual readability slice
+
+- `docs/concept-art/visual-overhaul-v1/` を現行浸水marketへ適用し、浄水フィルター、冷却コイル、任意回収物のリレーコアを色とシルエットの両方で分離した
+- 回収物がmission groundにある間だけ、必須目標は4 tick、任意目標は3 tickのgeometry-only markerを表示する。運搬・カート積載・抽出時はmarkerを消し、`ItemLocation`を唯一の所在表現として維持する
+- 中央通路の低いamber chevronは抽出地点へ向ける。ブラウザ確認で逆向きを検出したため同一スライス内で修正した
+- runtime screenshotでは必須フィルター3個、冷却コイル、カート、味方隊員、抽出ring、退避方向を初期market画角で判別できた。texture countは3のまま、Three.js objectは表示投影だけでgameplay、navigation、collision、Security Cellを変更しない
+- concept画像と回収物markerは引き続きCanary以外のproduction asset approval、rights昇格、Phase H承認を意味しない
 
 ## 現行アーキテクチャ
 
@@ -39,12 +51,12 @@
 - 入力はheld physical codeを真実源にし、logical actionを毎sample解決する。keyboardと標準Gamepad APIは同じaction境界へ統合する
 - カート操作中はMissionSessionのcart-control stateとPhysicsWorldのcollision-limited kinematic pairを使う。ItemLocation、資源積載、抽出は従来の真実源を維持する
 - ThirdPersonCameraはdesired distanceとocclusion後のeffective distanceを分離する
+- Pointer Lockに依存しないcanvas右ドラッグはInputControllerがpointer stateを所有し、ThirdPersonCameraへyaw / pitch deltaだけを渡す。modal、Guided QA、editable controlでは入力しない
+- Guided QAは既存controllerとQA配置を順序付ける診断adapterで、AI状態を直接PASSへ書き換えない。22段階readbackはruntime stateとrevisionから判定する
+- semantic cueと字幕はstate eventの投影で、Security Cell判断を所有しない。常時Porter pulseは使わず、認証・搬送遷移などの意味eventだけをrate-limitして鳴らす
+- `AssetPackRegistry` はprimitive / canary-v1を選択し、Canary GLBはmission chunkで遅延loadする。5 visual adapterはsimulation stateを真実源に保ち、失敗時はprimitiveへfallbackする
 
-## 2026-07-26 playability recovery
-
-Gate G-Aは `GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` で中断されました。確認した構造的欠陥は、ArrowLeft / ArrowRightの欠落と、aliasをlogical action単位のSetで保持していたため片方のkeyupが残る物理キーのactionを解除し得ることです。実機報告時のW不反応そのものを旧buildで再捕捉できていないため、推測で単一原因へ断定せず、F1診断と物理key stateへの変更で観測可能性と正しさを同時に回復しました。
-
-現在はWASD、矢印、alias混用、Shift、blur / visibility / modal / editable target clear、pointer lock拒否時のkeyboard移動、Gamepad標準mapping、wheel zoom、push-cart、積載・抽出、UI resource解放が自動・ブラウザ証拠を持ちます。Security Cellの状態所有、WorldState V2、migration、settlement、ItemLocation、敵知識、圧力予算と感覚調整値は変更していません。
+2026-07-26 playability recovery、2026-07-28 Phase G UX Closure、2026-07-27 snapshotは [`status-history.md`](status-history.md) へ原文のまま移した。
 
 ## フェーズ履歴
 
@@ -70,18 +82,18 @@ Gate G-Aは `GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` で中断されました�
 
 ## 現在の品質基準
 
-Recovery branchで型検査、28ファイル176テスト、production build、トップレベル依存整合、diff checkを通すこと。実ブラウザでは単独・alias keyboard入力、zoom、push-cart、partial抽出、帰還、console error 0、Rapier / scene / GPU / DOM復帰を確認する。Security Cellの感覚品質はこのtechnical PASSと混同せず、人間のミュートなし受入へ残す。
+現branchでトップレベル依存整合、型検査、全Vitest、production build、diff checkを通すこと。実ブラウザではGuided Audit 22 / 22、audio/caption、primitive / Canary、exact hash、A/B、3 lifecycle、console error 0、resource復帰を確認する。音量・音色・疲労感とphysical Gamepadは自動受入と混同しない。
 
 ## Re-entry snapshot
 
-- 2026-07-27に `git fetch --prune --tags origin` を実施した。現branch `fix/phase-g-playability-recovery` のHEADとupstreamはともに `a3b5e73d60637c00b9bbb32a869bbf2763eb9b90`、ahead / behindは0 / 0で、取り込むremote commitがないためpullは不要だった
-- fetch前のworktreeはcleanで、staged / unstaged / untrackedは0件、進行中のmerge / rebase / cherry-pick等もなかった。ゲーム実装、manifest、lockfile、保持中のreview成果物に差分はない
-- 現branchは `origin/feat/phase-g-security-cell` より2commit先、`origin/main` より16commit先である。これは現在のrecovery履歴であり、main統合やPhase G受入を意味しない
-- Node `v24.13.0` / npm `11.6.2` で `npm ls --depth=0`、型検査、28ファイル176テスト、production build、`git diff --check` を再確認した
-- 同一HEADを既存Vite serverで `http://localhost:5173/?qa=1&security-posture=watchful` から開き、scene描画、固定60 Hz、console error 0を確認した。既知のRapier警告だけが残る
-- Windows上のplain `npm run dev` は今回 `[::1]:5173` にbindし、`127.0.0.1` では接続できなかった。再現可能な正規コマンドは `npm run dev -- --host 127.0.0.1` とする。これは端末の名前解決・listener境界で、ゲーム描画障害ではない
-- portableな状態はtracked source、lockfile、正本文書、remote branchである。`node_modules`、`dist`、`.serena`、IndexedDB、実行中Vite processはignoredまたは端末ローカルで、commit対象・remote証拠にしない
-- V1→V2 browser migrationと3visit resource計測は同じ `6df8ba0` の2026-07-23証跡を参照する。物理GamepadとミュートなしGate G-Aは未検証のまま
-- Vite大容量warningとRapier初期化warningは既知・非ブロッキング。警告隠しは行わない
-- PR更新、main統合、deploy、release、rights判断は未実施でオーナー所有。現在のbottleneckは `GATE_G_A_RETEST_REQUIRED` だけで、次の具体手はコードを変えずミュートなし人間評価を最初から1回行うこと
-- 最短コマンド、残作業のpurpose / effect / requirements / state / owner / nextはルート `PROJECT_HANDOFF.md` を参照する
+- 最初に `git fetch --prune --tags origin` を行い、live `origin/feat/phase-g-guided-qa-canary-v1` と `origin/project/frontier` のidentityを確認する。両refは本Phase G正本を含む同一commitであることが完了条件で、静的SHAよりlive refを優先する
+- canonical ancestryはlocal `d2683ee` とremote `f3ea109` の双方。no-force mergeは `65fb21f`、accepted runtime / evidence tipは `c9c9cdc`
+- preflightと競合解決は `artifacts/reconciliation/phase-g-canonical-v2/`、fresh browser evidenceは `docs/evidence/phase-g-closure/` にある
+- latest local gateは34 files / 203 tests、typecheck、production build、external build、diff checkがPASS。2026-07-29のDドライブfresh `npm ci` は55 packages、0 vulnerabilities
+- Guided Auditは22 / 22、semantic audioは20 / 20、Porter periodic pulse 0。各stepはexpected / actual / tick / duration / revision / result / failure reasonを持つ
+- rightsは `DECLARED` / `internalOnly: false` / `distributionApproved: true` / `LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1`。registry / producer manifest / provenance不一致、欠落ではprimitiveへfallbackし、external outputはexact GLBとproject scopeを検証する
+- A/Bは6状態 × 4条件 = 24 screenshots。固定seed / posture / camera / 1280×720のreadbackを持つ
+- browserはconsole error、unhandled rejection、external request、event duplicationが各0。3 lifecycleのscene 60 / geometry 47 / texture 3 / program 4 / draw calls 66 / DOM 238 / HUD 41は一定
+- portableなのはtracked source、tests、Canary copy、registry / manifest、artifacts、evidence、正本文書。`node_modules`、`dist`、`.serena`、IndexedDB、音量設定、Vite / Chrome processは端末ローカル
+- human sensory reviewはdeferred / non-blocking。physical Gamepad、remote CI、PR review、main統合、deploy、releaseは未完了またはowner gate。Exact procedural Canaryのrights/production asset gateは完了
+- Phase H1はtechnical unlockのみ。完全Promptのowner承認前に実装しない。V2 schema、static / persisted境界、WorldState / ItemLocation / settlement / Security knowledge authorityを維持する

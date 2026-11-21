@@ -2,6 +2,54 @@
 
 この文書は確定済みの設計判断だけを記録します。検討中の案は `idea-ledger.md`、実装・検証の詳細は `README.md` に置きます。
 
+## 2026-11-21 — 操作・画面品質をPhase H1より先にし、既存conceptを見た目の基準にする
+
+- 決定: 次の集中セッションは「操作・画面品質」（A操作感・B画面・C HUD）をPhase H1より先に行う。現行の浸水市場と船内は `docs/concept-art/visual-overhaul-v1/` の01・02・03・09を見た目の基準にする
+- authority: 本人原文「操作・画面品質を先に。理想的にはコンセプトアートなどデザイン駆動が欲しいですが推奨で良いです。」順序は本人の決定。基準画像の選定、PS1既定値の維持、右ドラッグ維持、HUDを減らし状態を画面内の光で伝える方針は、AIの推奨を本人が委任で受け入れたもの
+- 理由: 本人の懸念が操作と画面に直接ある。原因は照明・材質・密度・アニメーション・HUD文字にあり（[観測と原因](evidence/restart-2026-11-21-feel-visual/README.md)）、既存concept画像で比較の基準をすぐ置ける
+- 帰結: 2026-08-04の「field visualを明るい無人街まで拡張する」は維持し、暗さは浸水市場のfield固有条件に留める。ゲームルール、Security Cell、保存、`ItemLocation` は変更しない。見た目の最終的な採否は実画面を見た本人が決め、concept画像のproduction asset承認は含まない
+
+## 2026-08-04 — Procedural CanaryをLOWPASS project-scoped productionへ昇格する
+
+- 決定: `lowpass-readability-canary-v1`を`LicenseRef-LOWPASS-Project-Owned-Procedural-Canary-v1`の範囲で`DECLARED`とし、LOWPASS gameの開発・保守・build・同gameの配布へ使用できるproduction packとして承認する
+- authority: ownerの本task内指示。producer正本はCGAW commit `5d33ba89f141303072e2bc782c8f54302c6fd572`と`docs/compat/lowpass-v1/RIGHTS.md`
+- 実装: importerはGLB/manifest SHA、producer commit、LicenseRef、manifest/readback rights一致をfail closedで固定する。external buildはassetを除去せず、exact GLBとproject scopeを検証して同梱する
+- 境界: standalone asset配布、一般第三者再利用、concept art、将来texture/audio/第三者素材、PR/main、release/deploy/publicationは承認しない。primitive fallback、simulation authority、Security Cell規則は維持する
+
+## 2026-08-04 — 回収物の視覚言語をgameplay stateの投影に限定する
+
+- 決定: 浄水フィルター、冷却コイル、リレーコアを別シルエット・別色にし、必須 / 任意をtick数で区別するground markerと抽出方向chevronをgeometry-onlyで描画する
+- 理由: 現行primitiveではリレーコアが冷却コイルと同じ姿になり、目的種別、必須性、帰還方向を画面だけで説明できなかったため
+- 帰結: marker表示は`ItemLocation.kind === "mission-ground"`から投影し、運搬時は消す。Three.js表示は所在、衝突、経路、精算を所有しない。texture追加、gameplay変更、Canary rights昇格、production asset承認は行わない
+
+## 2026-08-04 — field visualを「明るい無人街」まで拡張する
+
+- 決定: LOWPASSのfield既定を「暗い放棄施設」に限定しない。普通のoffice、building、shopping mall、station、housing、library、hotel、medical center、parking / logistics、school / community campusを含む、人は不在だが必ずしも崩壊していない都市を正規の探索範囲とする
+- visual evidence: `docs/concept-art/field-expansion-v1/` の10枚を都市scaleのconcept基準とする。`docs/concept-art/visual-overhaul-v1/` は現行浸水marketとmachine / propの局所studyへ限定する
+- 理由: 無人状態を全面的な暗さ、瓦礫、放棄施設だけで表現すると、場所の用途、route topology、日常生活の不在というLOWPASS固有の判断材料が失われるため
+- 帰結: 昼光、通常建築、glass、植栽、暖色舗装、稼働中設備を既定選択肢に含める。浸水、停電、破損、過成長はfield固有条件とし、全体paletteへ昇格しない。concept画像は`CONCEPT_REFERENCE_ONLY`で、gameplay authorityやproduction asset approvalを変更しない
+
+## 2026-07-29 — Phase G正本を両履歴保全のno-force reconciliationへ確定する
+
+- 決定: canonical implementation sourceはlocal `d2683ee` lineageとし、remote `f3ea10949a908236adad1d2106ff0634804fc4bd` は履歴を保全したgreen baselineだがacceptance-equivalentではないものとしてsupersedeする
+- canonical identity: 両系統を親に持つmerge `65fb21f992d9b2d8f933c343f1b2ab766311bbe2` と、mergeを書き換えず追加したcorrective `bf6341b` / accepted runtime-evidence tip `c9c9cdc16268c60995cf82499dc59ca277d4f1ba`。共有正本はlive `origin/feat/phase-g-guided-qa-canary-v1` と `origin/project/frontier` のreadbackを優先する
+- 理由: local側の22段階Security Cell因果、状態別A/B、semantic event-only audio、明示rights境界を採用しつつ、remote側のgreen履歴と有用な非競合coverageを消さず、normal fast-forward可能な共通祖先を作るため
+- 4 gap: Porter periodic pulseを除去し20の意味cueへ限定、Guided Auditのexpected / actual / tick / duration / revision / failure reasonを個別化、rightsをregistry / manifest / external buildでfail-closed化、6状態 × 4条件の24 A/B証拠を再生成する
+- 履歴方針: force / force-with-lease、rebase、reset、tag上書き、repository全体のours / theirsを使わない。`d2683ee` と `f3ea109` は双方ともcanonical ancestryに残す
+- 帰結: Phase Gは `PHASE_G_CANONICAL_RECONCILIATION_GREEN`。human sensory reviewはdeferred / non-blocking、Canaryは`NOASSERTION` / internal-only、Phase H1はtechnical unlockのみで明示承認前に開始しない。main、PR merge、deploy、release、rights昇格は別gate
+
+## 2026-07-28 — Phase Gの自動受入と人間感覚レビューを分離する
+
+- 決定: camera orbit、Guided QA、22段階audit、semantic cueと字幕が自動・ブラウザ証拠を満たした時点を `PHASE_G_AUTOMATED_ACCEPTANCE_GREEN` とし、音量・音色・疲労感と最終game feelは `HUMAN_SENSORY_REVIEW_DEFERRED_NON_BLOCKING` とする
+- 理由: 既に人間PASSのmovement、zoom、cart、外観を再び必須停止へ戻さず、機械判定可能な因果・操作・非無音・字幕を再現可能な証拠で閉じるため
+- 帰結: `GATE_G_A_RETEST_REQUIRED` は履歴へ移す。human sensory PASS、production audio complete、final game feel acceptedとは記録せず、観測事実なしに距離、delay、scan、lock、pressureを調整しない。Phase Hは別承認
+
+## 2026-07-28 — Canaryをsimulation非所有の内部visual packとして統合する
+
+- 決定: `AssetPackRegistry` でprimitive / canary-v1を選択し、exact hash検証済みGLBをmission chunkで遅延loadする。Needle、Watcher、Porter、Shopping cart、Field terminalは既存simulation stateを投影するvisual adapterとし、load失敗時はprimitiveへfallbackする
+- 理由: CGAWのstable node / material / anchor契約をconsumer側で実証しながら、GLB transformやcollision proxyをgameplay authorityへ昇格せず、primitive経路を回帰基準として保持するため
+- 帰結: source packageをproduction dependencyにせず、import時に絶対pathを除去する。rights `NOASSERTION`、internal only、distribution未承認を固定し、UV、texture、Blender、rights、production approvalは別gateとする
+
 ## 2026-07-26 — 感覚評価を停止し、playability baselineを先に復旧する
 
 - 決定: Gate G-Aを `GATE_G_A_BLOCKED_BY_PLAYABILITY_BASELINE` とし、Phase Gの感覚調整とPhase Hを停止してkeyboard、Gamepad、camera distance、push-cartを独立recovery branchで復旧する

@@ -1,0 +1,2481 @@
+{
+  "schemaVersion": "phase-g-guided-audit-1.0.0",
+  "generatedAtIso": "2026-11-21T05:38:57.914Z",
+  "result": "PASS",
+  "timeoutCount": 0,
+  "duplicateEventCount": 0,
+  "steps": [
+    {
+      "id": "watchful-mission",
+      "label": "Watchful mission starts",
+      "startTick": 692,
+      "endTick": 692,
+      "durationMs": 2375,
+      "timeoutMs": 12000,
+      "expected": "world=mission, posture revision available",
+      "expectedState": "world=mission, posture revision available",
+      "actual": {
+        "tick": 692,
+        "elapsedSeconds": 11.533333333333486,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "unknown",
+        "alliedPresence": 0,
+        "hostilePresence": 0,
+        "presenceBand": "unknown",
+        "watcherTask": "patrol",
+        "needleTask": "dormant",
+        "hostileLinkState": "unavailable",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [],
+        "needleLocalFactKinds": [],
+        "sharedFactKinds": [],
+        "revisions": {
+          "runtimeTick": 692,
+          "blackboard": 0,
+          "sharedContact": 0,
+          "needleTransition": 0,
+          "watcherTransition": 0,
+          "communication": 1,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 692,
+        "elapsedSeconds": 11.533333333333486,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "unknown",
+        "alliedPresence": 0,
+        "hostilePresence": 0,
+        "presenceBand": "unknown",
+        "watcherTask": "patrol",
+        "needleTask": "dormant",
+        "hostileLinkState": "unavailable",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [],
+        "needleLocalFactKinds": [],
+        "sharedFactKinds": [],
+        "revisions": {
+          "runtimeTick": 692,
+          "blackboard": 0,
+          "sharedContact": 0,
+          "needleTransition": 0,
+          "watcherTransition": 0,
+          "communication": 1,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 692,
+        "blackboard": 0,
+        "sharedContact": 0,
+        "needleTransition": 0,
+        "watcherTransition": 0,
+        "communication": 1,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 692,
+        "blackboard": 0,
+        "sharedContact": 0,
+        "needleTransition": 0,
+        "watcherTransition": 0,
+        "communication": 1,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "watchful mission ready // primitive // world=mission, posture revision available"
+    },
+    {
+      "id": "player-isolated",
+      "label": "Player is isolated",
+      "startTick": 692,
+      "endTick": 702,
+      "durationMs": 403,
+      "timeoutMs": 3000,
+      "expected": "isolation=isolated",
+      "expectedState": "isolation=isolated",
+      "actual": {
+        "tick": 702,
+        "elapsedSeconds": 11.700000000000161,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "patrol",
+        "needleTask": "patrol",
+        "hostileLinkState": "disconnected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [],
+        "sharedFactKinds": [],
+        "revisions": {
+          "runtimeTick": 702,
+          "blackboard": 1,
+          "sharedContact": 0,
+          "needleTransition": 1,
+          "watcherTransition": 0,
+          "communication": 4,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 702,
+        "elapsedSeconds": 11.700000000000161,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "patrol",
+        "needleTask": "patrol",
+        "hostileLinkState": "disconnected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [],
+        "sharedFactKinds": [],
+        "revisions": {
+          "runtimeTick": 702,
+          "blackboard": 1,
+          "sharedContact": 0,
+          "needleTransition": 1,
+          "watcherTransition": 0,
+          "communication": 4,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 702,
+        "blackboard": 1,
+        "sharedContact": 0,
+        "needleTransition": 1,
+        "watcherTransition": 0,
+        "communication": 4,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 702,
+        "blackboard": 1,
+        "sharedContact": 0,
+        "needleTransition": 1,
+        "watcherTransition": 0,
+        "communication": 4,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "player isolated; reinforcement removed; hostile link held for watcher-first contact // isolation=isolated"
+    },
+    {
+      "id": "watcher-recognition",
+      "label": "Watcher directly recognizes player",
+      "startTick": 702,
+      "endTick": 702,
+      "durationMs": 0,
+      "timeoutMs": 5000,
+      "expected": "watcher local agent fact",
+      "expectedState": "watcher local agent fact",
+      "actual": {
+        "tick": 702,
+        "elapsedSeconds": 11.700000000000161,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "patrol",
+        "needleTask": "patrol",
+        "hostileLinkState": "disconnected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [],
+        "sharedFactKinds": [],
+        "revisions": {
+          "runtimeTick": 702,
+          "blackboard": 1,
+          "sharedContact": 0,
+          "needleTransition": 1,
+          "watcherTransition": 0,
+          "communication": 4,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 702,
+        "elapsedSeconds": 11.700000000000161,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "patrol",
+        "needleTask": "patrol",
+        "hostileLinkState": "disconnected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [],
+        "sharedFactKinds": [],
+        "revisions": {
+          "runtimeTick": 702,
+          "blackboard": 1,
+          "sharedContact": 0,
+          "needleTransition": 1,
+          "watcherTransition": 0,
+          "communication": 4,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 702,
+        "blackboard": 1,
+        "sharedContact": 0,
+        "needleTransition": 1,
+        "watcherTransition": 0,
+        "communication": 4,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 702,
+        "blackboard": 1,
+        "sharedContact": 0,
+        "needleTransition": 1,
+        "watcherTransition": 0,
+        "communication": 4,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "observed // watcher local agent fact"
+    },
+    {
+      "id": "watcher-local-fact",
+      "label": "Watcher local fact is recorded",
+      "startTick": 702,
+      "endTick": 702,
+      "durationMs": 0,
+      "timeoutMs": 2000,
+      "expected": "watcher localFacts contains agent-sighting",
+      "expectedState": "watcher localFacts contains agent-sighting",
+      "actual": {
+        "tick": 702,
+        "elapsedSeconds": 11.700000000000161,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "patrol",
+        "needleTask": "patrol",
+        "hostileLinkState": "disconnected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [],
+        "sharedFactKinds": [],
+        "revisions": {
+          "runtimeTick": 702,
+          "blackboard": 1,
+          "sharedContact": 0,
+          "needleTransition": 1,
+          "watcherTransition": 0,
+          "communication": 4,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 702,
+        "elapsedSeconds": 11.700000000000161,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "patrol",
+        "needleTask": "patrol",
+        "hostileLinkState": "disconnected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [],
+        "sharedFactKinds": [],
+        "revisions": {
+          "runtimeTick": 702,
+          "blackboard": 1,
+          "sharedContact": 0,
+          "needleTransition": 1,
+          "watcherTransition": 0,
+          "communication": 4,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 702,
+        "blackboard": 1,
+        "sharedContact": 0,
+        "needleTransition": 1,
+        "watcherTransition": 0,
+        "communication": 4,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 702,
+        "blackboard": 1,
+        "sharedContact": 0,
+        "needleTransition": 1,
+        "watcherTransition": 0,
+        "communication": 4,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "observed // watcher localFacts contains agent-sighting"
+    },
+    {
+      "id": "hostile-share",
+      "label": "Contact crosses hostile link",
+      "startTick": 702,
+      "endTick": 740,
+      "durationMs": 619,
+      "timeoutMs": 6000,
+      "expected": "shared agent fact and connected link",
+      "expectedState": "shared agent fact and connected link",
+      "actual": {
+        "tick": 740,
+        "elapsedSeconds": 12.333333333333526,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "patrol",
+        "needleTask": "patrol",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "locking",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 740,
+          "blackboard": 2,
+          "sharedContact": 1,
+          "needleTransition": 3,
+          "watcherTransition": 0,
+          "communication": 7,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 740,
+        "elapsedSeconds": 12.333333333333526,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "patrol",
+        "needleTask": "patrol",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "locking",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 740,
+          "blackboard": 2,
+          "sharedContact": 1,
+          "needleTransition": 3,
+          "watcherTransition": 0,
+          "communication": 7,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 740,
+        "blackboard": 2,
+        "sharedContact": 1,
+        "needleTransition": 3,
+        "watcherTransition": 0,
+        "communication": 7,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 740,
+        "blackboard": 2,
+        "sharedContact": 1,
+        "needleTransition": 3,
+        "watcherTransition": 0,
+        "communication": 7,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "hostile link restored; normal share delay retained // shared agent fact and connected link"
+    },
+    {
+      "id": "needle-shared-response",
+      "label": "Needle reacts to shared information",
+      "startTick": 740,
+      "endTick": 820,
+      "durationMs": 1363,
+      "timeoutMs": 4000,
+      "expected": "Needle task leaves patrol",
+      "expectedState": "Needle task leaves patrol",
+      "actual": {
+        "tick": 820,
+        "elapsedSeconds": 13.666666666666925,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1,
+        "presenceBand": "predatory",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 820,
+          "blackboard": 6,
+          "sharedContact": 4,
+          "needleTransition": 4,
+          "watcherTransition": 0,
+          "communication": 12,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 820,
+        "elapsedSeconds": 13.666666666666925,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1,
+        "presenceBand": "predatory",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 820,
+          "blackboard": 6,
+          "sharedContact": 4,
+          "needleTransition": 4,
+          "watcherTransition": 0,
+          "communication": 12,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 820,
+        "blackboard": 6,
+        "sharedContact": 4,
+        "needleTransition": 4,
+        "watcherTransition": 0,
+        "communication": 12,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 820,
+        "blackboard": 6,
+        "sharedContact": 4,
+        "needleTransition": 4,
+        "watcherTransition": 0,
+        "communication": 12,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "observed // Needle task leaves patrol"
+    },
+    {
+      "id": "needle-direct-reacquire",
+      "label": "Needle directly re-acquires player",
+      "startTick": 820,
+      "endTick": 820,
+      "durationMs": 0,
+      "timeoutMs": 5000,
+      "expected": "needle local agent fact",
+      "expectedState": "needle local agent fact",
+      "actual": {
+        "tick": 820,
+        "elapsedSeconds": 13.666666666666925,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1,
+        "presenceBand": "predatory",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 820,
+          "blackboard": 6,
+          "sharedContact": 4,
+          "needleTransition": 5,
+          "watcherTransition": 0,
+          "communication": 12,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 820,
+        "elapsedSeconds": 13.666666666666925,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1,
+        "presenceBand": "predatory",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 820,
+          "blackboard": 6,
+          "sharedContact": 4,
+          "needleTransition": 5,
+          "watcherTransition": 0,
+          "communication": 12,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 820,
+        "blackboard": 6,
+        "sharedContact": 4,
+        "needleTransition": 5,
+        "watcherTransition": 0,
+        "communication": 12,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 820,
+        "blackboard": 6,
+        "sharedContact": 4,
+        "needleTransition": 5,
+        "watcherTransition": 0,
+        "communication": 12,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "Needle placed for direct line-of-sight re-acquisition // needle local agent fact"
+    },
+    {
+      "id": "lock-on-start",
+      "label": "Lock-on begins",
+      "startTick": 820,
+      "endTick": 846,
+      "durationMs": 418,
+      "timeoutMs": 6000,
+      "expected": "lock=locking or locked",
+      "expectedState": "lock=locking or locked",
+      "actual": {
+        "tick": 846,
+        "elapsedSeconds": 14.10000000000028,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1,
+        "presenceBand": "predatory",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "locking",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 846,
+          "blackboard": 6,
+          "sharedContact": 4,
+          "needleTransition": 7,
+          "watcherTransition": 0,
+          "communication": 14,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 846,
+        "elapsedSeconds": 14.10000000000028,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1,
+        "presenceBand": "predatory",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "locking",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 846,
+          "blackboard": 6,
+          "sharedContact": 4,
+          "needleTransition": 7,
+          "watcherTransition": 0,
+          "communication": 14,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 846,
+        "blackboard": 6,
+        "sharedContact": 4,
+        "needleTransition": 7,
+        "watcherTransition": 0,
+        "communication": 14,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 846,
+        "blackboard": 6,
+        "sharedContact": 4,
+        "needleTransition": 7,
+        "watcherTransition": 0,
+        "communication": 14,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "observed // lock=locking or locked"
+    },
+    {
+      "id": "reinforcement-presence",
+      "label": "Reinforcement enters local presence",
+      "startTick": 846,
+      "endTick": 855,
+      "durationMs": 146,
+      "timeoutMs": 3000,
+      "expected": "allied presence >= 2",
+      "expectedState": "allied presence >= 2",
+      "actual": {
+        "tick": 855,
+        "elapsedSeconds": 14.250000000000288,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "reinforced",
+        "alliedPresence": 2,
+        "hostilePresence": 1.5,
+        "presenceBand": "cautious",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "locking",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 855,
+          "blackboard": 6,
+          "sharedContact": 4,
+          "needleTransition": 7,
+          "watcherTransition": 0,
+          "communication": 15,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 855,
+        "elapsedSeconds": 14.250000000000288,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "reinforced",
+        "alliedPresence": 2,
+        "hostilePresence": 1.5,
+        "presenceBand": "cautious",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "locking",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 855,
+          "blackboard": 6,
+          "sharedContact": 4,
+          "needleTransition": 7,
+          "watcherTransition": 0,
+          "communication": 15,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 855,
+        "blackboard": 6,
+        "sharedContact": 4,
+        "needleTransition": 7,
+        "watcherTransition": 0,
+        "communication": 15,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 855,
+        "blackboard": 6,
+        "sharedContact": 4,
+        "needleTransition": 7,
+        "watcherTransition": 0,
+        "communication": 15,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "Mara entered local Presence through normal PresenceService // allied presence >= 2"
+    },
+    {
+      "id": "lock-release",
+      "label": "Reinforcement releases lock",
+      "startTick": 855,
+      "endTick": 895,
+      "durationMs": 674,
+      "timeoutMs": 4000,
+      "expected": "lock=inactive",
+      "expectedState": "lock=inactive",
+      "actual": {
+        "tick": 895,
+        "elapsedSeconds": 14.916666666666988,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "reinforced",
+        "alliedPresence": 2,
+        "hostilePresence": 1.5,
+        "presenceBand": "cautious",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 895,
+          "blackboard": 10,
+          "sharedContact": 8,
+          "needleTransition": 8,
+          "watcherTransition": 0,
+          "communication": 18,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 895,
+        "elapsedSeconds": 14.916666666666988,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "reinforced",
+        "alliedPresence": 2,
+        "hostilePresence": 1.5,
+        "presenceBand": "cautious",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 895,
+          "blackboard": 10,
+          "sharedContact": 8,
+          "needleTransition": 8,
+          "watcherTransition": 0,
+          "communication": 18,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 895,
+        "blackboard": 10,
+        "sharedContact": 8,
+        "needleTransition": 8,
+        "watcherTransition": 0,
+        "communication": 18,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 895,
+        "blackboard": 10,
+        "sharedContact": 8,
+        "needleTransition": 8,
+        "watcherTransition": 0,
+        "communication": 18,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "observed // lock=inactive"
+    },
+    {
+      "id": "cautious-transition",
+      "label": "Security Cell becomes cautious",
+      "startTick": 895,
+      "endTick": 895,
+      "durationMs": 0,
+      "timeoutMs": 5000,
+      "expected": "band=cautious",
+      "expectedState": "band=cautious",
+      "actual": {
+        "tick": 895,
+        "elapsedSeconds": 14.916666666666988,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "reinforced",
+        "alliedPresence": 2,
+        "hostilePresence": 1.5,
+        "presenceBand": "cautious",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 895,
+          "blackboard": 10,
+          "sharedContact": 8,
+          "needleTransition": 8,
+          "watcherTransition": 0,
+          "communication": 18,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 895,
+        "elapsedSeconds": 14.916666666666988,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "reinforced",
+        "alliedPresence": 2,
+        "hostilePresence": 1.5,
+        "presenceBand": "cautious",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "dormant",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 895,
+          "blackboard": 10,
+          "sharedContact": 8,
+          "needleTransition": 8,
+          "watcherTransition": 0,
+          "communication": 18,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 895,
+        "blackboard": 10,
+        "sharedContact": 8,
+        "needleTransition": 8,
+        "watcherTransition": 0,
+        "communication": 18,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 895,
+        "blackboard": 10,
+        "sharedContact": 8,
+        "needleTransition": 8,
+        "watcherTransition": 0,
+        "communication": 18,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "observed // band=cautious"
+    },
+    {
+      "id": "porter-authentication",
+      "label": "Porter authenticates",
+      "startTick": 895,
+      "endTick": 1081,
+      "durationMs": 3099,
+      "timeoutMs": 7000,
+      "expected": "porter=friendly",
+      "expectedState": "porter=friendly",
+      "actual": {
+        "tick": 1081,
+        "elapsedSeconds": 18.016666666666925,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "reinforced",
+        "alliedPresence": 2.75,
+        "hostilePresence": 1.5,
+        "presenceBand": "outnumbered",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1081,
+          "blackboard": 30,
+          "sharedContact": 26,
+          "needleTransition": 13,
+          "watcherTransition": 0,
+          "communication": 34,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 1081,
+        "elapsedSeconds": 18.016666666666925,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "reinforced",
+        "alliedPresence": 2.75,
+        "hostilePresence": 1.5,
+        "presenceBand": "outnumbered",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1081,
+          "blackboard": 30,
+          "sharedContact": 26,
+          "needleTransition": 13,
+          "watcherTransition": 0,
+          "communication": 34,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 1081,
+        "blackboard": 30,
+        "sharedContact": 26,
+        "needleTransition": 13,
+        "watcherTransition": 0,
+        "communication": 34,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 1081,
+        "blackboard": 30,
+        "sharedContact": 26,
+        "needleTransition": 13,
+        "watcherTransition": 0,
+        "communication": 34,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "Porter authentication requested // HANDSHAKE_STARTED // porter=friendly"
+    },
+    {
+      "id": "outnumbered-transition",
+      "label": "Security Cell becomes outnumbered",
+      "startTick": 1081,
+      "endTick": 1081,
+      "durationMs": 0,
+      "timeoutMs": 5000,
+      "expected": "band=outnumbered",
+      "expectedState": "band=outnumbered",
+      "actual": {
+        "tick": 1081,
+        "elapsedSeconds": 18.016666666666925,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "reinforced",
+        "alliedPresence": 2.75,
+        "hostilePresence": 1.5,
+        "presenceBand": "outnumbered",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1081,
+          "blackboard": 30,
+          "sharedContact": 26,
+          "needleTransition": 13,
+          "watcherTransition": 0,
+          "communication": 34,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 1081,
+        "elapsedSeconds": 18.016666666666925,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "reinforced",
+        "alliedPresence": 2.75,
+        "hostilePresence": 1.5,
+        "presenceBand": "outnumbered",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1081,
+          "blackboard": 30,
+          "sharedContact": 26,
+          "needleTransition": 13,
+          "watcherTransition": 0,
+          "communication": 34,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 1081,
+        "blackboard": 30,
+        "sharedContact": 26,
+        "needleTransition": 13,
+        "watcherTransition": 0,
+        "communication": 34,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 1081,
+        "blackboard": 30,
+        "sharedContact": 26,
+        "needleTransition": 13,
+        "watcherTransition": 0,
+        "communication": 34,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "observed // band=outnumbered"
+    },
+    {
+      "id": "cell-disengage",
+      "label": "Security Cell disengages",
+      "startTick": 1081,
+      "endTick": 1085,
+      "durationMs": 59,
+      "timeoutMs": 5000,
+      "expected": "Needle and Watcher disengage",
+      "expectedState": "Needle and Watcher disengage",
+      "actual": {
+        "tick": 1085,
+        "elapsedSeconds": 18.083333333333588,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "reinforced",
+        "alliedPresence": 2.75,
+        "hostilePresence": 1.5,
+        "presenceBand": "outnumbered",
+        "watcherTask": "disengage",
+        "needleTask": "disengage",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1085,
+          "blackboard": 31,
+          "sharedContact": 26,
+          "needleTransition": 13,
+          "watcherTransition": 0,
+          "communication": 35,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 1085,
+        "elapsedSeconds": 18.083333333333588,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "reinforced",
+        "alliedPresence": 2.75,
+        "hostilePresence": 1.5,
+        "presenceBand": "outnumbered",
+        "watcherTask": "disengage",
+        "needleTask": "disengage",
+        "hostileLinkState": "connected",
+        "relayState": "not-deployed",
+        "flareState": "not-deployed",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1085,
+          "blackboard": 31,
+          "sharedContact": 26,
+          "needleTransition": 13,
+          "watcherTransition": 0,
+          "communication": 35,
+          "squadFeedback": 0,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 1085,
+        "blackboard": 31,
+        "sharedContact": 26,
+        "needleTransition": 13,
+        "watcherTransition": 0,
+        "communication": 35,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 1085,
+        "blackboard": 31,
+        "sharedContact": 26,
+        "needleTransition": 13,
+        "watcherTransition": 0,
+        "communication": 35,
+        "squadFeedback": 0,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "observed // Needle and Watcher disengage"
+    },
+    {
+      "id": "relay-deploy",
+      "label": "Relay is deployed",
+      "startTick": 1085,
+      "endTick": 1085,
+      "durationMs": 1,
+      "timeoutMs": 4000,
+      "expected": "relay=active",
+      "expectedState": "relay=active",
+      "actual": {
+        "tick": 1085,
+        "elapsedSeconds": 18.083333333333588,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "reinforced",
+        "alliedPresence": 2.75,
+        "hostilePresence": 1.5,
+        "presenceBand": "outnumbered",
+        "watcherTask": "disengage",
+        "needleTask": "disengage",
+        "hostileLinkState": "connected",
+        "relayState": "active",
+        "flareState": "not-deployed",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1085,
+          "blackboard": 31,
+          "sharedContact": 26,
+          "needleTransition": 13,
+          "watcherTransition": 0,
+          "communication": 39,
+          "squadFeedback": 1,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 1085,
+        "elapsedSeconds": 18.083333333333588,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "reinforced",
+        "alliedPresence": 2.75,
+        "hostilePresence": 1.5,
+        "presenceBand": "outnumbered",
+        "watcherTask": "disengage",
+        "needleTask": "disengage",
+        "hostileLinkState": "connected",
+        "relayState": "active",
+        "flareState": "not-deployed",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1085,
+          "blackboard": 31,
+          "sharedContact": 26,
+          "needleTransition": 13,
+          "watcherTransition": 0,
+          "communication": 39,
+          "squadFeedback": 1,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 1085,
+        "blackboard": 31,
+        "sharedContact": 26,
+        "needleTransition": 13,
+        "watcherTransition": 0,
+        "communication": 39,
+        "squadFeedback": 1,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 1085,
+        "blackboard": 31,
+        "sharedContact": 26,
+        "needleTransition": 13,
+        "watcherTransition": 0,
+        "communication": 39,
+        "squadFeedback": 1,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "relay deployment requested // RELAY_DEPLOYED // relay=active"
+    },
+    {
+      "id": "relay-sabotage-start",
+      "label": "Relay sabotage begins",
+      "startTick": 1085,
+      "endTick": 1234,
+      "durationMs": 2488,
+      "timeoutMs": 12000,
+      "expected": "relay=sabotaging",
+      "expectedState": "relay=sabotaging",
+      "actual": {
+        "tick": 1234,
+        "elapsedSeconds": 20.56666666666678,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 0,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "sabotaging",
+        "flareState": "not-deployed",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1234,
+          "blackboard": 49,
+          "sharedContact": 43,
+          "needleTransition": 36,
+          "watcherTransition": 0,
+          "communication": 52,
+          "squadFeedback": 1,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 1234,
+        "elapsedSeconds": 20.56666666666678,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 0,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "sabotaging",
+        "flareState": "not-deployed",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1234,
+          "blackboard": 49,
+          "sharedContact": 43,
+          "needleTransition": 36,
+          "watcherTransition": 0,
+          "communication": 52,
+          "squadFeedback": 1,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 1234,
+        "blackboard": 49,
+        "sharedContact": 43,
+        "needleTransition": 36,
+        "watcherTransition": 0,
+        "communication": 52,
+        "squadFeedback": 1,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 1234,
+        "blackboard": 49,
+        "sharedContact": 43,
+        "needleTransition": 36,
+        "watcherTransition": 0,
+        "communication": 52,
+        "squadFeedback": 1,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "existing AI may reserve and sabotage relay-01 // relay=sabotaging"
+    },
+    {
+      "id": "relay-disabled",
+      "label": "Relay becomes disabled",
+      "startTick": 1234,
+      "endTick": 1495,
+      "durationMs": 4371,
+      "timeoutMs": 12000,
+      "expected": "relay=disabled",
+      "expectedState": "relay=disabled",
+      "actual": {
+        "tick": 1495,
+        "elapsedSeconds": 24.916666666666533,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 0,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "sabotage-relay",
+        "hostileLinkState": "connected",
+        "relayState": "disabled",
+        "flareState": "not-deployed",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1495,
+          "blackboard": 64,
+          "sharedContact": 56,
+          "needleTransition": 39,
+          "watcherTransition": 0,
+          "communication": 70,
+          "squadFeedback": 2,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 1495,
+        "elapsedSeconds": 24.916666666666533,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 0,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "sabotage-relay",
+        "hostileLinkState": "connected",
+        "relayState": "disabled",
+        "flareState": "not-deployed",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1495,
+          "blackboard": 64,
+          "sharedContact": 56,
+          "needleTransition": 39,
+          "watcherTransition": 0,
+          "communication": 70,
+          "squadFeedback": 2,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 1495,
+        "blackboard": 64,
+        "sharedContact": 56,
+        "needleTransition": 39,
+        "watcherTransition": 0,
+        "communication": 70,
+        "squadFeedback": 2,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 1495,
+        "blackboard": 64,
+        "sharedContact": 56,
+        "needleTransition": 39,
+        "watcherTransition": 0,
+        "communication": 70,
+        "squadFeedback": 2,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "observed // relay=disabled"
+    },
+    {
+      "id": "relay-restart",
+      "label": "Relay restarts",
+      "startTick": 1495,
+      "endTick": 1587,
+      "durationMs": 1542,
+      "timeoutMs": 5000,
+      "expected": "relay=active",
+      "expectedState": "relay=active",
+      "actual": {
+        "tick": 1587,
+        "elapsedSeconds": 26.44999999999978,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "sabotage-relay",
+        "hostileLinkState": "connected",
+        "relayState": "active",
+        "flareState": "not-deployed",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1587,
+          "blackboard": 69,
+          "sharedContact": 59,
+          "needleTransition": 39,
+          "watcherTransition": 0,
+          "communication": 78,
+          "squadFeedback": 4,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 1587,
+        "elapsedSeconds": 26.44999999999978,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "sabotage-relay",
+        "hostileLinkState": "connected",
+        "relayState": "active",
+        "flareState": "not-deployed",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1587,
+          "blackboard": 69,
+          "sharedContact": 59,
+          "needleTransition": 39,
+          "watcherTransition": 0,
+          "communication": 78,
+          "squadFeedback": 4,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 1587,
+        "blackboard": 69,
+        "sharedContact": 59,
+        "needleTransition": 39,
+        "watcherTransition": 0,
+        "communication": 78,
+        "squadFeedback": 4,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 1587,
+        "blackboard": 69,
+        "sharedContact": 59,
+        "needleTransition": 39,
+        "watcherTransition": 0,
+        "communication": 78,
+        "squadFeedback": 4,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "relay restart requested // RELAY_RESTARTING // relay=active"
+    },
+    {
+      "id": "flare-deploy",
+      "label": "Flare is deployed",
+      "startTick": 1587,
+      "endTick": 1587,
+      "durationMs": 1,
+      "timeoutMs": 4000,
+      "expected": "flare=active",
+      "expectedState": "flare=active",
+      "actual": {
+        "tick": 1587,
+        "elapsedSeconds": 26.44999999999978,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "sabotage-relay",
+        "hostileLinkState": "connected",
+        "relayState": "active",
+        "flareState": "active",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1587,
+          "blackboard": 69,
+          "sharedContact": 59,
+          "needleTransition": 39,
+          "watcherTransition": 0,
+          "communication": 78,
+          "squadFeedback": 5,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 1587,
+        "elapsedSeconds": 26.44999999999978,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "sabotage-relay",
+        "hostileLinkState": "connected",
+        "relayState": "active",
+        "flareState": "active",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1587,
+          "blackboard": 69,
+          "sharedContact": 59,
+          "needleTransition": 39,
+          "watcherTransition": 0,
+          "communication": 78,
+          "squadFeedback": 5,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 1587,
+        "blackboard": 69,
+        "sharedContact": 59,
+        "needleTransition": 39,
+        "watcherTransition": 0,
+        "communication": 78,
+        "squadFeedback": 5,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 1587,
+        "blackboard": 69,
+        "sharedContact": 59,
+        "needleTransition": 39,
+        "watcherTransition": 0,
+        "communication": 78,
+        "squadFeedback": 5,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "flare deployment requested // DEPLOYED // flare=active"
+    },
+    {
+      "id": "flare-local-fact",
+      "label": "Flare fact is generated",
+      "startTick": 1587,
+      "endTick": 1596,
+      "durationMs": 173,
+      "timeoutMs": 5000,
+      "expected": "local flare-sighting",
+      "expectedState": "local flare-sighting",
+      "actual": {
+        "tick": 1596,
+        "elapsedSeconds": 26.59999999999977,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1.75,
+        "hostilePresence": 1.5,
+        "presenceBand": "cautious",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "active",
+        "flareState": "observed",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "flare-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting",
+          "flare-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1596,
+          "blackboard": 70,
+          "sharedContact": 59,
+          "needleTransition": 42,
+          "watcherTransition": 0,
+          "communication": 79,
+          "squadFeedback": 5,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 1596,
+        "elapsedSeconds": 26.59999999999977,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1.75,
+        "hostilePresence": 1.5,
+        "presenceBand": "cautious",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "active",
+        "flareState": "observed",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "flare-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting",
+          "flare-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1596,
+          "blackboard": 70,
+          "sharedContact": 59,
+          "needleTransition": 42,
+          "watcherTransition": 0,
+          "communication": 79,
+          "squadFeedback": 5,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 1596,
+        "blackboard": 70,
+        "sharedContact": 59,
+        "needleTransition": 42,
+        "watcherTransition": 0,
+        "communication": 79,
+        "squadFeedback": 5,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 1596,
+        "blackboard": 70,
+        "sharedContact": 59,
+        "needleTransition": 42,
+        "watcherTransition": 0,
+        "communication": 79,
+        "squadFeedback": 5,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "hostile machines placed to observe active flare through existing perception // local flare-sighting"
+    },
+    {
+      "id": "flare-shared-fact",
+      "label": "Flare fact is shared",
+      "startTick": 1596,
+      "endTick": 1638,
+      "durationMs": 682,
+      "timeoutMs": 6000,
+      "expected": "shared flare-sighting",
+      "expectedState": "shared flare-sighting",
+      "actual": {
+        "tick": 1638,
+        "elapsedSeconds": 27.29999999999973,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1.75,
+        "hostilePresence": 1.5,
+        "presenceBand": "cautious",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "active",
+        "flareState": "shared",
+        "porterState": "friendly-idle",
+        "lockState": "locking",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "flare-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting",
+          "flare-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting",
+          "flare-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1638,
+          "blackboard": 75,
+          "sharedContact": 64,
+          "needleTransition": 44,
+          "watcherTransition": 0,
+          "communication": 82,
+          "squadFeedback": 5,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 1638,
+        "elapsedSeconds": 27.29999999999973,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1.75,
+        "hostilePresence": 1.5,
+        "presenceBand": "cautious",
+        "watcherTask": "maintain-overwatch",
+        "needleTask": "observe-agent",
+        "hostileLinkState": "connected",
+        "relayState": "active",
+        "flareState": "shared",
+        "porterState": "friendly-idle",
+        "lockState": "locking",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "flare-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting",
+          "flare-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "sharedFactKinds": [
+          "agent-sighting",
+          "flare-sighting",
+          "friendly-machine-sighting",
+          "relay-sighting"
+        ],
+        "revisions": {
+          "runtimeTick": 1638,
+          "blackboard": 75,
+          "sharedContact": 64,
+          "needleTransition": 44,
+          "watcherTransition": 0,
+          "communication": 82,
+          "squadFeedback": 5,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 1638,
+        "blackboard": 75,
+        "sharedContact": 64,
+        "needleTransition": 44,
+        "watcherTransition": 0,
+        "communication": 82,
+        "squadFeedback": 5,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 1638,
+        "blackboard": 75,
+        "sharedContact": 64,
+        "needleTransition": 44,
+        "watcherTransition": 0,
+        "communication": 82,
+        "squadFeedback": 5,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "observed // shared flare-sighting"
+    },
+    {
+      "id": "flare-expiry",
+      "label": "Flare fact expires",
+      "startTick": 1638,
+      "endTick": 2184,
+      "durationMs": 9086,
+      "timeoutMs": 12000,
+      "expected": "no local/shared flare-sighting",
+      "expectedState": "no local/shared flare-sighting",
+      "actual": {
+        "tick": 2184,
+        "elapsedSeconds": 36.39999999999922,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "patrol",
+        "needleTask": "patrol",
+        "hostileLinkState": "disconnected",
+        "relayState": "active",
+        "flareState": "active",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [],
+        "revisions": {
+          "runtimeTick": 2184,
+          "blackboard": 90,
+          "sharedContact": 72,
+          "needleTransition": 52,
+          "watcherTransition": 0,
+          "communication": 118,
+          "squadFeedback": 5,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "actualState": {
+        "tick": 2184,
+        "elapsedSeconds": 36.39999999999922,
+        "world": "mission",
+        "controlledAgent": "player",
+        "playerIsolationState": "isolated",
+        "alliedPresence": 1,
+        "hostilePresence": 1.5,
+        "presenceBand": "predatory",
+        "watcherTask": "patrol",
+        "needleTask": "patrol",
+        "hostileLinkState": "disconnected",
+        "relayState": "active",
+        "flareState": "active",
+        "porterState": "friendly-idle",
+        "lockState": "inactive",
+        "interferenceState": "inactive",
+        "watcherLocalFactKinds": [
+          "agent-sighting",
+          "friendly-machine-sighting"
+        ],
+        "needleLocalFactKinds": [
+          "agent-sighting"
+        ],
+        "sharedFactKinds": [],
+        "revisions": {
+          "runtimeTick": 2184,
+          "blackboard": 90,
+          "sharedContact": 72,
+          "needleTransition": 52,
+          "watcherTransition": 0,
+          "communication": 118,
+          "squadFeedback": 5,
+          "interference": 0
+        },
+        "duplicateEventCount": 0
+      },
+      "revision": {
+        "runtimeTick": 2184,
+        "blackboard": 90,
+        "sharedContact": 72,
+        "needleTransition": 52,
+        "watcherTransition": 0,
+        "communication": 118,
+        "squadFeedback": 5,
+        "interference": 0
+      },
+      "relevantRevisions": {
+        "runtimeTick": 2184,
+        "blackboard": 90,
+        "sharedContact": 72,
+        "needleTransition": 52,
+        "watcherTransition": 0,
+        "communication": 118,
+        "squadFeedback": 5,
+        "interference": 0
+      },
+      "result": "PASS",
+      "failureReason": null,
+      "failureCode": null,
+      "diagnosticMessage": "observed // no local/shared flare-sighting"
+    }
+  ]
+}

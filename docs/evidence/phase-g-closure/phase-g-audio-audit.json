@@ -1,0 +1,211 @@
+{
+  "schemaVersion": "phase-g-audio-audit-1.0.0",
+  "result": "PASS",
+  "cueCount": 20,
+  "nonSilentCount": 20,
+  "clippedCount": 0,
+  "distinctFingerprintCount": 20,
+  "acceptanceBoundary": "Automated event firing, non-silence, bounded peaks, distinct design fingerprints, rate limiting, mute, context resume, and caption fallback; not a human aesthetic verdict.",
+  "cues": [
+    {
+      "id": "watcher-contact",
+      "label": "WATCHER CONTACT DETECTED",
+      "sampleRate": 24000,
+      "durationSeconds": 0.13,
+      "peak": 0.0449492521584034,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-f817903d"
+    },
+    {
+      "id": "share-transmit",
+      "label": "HOSTILE SHARE TRANSMIT",
+      "sampleRate": 24000,
+      "durationSeconds": 0.14004166666666668,
+      "peak": 0.03999999910593033,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-74ee20b6"
+    },
+    {
+      "id": "share-receive",
+      "label": "HOSTILE SHARE RECEIVE",
+      "sampleRate": 24000,
+      "durationSeconds": 0.16,
+      "peak": 0.0359499454498291,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-2a7a359f"
+    },
+    {
+      "id": "needle-reacquired",
+      "label": "NEEDLE DIRECT RE-ACQUISITION",
+      "sampleRate": 24000,
+      "durationSeconds": 0.09,
+      "peak": 0.04499997943639755,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-09d2dde4"
+    },
+    {
+      "id": "lock-on-warning",
+      "label": "LOCK-ON WARNING",
+      "sampleRate": 24000,
+      "durationSeconds": 0.08,
+      "peak": 0.03999999538064003,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-41f0f0ba"
+    },
+    {
+      "id": "interference-pulse",
+      "label": "INTERFERENCE PULSE",
+      "sampleRate": 24000,
+      "durationSeconds": 0.18,
+      "peak": 0.04944314435124397,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-accffe0f"
+    },
+    {
+      "id": "reinforcement-accepted",
+      "label": "REINFORCEMENT ACCEPTED",
+      "sampleRate": 24000,
+      "durationSeconds": 0.16,
+      "peak": 0.0336720310151577,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-c029aa07"
+    },
+    {
+      "id": "cautious-transition",
+      "label": "SECURITY CELL RE-EVALUATING",
+      "sampleRate": 24000,
+      "durationSeconds": 0.15,
+      "peak": 0.03192732855677605,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-ef0f5930"
+    },
+    {
+      "id": "outnumbered-transition",
+      "label": "SECURITY CELL OUTNUMBERED",
+      "sampleRate": 24000,
+      "durationSeconds": 0.26,
+      "peak": 0.041984815150499344,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-1beea1ca"
+    },
+    {
+      "id": "cell-disengage",
+      "label": "SECURITY CELL DISENGAGING",
+      "sampleRate": 24000,
+      "durationSeconds": 0.3,
+      "peak": 0.04471469298005104,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-d8ae96ff"
+    },
+    {
+      "id": "relay-sabotage-start",
+      "label": "RELAY SABOTAGE STARTED",
+      "sampleRate": 24000,
+      "durationSeconds": 0.24,
+      "peak": 0.04199995845556259,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-86086cd3"
+    },
+    {
+      "id": "relay-disabled",
+      "label": "RELAY DISABLED",
+      "sampleRate": 24000,
+      "durationSeconds": 0.2,
+      "peak": 0.04449377581477165,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-93b37ebd"
+    },
+    {
+      "id": "relay-restarted",
+      "label": "RELAY RESTORED",
+      "sampleRate": 24000,
+      "durationSeconds": 0.2800416666666667,
+      "peak": 0.037987180054187775,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-2a67cdef"
+    },
+    {
+      "id": "porter-authenticated",
+      "label": "PORTER AUTHENTICATED",
+      "sampleRate": 24000,
+      "durationSeconds": 0.2,
+      "peak": 0.031990546733140945,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-bd3cb729"
+    },
+    {
+      "id": "porter-command-accepted",
+      "label": "PORTER COMMAND ACCEPTED",
+      "sampleRate": 24000,
+      "durationSeconds": 0.12,
+      "peak": 0.02947746403515339,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-6bfc92a9"
+    },
+    {
+      "id": "porter-carry-accepted",
+      "label": "PORTER CARRY ACCEPTED",
+      "sampleRate": 24000,
+      "durationSeconds": 0.16,
+      "peak": 0.02780074067413807,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-509b7c38"
+    },
+    {
+      "id": "porter-path-failed",
+      "label": "PORTER PATH FAILED",
+      "sampleRate": 24000,
+      "durationSeconds": 0.21,
+      "peak": 0.03561659902334213,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-8af2cf32"
+    },
+    {
+      "id": "porter-gate-rejected",
+      "label": "PORTER GATE REJECTED",
+      "sampleRate": 24000,
+      "durationSeconds": 0.23,
+      "peak": 0.03799998760223389,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-8efc2b2d"
+    },
+    {
+      "id": "flare-deployed",
+      "label": "FLARE DEPLOYED",
+      "sampleRate": 24000,
+      "durationSeconds": 0.18,
+      "peak": 0.03798306733369827,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-2a2bbcf9"
+    },
+    {
+      "id": "flare-observed",
+      "label": "FLARE OBSERVED",
+      "sampleRate": 24000,
+      "durationSeconds": 0.13,
+      "peak": 0.03371654823422432,
+      "nonSilent": true,
+      "clipped": false,
+      "fingerprint": "fnv1a-643c31e9"
+    }
+  ]
+}
